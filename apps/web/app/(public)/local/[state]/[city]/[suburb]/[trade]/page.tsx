@@ -592,9 +592,9 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                             )}
                                         </div>
                                         <div className="flex items-center justify-center gap-6 text-sm text-zinc-500">
-                                            <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-600" /> Free to post</span>
-                                            <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-600" /> ABN verified tradies</span>
-                                            <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-600" /> 24hr response</span>
+                                            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-green-600" /> Free to post</span>
+                                            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-green-600" /> ABN verified tradies</span>
+                                            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-green-600" /> 24hr response</span>
                                         </div>
                                     </div>
                                     
