@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://traderefer.au/sitemap.xml
+
+# Block only admin and API routes
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/static/
+Disallow: /join/
+
+# Allow everything else (business profiles, local pages, trades, etc)
+Allow: /b/
+Allow: /local/
+Allow: /trades/
+Allow: /top/
+Allow: /find-

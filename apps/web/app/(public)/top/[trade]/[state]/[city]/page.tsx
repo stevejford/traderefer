@@ -98,7 +98,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
         title: `Top ${tradeNoun} in ${cityName} | TradeRefer`,
         description: `The ${count > 0 ? count : ''} highest-rated ${tradeNoun.toLowerCase()} in ${cityName}, ${stateName} ranked by ${totalReviews > 0 ? totalReviews.toLocaleString() + ' ' : ''}Google reviews.${topBizStr} Free quotes from verified local tradies.`,
-        robots: count === 0 ? { index: false, follow: true } : { index: true, follow: true },
+        robots: { index: true, follow: true },
         alternates: { canonical: `https://traderefer.au/top/${trade}/${state}/${city}` },
         openGraph: {
             title: `Top ${tradeNoun} in ${cityName} | TradeRefer`,

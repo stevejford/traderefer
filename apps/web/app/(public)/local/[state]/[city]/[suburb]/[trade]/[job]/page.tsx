@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
         title: `${jobName} in ${suburbName} | TradeRefer`,
         description: `Compare ${count > 0 ? count : 'verified'} ${jobName.toLowerCase()} specialists in ${suburbName}, ${cityName} ${stateUpper}.${cost ? ` Typical cost $${cost.low}–$${cost.high}${cost.unit}.` : ''} ABN-checked, community-referred. Get free quotes today.`,
-        robots: count === 0 ? { index: false, follow: true } : { index: true, follow: true },
+        robots: { index: true, follow: true },
         alternates: { canonical: `https://traderefer.au/local/${state}/${city}/${suburb}/${trade}/${job}` },
         openGraph: {
             title: `${jobName} in ${suburbName} | TradeRefer`,

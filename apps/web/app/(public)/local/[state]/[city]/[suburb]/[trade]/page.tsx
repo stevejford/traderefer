@@ -62,7 +62,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
         title: `Best ${tradeNamePlural} in ${suburbWithPostcode} | TradeRefer`,
         description: `Compare ${count > 0 ? count : 'verified'} ${count === 1 ? tradeName.toLowerCase() : tradeNamePlural.toLowerCase()} in ${suburbWithPostcode}${cityDisplay} ${stateUpper}.${priceStr ? ` Avg cost $${cost.low}–$${cost.high}${cost.unit}.` : ''}${topBizStr} ${totalReviews > 0 ? ' ' + totalReviews + ' reviews.' : ''} ABN-verified, community-referred. Free quotes.`,
-        robots: count === 0 ? { index: false, follow: true } : { index: true, follow: true },
+        robots: { index: true, follow: true },
         alternates: { canonical: `https://traderefer.au/local/${state}/${city}/${suburb}/${trade}` },
         openGraph: {
             title: `${tradeName} in ${suburbWithPostcode} | TradeRefer`,

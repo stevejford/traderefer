@@ -217,11 +217,11 @@ function buildSeoContent(business: any, slug: string, hasRating: boolean, rating
         : minTitle.length <= 70 ? minTitle
         : `${cleanName.slice(0, 57)} | TradeRefer`;
     const description = [
-        `${cleanName} provides ${titleTrade.toLowerCase()} services in ${localArea}.`,
-        yearsExperience > 0 ? `${yearsExperience} years experience.` : "",
-        hasRating ? `${reviewCount} verified ${reviewLabel.toLowerCase()} (${rating.toFixed(1)}★).` : "",
-        `Read reviews, compare quotes and get connected free via TradeRefer.`,
-        business.is_verified ? "ABN verified." : "",
+        `${cleanName}: ${titleTrade.toLowerCase()} in ${localArea}.`,
+        hasRating ? `${rating.toFixed(1)}★ from ${reviewCount} ${reviewLabel.toLowerCase()}.` : "",
+        yearsExperience > 0 ? `${yearsExperience} years local experience.` : "",
+        business.is_verified ? "ABN verified & trusted." : "Local trade service.",
+        `Get free quotes from ${cleanName} on TradeRefer today.`
     ].filter(Boolean).join(" ");
     const heading = `${cleanName} — ${titleTrade} in ${suburb}`;
     const intro = `Looking for ${serviceLabel.toLowerCase()} in ${suburb}? ${cleanName} helps customers in ${locationLabel} compare options, review completed work, and request free quotes for ${serviceList.toLowerCase()}.`;

@@ -297,7 +297,7 @@ export async function generateMetadata({
         alternates: { canonical: "https://traderefer.au/businesses" },
         openGraph: { title, description },
         twitter: { card: 'summary_large_image', title, description },
-        robots: isPaginated ? { index: false, follow: true } : { index: true, follow: true },
+        robots: { index: true, follow: true },
     };
 }
 
