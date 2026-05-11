@@ -605,7 +605,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                                 {nearbySuburbs.map((s: any) => (
                                                     <Link 
                                                         key={s.suburb} 
-                                                        href={`/local/${state}/${city}/${slugify(s.suburb)}/${trade}`}
+                                                        href={`/local/${state}/${city}/${s.suburb.toLowerCase().replace(/\s+/g, '-')}/${trade}`}
                                                         className="px-4 py-3 bg-zinc-50 hover:bg-orange-50 border border-zinc-200 hover:border-orange-300 rounded-xl text-center font-bold text-zinc-700 hover:text-orange-600 transition-all"
                                                     >
                                                         {formatSlug(s.suburb)}
