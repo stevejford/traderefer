@@ -572,24 +572,49 @@ export default async function TradeLocationPage({ params }: PageProps) {
                             )}
 
                             {businesses.length === 0 ? (
-                                <div className="bg-white rounded-3xl border border-zinc-200 p-12 text-center">
-                                    <div className="w-20 h-20 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                                        <MapPin className="w-10 h-10 text-zinc-300" />
+                                <>
+                                    <div className="bg-gradient-to-br from-orange-50 to-white rounded-3xl border-2 border-orange-200 p-12 text-center mb-8">
+                                        <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                            <Zap className="w-10 h-10 text-orange-600" />
+                                        </div>
+                                        <h3 className="text-3xl font-black text-zinc-900 mb-3">We&apos;ll Find You a {tradeName}</h3>
+                                        <p className="text-zinc-600 max-w-lg mx-auto mb-6 text-lg">
+                                            No {tradeName.toLowerCase()} listed in {suburbName} yet, but we can connect you with verified specialists nearby. Post your job free and get quotes within 24 hours.
+                                        </p>
+                                        <div className="flex flex-col sm:flex-row justify-center gap-3 mb-6">
+                                            <Button asChild size="lg" className="bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-bold px-8 h-14 text-lg">
+                                                <Link href="/register?type=homeowner">Get Free Quotes →</Link>
+                                            </Button>
+                                            {nearbySuburbs.length > 0 && (
+                                                <Button asChild size="lg" variant="outline" className="rounded-xl font-bold px-8 h-14 border-2">
+                                                    <Link href={broaderCityTradeHref}>Browse Nearby Areas</Link>
+                                                </Button>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center justify-center gap-6 text-sm text-zinc-500">
+                                            <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-600" /> Free to post</span>
+                                            <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-600" /> ABN verified tradies</span>
+                                            <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-600" /> 24hr response</span>
+                                        </div>
                                     </div>
-                                    <h3 className="text-2xl font-black text-zinc-900 mb-2">No {tradeName} listed in {suburbName} yet</h3>
-                                    <p className="text-zinc-500 max-w-md mx-auto mb-8 text-lg">
-                                        No specialists listed in {suburbName} yet — get quotes from verified {tradeName.toLowerCase()} across {cityName} instead.
-                                    </p>
-                                    <p className="text-zinc-400 max-w-md mx-auto mb-6 text-sm">Join 1,200+ homeowners who&apos;ve found their tradie on TradeRefer.</p>
-                                    <div className="flex flex-col sm:flex-row justify-center gap-3">
-                                        <Button asChild size="lg" className="bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-bold px-8">
-                                            <Link href={broaderCityTradeHref}>Browse {cityName} Results</Link>
-                                        </Button>
-                                        <Button asChild size="lg" variant="outline" className="rounded-xl font-bold px-8">
-                                            <Link href="/register?type=homeowner">Request a Free Quote</Link>
-                                        </Button>
-                                    </div>
-                                </div>
+                                    
+                                    {nearbySuburbs.length > 0 && (
+                                        <div className="bg-white rounded-3xl border border-zinc-200 p-8">
+                                            <h3 className="text-2xl font-black text-zinc-900 mb-4">Find {tradeName} in Nearby Suburbs</h3>
+                                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                                                {nearbySuburbs.map((s: any) => (
+                                                    <Link 
+                                                        key={s.suburb} 
+                                                        href={`/local/${state}/${city}/${slugify(s.suburb)}/${trade}`}
+                                                        className="px-4 py-3 bg-zinc-50 hover:bg-orange-50 border border-zinc-200 hover:border-orange-300 rounded-xl text-center font-bold text-zinc-700 hover:text-orange-600 transition-all"
+                                                    >
+                                                        {formatSlug(s.suburb)}
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
                             ) : (
                                 <div className="grid grid-cols-1 gap-6">
                                     {businesses.map((biz: any, index: number) => (
