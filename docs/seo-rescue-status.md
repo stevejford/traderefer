@@ -4,19 +4,21 @@ Last updated: 2026-05-25
 
 ## Current Live State
 
-The first SEO rescue pass is deployed to production on Vercel.
+The first SEO rescue pass is deployed to production on Vercel and merged to the upstream GitHub repository.
 
 - Production domain: `https://traderefer.au`
 - Vercel deployment: `dpl_9AigpD6pW6Fs4tE2H9FSHaHYBEUP`
-- Upstream PR: `https://github.com/maddonsteve2-blip/traderefer/pull/1`
+- Upstream PR: `https://github.com/maddonsteve2-blip/traderefer/pull/1` (merged)
 - Fork containing rescue commits: `https://github.com/stevejford/traderefer`
+- Railway API deployment: `828c4e70-3422-4c62-b3e5-a7ad2a1cc4d8` for commit `4abaddb4`
 
 Local commits:
 
 - `cfa6fa98 Rescue TradeRefer SEO indexation`
 - `eee3c1ee Add TradeRefer SEO rescue monitoring`
+- `4abaddb4 Document TradeRefer SEO rescue status`
 
-The upstream repository currently grants the active GitHub account read-only access, so the code was pushed to the fork and opened as a PR.
+The upstream repository is now at commit `4abaddb4`.
 
 ## Live Sitemap Counts
 
@@ -48,10 +50,10 @@ The monitor currently checks these URLs:
 
 ## GSC State
 
-Latest GSC cache seen during rescue:
+Latest GSC cache seen during rescue monitor:
 
-- Pulled at: `2026-05-24T19:45:00.513200+00:00`
-- Last 28 days: 11 clicks, 3,836 impressions, 0.29% CTR, average position 16.8
+- Pulled at: `2026-05-25T13:58:58.020062+00:00`
+- Last 28 days: 11 clicks, 3,458 impressions, 0.32% CTR, average position 15.3
 
 The existing `gsc_token.json` has readonly scope only. Sitemap listing works, but submitting the sitemap fails with `403 insufficient authentication scopes`.
 
@@ -111,7 +113,6 @@ Watch for:
 
 ## Next Recovery Gates
 
-1. Merge the upstream PR or grant write access to the upstream repo.
-2. Complete writable GSC OAuth and resubmit `https://traderefer.au/sitemap.xml`.
-3. Reconnect DeepSyte and run visual/performance/SEO samples across home, profile, local trade, suburb, top, and generic near-me pages.
-4. Monitor GSC at 7, 14, and 28 days before adding any new programmatic page sets.
+1. Complete writable GSC OAuth and resubmit `https://traderefer.au/sitemap.xml`.
+2. Reconnect DeepSyte and run visual/performance/SEO samples across home, profile, local trade, suburb, top, and generic near-me pages.
+3. Monitor GSC at 7, 14, and 28 days before adding any new programmatic page sets.
