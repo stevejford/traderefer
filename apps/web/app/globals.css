@@ -93,11 +93,17 @@
     @apply transition-all duration-300;
   }
 
+  a:focus,
   a:focus-visible,
+  button:focus,
   button:focus-visible,
+  input:focus,
   input:focus-visible,
+  textarea:focus,
   textarea:focus-visible,
+  select:focus,
   select:focus-visible,
+  [role="button"]:focus,
   [role="button"]:focus-visible {
     outline: 3px solid #111827;
     outline-offset: 3px;
