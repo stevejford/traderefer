@@ -95,23 +95,30 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const cityName = formatSlug(city);
     const suburbName = formatSlug(suburb);
     const stateName = STATE_NAMES[state] || state.toUpperCase();
-    const cost = TRADE_COST_GUIDE[tradeName];
-    const priceStr = cost ? ` | $${cost.low}–$${cost.high}${cost.unit}` : "";
-    const year = new Date().getFullYear();
-
     const businesses = await getTopBusinesses(trade, state, suburb);
     const totalReviews = businesses.reduce((acc: number, biz: any) => acc + (parseInt(biz.total_reviews) || 0), 0);
     const topBiz = businesses[0] as any;
     const topBizStr = topBiz ? ` #1: ${topBiz.business_name} (${parseFloat(topBiz.avg_rating).toFixed(1)}★).` : "";
+    const canonicalUrl = `https://traderefer.au/top/${trade}/${state}/${city}/${suburb}`;
 
     return {
         title: `Top ${tradeName} in ${suburbName} | TradeRefer`,
         description: `The ${businesses.length} highest-rated ${tradeName.toLowerCase()} in ${suburbName}, ${cityName} ${stateName} ranked by ${totalReviews.toLocaleString()} verified reviews.${topBizStr} Get free quotes today.`,
         robots: { index: businesses.length >= 3, follow: true },
-        alternates: { canonical: `https://traderefer.au/top/${trade}/${state}/${city}/${suburb}` },
+        alternates: { canonical: canonicalUrl },
         openGraph: {
             title: `Top ${tradeName} in ${suburbName} | TradeRefer`,
             description: `Ranked by verified Google reviews. Best ${tradeName.toLowerCase()} in ${suburbName}.`,
+            url: canonicalUrl,
+            siteName: 'TradeRefer',
+            type: 'website',
+            images: ['https://traderefer.au/og-default.jpg'],
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: `Top ${tradeName} in ${suburbName} | TradeRefer`,
+            description: `Ranked by verified Google reviews. Best ${tradeName.toLowerCase()} in ${suburbName}.`,
+            images: ['https://traderefer.au/og-default.jpg'],
         },
     };
 }

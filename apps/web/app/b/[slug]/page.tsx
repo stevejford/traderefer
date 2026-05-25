@@ -390,6 +390,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const { title, description } = buildSeoContent(business, canonicalSlug, hasRating, rating, reviewCount);
     const url = `https://traderefer.au/b/${canonicalSlug}`;
     const imageUrl = business.logo_url || business.cover_photo_url || (Array.isArray(business.photo_urls) ? business.photo_urls[0] : null) || null;
+    const ogImageUrl = imageUrl || 'https://traderefer.au/og-default.jpg';
 
     return {
         title,
@@ -401,13 +402,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
             url,
             type: 'website',
             siteName: 'TradeRefer',
-            ...(imageUrl ? { images: [{ url: imageUrl, width: 1200, height: 630, alt: business.business_name }] } : {}),
+            images: [{ url: ogImageUrl, width: 1200, height: 630, alt: business.business_name || 'TradeRefer business profile' }],
         },
         twitter: {
             card: 'summary_large_image',
             title,
             description,
-            ...(imageUrl ? { images: [imageUrl] } : {}),
+            images: [ogImageUrl],
         },
     };
 }

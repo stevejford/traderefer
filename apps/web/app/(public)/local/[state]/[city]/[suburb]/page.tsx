@@ -60,19 +60,25 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const pc = getDisplayPostcode(canonicalSuburb, state);
     const pcLabel = pc ? ` ${stateUpper} ${pc}` : ` ${stateUpper}`;
     const stats = await getSuburbStats(state, city, canonicalSuburb);
+    const canonicalUrl = `https://traderefer.au/local/${state}/${city}/${canonicalSuburb}`;
     return {
         title: `${stats.total > 0 ? stats.total + ' ' : ''}Trusted Tradies in ${suburbName}${pcLabel} | TradeRefer`,
         description: `Compare ${stats.total > 0 ? stats.total : 'verified'} local tradespeople in ${suburbName}, ${cityName}${pcLabel}. Browse ${stats.categories > 0 ? stats.categories + ' trade categories' : 'plumbers, electricians, builders & more'} — ABN-checked with real community referrals. Free quotes.`,
         robots: { index: stats.total >= 2 || stats.categories >= 2, follow: true },
-        alternates: { canonical: `https://traderefer.au/local/${state}/${city}/${canonicalSuburb}` },
+        alternates: { canonical: canonicalUrl },
         openGraph: {
             title: `${stats.total > 0 ? stats.total + ' ' : ''}Trusted Tradies in ${suburbName}${pcLabel} | TradeRefer`,
             description: `Compare ${stats.total > 0 ? stats.total : 'verified'} local tradespeople in ${suburbName}${pcLabel}. ABN-checked, community-ranked.`,
+            url: canonicalUrl,
+            siteName: 'TradeRefer',
+            type: 'website',
+            images: [{ url: 'https://traderefer.au/og-default.jpg', width: 1200, height: 630, alt: `Trusted tradies in ${suburbName}${pcLabel}` }],
         },
         twitter: {
             card: 'summary_large_image',
             title: `${stats.total > 0 ? stats.total + ' ' : ''}Trusted Tradies in ${suburbName}${pcLabel} | TradeRefer`,
             description: `Compare ${stats.total > 0 ? stats.total : 'verified'} local tradespeople in ${suburbName}${pcLabel}. ABN-checked, community-ranked.`,
+            images: ['https://traderefer.au/og-default.jpg'],
         },
     };
 }

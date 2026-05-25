@@ -68,34 +68,36 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const stateUpper = state.toUpperCase();
     const tradeKey = normalizeTradeName(tradeName);
     const cost = TRADE_COST_GUIDE[tradeKey] || TRADE_COST_GUIDE[tradeName];
-    const priceStr = cost ? ` | $${cost.low}\u2013$${cost.high}${cost.unit}` : "";
 
     const businesses = await getBusinesses(state, city, trade, canonicalSuburb);
     const count = businesses.length;
-    const topBiz = businesses[0];
     const postcode = getDisplayPostcode(canonicalSuburb, state) || businesses.map((b: any) => extractPostcode(b.address, state)).find(Boolean) || null;
     const suburbWithPostcode = postcode ? `${suburbName} ${postcode}` : suburbName;
     const cityDisplay = suburbName.toLowerCase() === cityName.toLowerCase() ? '' : `, ${cityName}`;
-    const avgRating = count > 0
-        ? (businesses.reduce((acc: number, biz: any) => acc + (parseFloat(biz.avg_rating) || 0), 0) / count).toFixed(1)
-        : "4.8";
     const totalReviews = businesses.reduce((acc: number, biz: any) => acc + (parseInt(biz.total_reviews) || 0), 0);
-    const topBizStr = topBiz && topBiz.avg_rating ? ` Top rated: ${topBiz.business_name} (${parseFloat(topBiz.avg_rating).toFixed(1)}\u2605).` : "";
+    const canonicalUrl = `https://traderefer.au/local/${state}/${city}/${canonicalSuburb}/${trade}`;
+    const titlePrefix = count > 0 ? `${count} ` : "";
+    const costSnippet = cost ? ` Avg cost $${cost.low}-${cost.high}${cost.unit}.` : "";
+    const reviewSnippet = totalReviews > 0 ? ` ${totalReviews} reviews.` : "";
 
     return {
-        title: `${count > 0 ? count + ' Verified ' : 'Verified '}${tradeNamePlural} in ${suburbWithPostcode} | TradeRefer`,
-        description: `Compare ${count > 0 ? count : 'verified'} ${count === 1 ? tradeName.toLowerCase() : tradeNamePlural.toLowerCase()} in ${suburbWithPostcode}${cityDisplay} ${stateUpper}.${priceStr ? ` Avg cost $${cost.low}–$${cost.high}${cost.unit}.` : ''}${topBizStr} ${totalReviews > 0 ? ' ' + totalReviews + ' reviews.' : ''} ABN-verified, community-referred. Free quotes.`,
+        title: `${titlePrefix}${tradeNamePlural} in ${suburbWithPostcode}`,
+        description: `Compare ${count > 0 ? count : 'verified'} ${count === 1 ? tradeName.toLowerCase() : tradeNamePlural.toLowerCase()} in ${suburbWithPostcode}${cityDisplay} ${stateUpper}.${costSnippet}${reviewSnippet} ABN-verified. Free quotes.`,
         robots: { index: count >= 2 || totalReviews > 0, follow: true },
-        alternates: { canonical: `https://traderefer.au/local/${state}/${city}/${canonicalSuburb}/${trade}` },
+        alternates: { canonical: canonicalUrl },
         openGraph: {
             title: `${tradeName} in ${suburbWithPostcode} | TradeRefer`,
             description: `${count > 0 ? count : 'Verified'} local ${tradeName.toLowerCase()} in ${suburbWithPostcode}. Compare ratings, pricing and referrals.`,
+            url: canonicalUrl,
+            siteName: 'TradeRefer',
+            type: 'website',
             images: [{ url: 'https://traderefer.au/og-default.jpg', width: 1200, height: 630, alt: `${tradeName} in ${suburbName}` }],
         },
         twitter: {
             card: 'summary_large_image',
             title: `${tradeName} in ${suburbWithPostcode} | TradeRefer`,
             description: `${count > 0 ? count : 'Verified'} local ${tradeName.toLowerCase()} in ${suburbWithPostcode}. Compare ratings, pricing and referrals.`,
+            images: ['https://traderefer.au/og-default.jpg'],
         },
     };
 }

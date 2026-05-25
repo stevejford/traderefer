@@ -90,29 +90,30 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const tradeNoun = TRADE_NOUNS[tradeName] || tradeName;
     const cityName = formatSlug(city);
     const stateName = STATE_NAMES[state] || state.toUpperCase();
-    const cost = TRADE_COST_GUIDE[tradeName];
-    const priceStr = cost ? ` | $${cost.low}–$${cost.high}${cost.unit}` : "";
-    const year = new Date().getFullYear();
-
     const businesses = await getTopBusinesses(trade, state, city);
     const count = businesses.length;
     const topBiz = businesses[0] as any;
     const totalReviews = businesses.reduce((acc: number, biz: any) => acc + (parseInt(biz.total_reviews) || 0), 0);
     const topBizStr = topBiz ? ` #1: ${topBiz.business_name} (${parseFloat(topBiz.avg_rating).toFixed(1)}★).` : "";
+    const canonicalUrl = `https://traderefer.au/top/${trade}/${state}/${city}`;
 
     return {
         title: `Top ${tradeNoun} in ${cityName} | TradeRefer`,
         description: `The ${count > 0 ? count : ''} highest-rated ${tradeNoun.toLowerCase()} in ${cityName}, ${stateName} ranked by ${totalReviews > 0 ? totalReviews.toLocaleString() + ' ' : ''}Google reviews.${topBizStr} Free quotes from verified local tradies.`,
         robots: { index: count >= 3, follow: true },
-        alternates: { canonical: `https://traderefer.au/top/${trade}/${state}/${city}` },
+        alternates: { canonical: canonicalUrl },
         openGraph: {
             title: `Top ${tradeNoun} in ${cityName} | TradeRefer`,
             description: `Ranked by real Google reviews. Find the best ${tradeNoun.toLowerCase()} in ${cityName}, ${stateName}.`,
+            url: canonicalUrl,
+            siteName: 'TradeRefer',
+            type: 'website',
             images: ['https://traderefer.au/og-default.jpg'],
         },
         twitter: {
             card: 'summary_large_image',
             title: `Top ${tradeNoun} in ${cityName} | TradeRefer`,
+            description: `Ranked by real Google reviews. Find the best ${tradeNoun.toLowerCase()} in ${cityName}, ${stateName}.`,
             images: ['https://traderefer.au/og-default.jpg'],
         },
     };

@@ -111,11 +111,16 @@ export default function RootLayout({
         <body
           className={`${inter.variable} ${outfit.variable} ${montserrat.variable} ${oswald.variable} font-sans antialiased`}
         >
+          <a href="#main-content" className="skip-link">
+            Skip to main content
+          </a>
           <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
           <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
           <ClientProviders />
           <ConditionalLayout footer={<DirectoryFooter />}>
-            {children}
+            <div id="main-content" tabIndex={-1}>
+              {children}
+            </div>
           </ConditionalLayout>
         </body>
       </html>

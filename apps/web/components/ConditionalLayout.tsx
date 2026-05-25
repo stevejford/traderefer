@@ -5,7 +5,7 @@ import { Navbar } from "@/components/layout-shared";
 
 const STANDALONE_ROUTES = ["/login", "/register", "/signup", "/onboarding", "/claim", "/leads/verify", "/leads/success", "/admin", "/join"];
 const DASHBOARD_ROUTES = ["/dashboard"];
-const NO_FOOTER_ROUTES = ["/dashboard", "/b/"];
+const NO_FOOTER_ROUTES = ["/dashboard"];
 
 export function ConditionalLayout({ children, footer }: { children: React.ReactNode; footer: React.ReactNode }) {
     const pathname = usePathname();
