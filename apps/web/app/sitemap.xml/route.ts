@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 
 export const revalidate = 86400; // 24-hour edge cache
 
-// Sub-sitemaps are served from the same domain via Next.js rewrites,
-// which proxy to the Railway API (no timeout / no response-size limits).
+// Sub-sitemaps are served by the web app so sitemap indexation rules can ship
+// with the SEO templates without waiting on the separate Railway API deploy.
 const BASE_URL = 'https://traderefer.au';
 
 export async function GET() {

@@ -25,6 +25,11 @@ function tradeToSlug(trade: string) {
     return trade.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
+function getTradeDisplayName(trade: string) {
+    const slug = tradeToSlug(trade);
+    return Object.keys(TRADE_NOUNS).find((name) => tradeToSlug(name) === slug) || formatSlug(trade);
+}
+
 const STATE_NAMES: Record<string, string> = {
     vic: "Victoria", nsw: "New South Wales", qld: "Queensland",
     wa: "Western Australia", sa: "South Australia", tas: "Tasmania",
@@ -33,7 +38,7 @@ const STATE_NAMES: Record<string, string> = {
 
 async function getTopBusinesses(trade: string, state: string, city: string) {
     try {
-        const tradeName = formatSlug(trade);
+        const tradeSlug = tradeToSlug(trade);
         const cityName = formatSlug(city);
         const stateUpper = state.toUpperCase();
         const results = await sql`
@@ -42,7 +47,7 @@ async function getTopBusinesses(trade: string, state: string, city: string) {
             FROM businesses b
             WHERE b.status = 'active'
               AND (b.listing_visibility = 'public' OR b.listing_visibility IS NULL)
-              AND b.trade_category ILIKE ${'%' + tradeName + '%'}
+              AND TRIM(BOTH '-' FROM REGEXP_REPLACE(LOWER(b.trade_category), '[^a-z0-9]+', '-', 'g')) = ${tradeSlug}
               AND b.city ILIKE ${'%' + cityName + '%'}
               AND b.state = ${stateUpper}
               AND b.avg_rating IS NOT NULL
@@ -57,14 +62,14 @@ async function getTopBusinesses(trade: string, state: string, city: string) {
 
 async function getNearbyTradeCities(trade: string, state: string, currentCity: string) {
     try {
-        const tradeName = formatSlug(trade);
+        const tradeSlug = tradeToSlug(trade);
         const stateUpper = state.toUpperCase();
         const cityName = formatSlug(currentCity);
         const results = await sql`
             SELECT DISTINCT city, state, COUNT(*) as cnt
             FROM businesses
             WHERE status = 'active'
-              AND trade_category ILIKE ${'%' + tradeName + '%'}
+              AND TRIM(BOTH '-' FROM REGEXP_REPLACE(LOWER(trade_category), '[^a-z0-9]+', '-', 'g')) = ${tradeSlug}
               AND state = ${stateUpper}
               AND city NOT ILIKE ${'%' + cityName + '%'}
               AND city IS NOT NULL AND city != ''
@@ -81,7 +86,7 @@ async function getNearbyTradeCities(trade: string, state: string, currentCity: s
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { trade, state, city } = await params;
-    const tradeName = formatSlug(trade);
+    const tradeName = getTradeDisplayName(trade);
     const tradeNoun = TRADE_NOUNS[tradeName] || tradeName;
     const cityName = formatSlug(city);
     const stateName = STATE_NAMES[state] || state.toUpperCase();
@@ -98,7 +103,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
         title: `Top ${tradeNoun} in ${cityName} | TradeRefer`,
         description: `The ${count > 0 ? count : ''} highest-rated ${tradeNoun.toLowerCase()} in ${cityName}, ${stateName} ranked by ${totalReviews > 0 ? totalReviews.toLocaleString() + ' ' : ''}Google reviews.${topBizStr} Free quotes from verified local tradies.`,
-        robots: { index: true, follow: true },
+        robots: { index: count >= 3, follow: true },
         alternates: { canonical: `https://traderefer.au/top/${trade}/${state}/${city}` },
         openGraph: {
             title: `Top ${tradeNoun} in ${cityName} | TradeRefer`,
@@ -115,7 +120,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function Top10CityPage({ params }: PageProps) {
     const { trade, state, city } = await params;
-    const tradeName = formatSlug(trade);
+    const tradeName = getTradeDisplayName(trade);
     const cityName = formatSlug(city);
     const stateName = STATE_NAMES[state] || state.toUpperCase();
     const stateUpper = state.toUpperCase();

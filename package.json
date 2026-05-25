@@ -7,6 +7,7 @@
         "build": "turbo build",
         "dev": "turbo dev",
         "lint": "turbo lint",
+        "seo:rescue-audit": "node scripts/seo_rescue_audit.mjs",
         "format": "prettier --write \"**/*.{ts,tsx,md}\""
     },
     "workspaces": [

@@ -53,6 +53,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
         title: `Best ${noun} Near Me | TradeRefer`,
         description: `Find trusted ${noun.toLowerCase()} near you. Compare ${count > 0 ? count.toLocaleString() + "+" : ""} verified ${noun.toLowerCase()} across Australia.${cost ? ` Costs from $${cost.low}–$${cost.high}${cost.unit}.` : ""} Free quotes, real reviews.`,
+        robots: { index: false, follow: true },
         alternates: { canonical: `https://traderefer.au/${slug}` },
         openGraph: {
             title: `Best ${noun} Near Me | TradeRefer`,
@@ -69,6 +70,7 @@ async function getBusinessCount(tradeName: string): Promise<number> {
             SELECT COUNT(*) as count
             FROM businesses
             WHERE status = 'active'
+              AND (listing_visibility = 'public' OR listing_visibility IS NULL)
               AND trade_category ILIKE ${"%" + tradeName + "%"}
         `;
         return parseInt(String(result[0]?.count || 0), 10);

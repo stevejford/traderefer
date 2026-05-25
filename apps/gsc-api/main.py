@@ -753,7 +753,7 @@ def get_existing_pages(existing_pages: str | None = None):
 # trade-relevant for TradeRefer's audience.
 _TRADE_ROOTS: frozenset[str] = frozenset({
     # Plumbing / gas
-    "plumb", "plumber", "drain", "hot water", "gas fit", "blocked drain", "pipe",
+    "plumb", "plumber", "drain", "hot water", "gas fit", "blocked drain", "pipe", "toilet repair",
     # Electrical
     "electri", "electrician", "switchboard", "ev charger", "solar panel", "solar install",
     # Building / construction
@@ -807,6 +807,11 @@ _TRADE_ROOTS: frozenset[str] = frozenset({
     "how much", "cost of", "price of", "quote for",
 })
 
+_TRADE_INTENT_ONLY_ROOTS: frozenset[str] = frozenset({
+    "near me", "in my area", "close to me", "find a", "hire a", "best ", "local ",
+    "how much", "cost of", "price of", "quote for",
+})
+
 # Known consumer retail / food / non-trade brands and categories to exclude
 _CONSUMER_BLOCKLIST: frozenset[str] = frozenset({
     "aldi", "kfc", "mcdonald", "mcdonalds", "subway", "bunnings", "woolworth", "woolies",
@@ -817,6 +822,8 @@ _CONSUMER_BLOCKLIST: frozenset[str] = frozenset({
     "grocery", "supermarket", "food deliver", "uber eat", "doordash", "deliveroo",
     "petrol", "fuel price", "servo near",
     "restaurant", "cafe near", "coffee shop",
+    "dessert", "kebab", "takeaway", "fish and chips", "burger near",
+    "car wash", "car washing", "public toilet", "toilets near",
     "chemist warehouse", "priceline", "pharmacy near",
     "gym near", "fitness near", "yoga near",
     "hairdresser", "hair salon", "barber near", "nail salon",
@@ -832,6 +839,8 @@ def _is_trade_relevant(keyword: str) -> bool:
         if block in kw:
             return False
     for root in _TRADE_ROOTS:
+        if root in _TRADE_INTENT_ONLY_ROOTS:
+            continue
         if root in kw:
             return True
     return False
@@ -1146,6 +1155,7 @@ def update_existing_pages(body: dict[str, Any] = Body(...)):
 async def get_keyword_gap(
     response: Response,
     refresh: bool = Query(False),
+    trade_relevant_only: bool = Query(True),
 ):
     cache_payload, is_fresh, freshness = cache_is_fresh(KEYWORD_GAP_FILE, DATAFORSEO_TTLS["keyword_gap"])
     cost = 0
@@ -1153,10 +1163,19 @@ async def get_keyword_gap(
         cache_payload, cost = await refresh_keyword_gap_cache()
         freshness = build_cache_freshness(KEYWORD_GAP_FILE, DATAFORSEO_TTLS["keyword_gap"], cache_payload)
     response.headers["X-DataForSEO-Cost"] = str(cost or 0)
+    keywords = cache_payload.get("items", [])
+    if trade_relevant_only:
+        keywords = [
+            item for item in keywords
+            if isinstance(item, dict) and item.get("keyword") and _is_trade_relevant(item["keyword"])
+        ]
     return {
         "target": cache_payload.get("target", DATAFORSEO_KEYWORD_GAP_TARGET),
         "exclude": cache_payload.get("exclude", DATAFORSEO_KEYWORD_GAP_EXCLUDE),
-        "keywords": cache_payload.get("items", []),
+        "keywords": keywords,
+        "tradeRelevantOnly": trade_relevant_only,
+        "unfilteredCount": len(cache_payload.get("items", [])),
+        "filteredCount": len(keywords),
         "freshness": freshness,
     }
 

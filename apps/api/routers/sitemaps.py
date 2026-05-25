@@ -1,3 +1,4 @@
+import os
 import re
 from fastapi import APIRouter, Depends
 from fastapi.responses import Response
@@ -29,11 +30,40 @@ def _urlset(urls: list[str]) -> str:
 def _url(loc: str, lastmod: str, freq: str, priority: str) -> str:
     return f"  <url><loc>{loc}</loc><lastmod>{lastmod}</lastmod><changefreq>{freq}</changefreq><priority>{priority}</priority></url>"
 
-def _extract_postcode(address: str | None) -> str | None:
+STATE_POSTCODE_RANGES: dict[str, list[tuple[int, int]]] = {
+    "ACT": [(2600, 2618), (2900, 2920)],
+    "NSW": [(2000, 2599), (2619, 2899), (2921, 2999)],
+    "NT": [(800, 899)],
+    "QLD": [(4000, 4999)],
+    "SA": [(5000, 5999)],
+    "TAS": [(7000, 7999)],
+    "VIC": [(3000, 3999)],
+    "WA": [(6000, 6799)],
+}
+
+def _postcode_valid_for_state(postcode: str | None, state: str | None) -> bool:
+    if not postcode or not re.fullmatch(r"\d{4}", postcode):
+        return False
+    ranges = STATE_POSTCODE_RANGES.get((state or "").upper())
+    if not ranges:
+        return False
+    numeric = int(postcode)
+    return any(start <= numeric <= end for start, end in ranges)
+
+def _extract_postcode(address: str | None, state: str | None = None) -> str | None:
     if not address:
         return None
-    m = re.search(r"\b(\d{4})\b", address)
-    return m.group(1) if m else None
+    matches = re.findall(r"\b(\d{4})\b", address)
+    if state:
+        for postcode in matches:
+            if _postcode_valid_for_state(postcode, state):
+                return postcode
+        return None
+    return matches[0] if matches else None
+
+def _suburb_segment(suburb_slug: str, address: str | None, state: str) -> str:
+    postcode = _extract_postcode(address, state)
+    return f"{suburb_slug}-{postcode}" if postcode else suburb_slug
 
 # ── Near-me slugs (mirrors constants.ts) ─────────────────────────────────
 
@@ -148,24 +178,28 @@ async def sitemap_general(db: AsyncSession = Depends(get_db)):
     # State hubs
     state_rows = await db.execute(text("""
         SELECT DISTINCT LOWER(state) as s FROM businesses
-        WHERE status='active' AND state IS NOT NULL AND state != ''
+        WHERE status='active'
+          AND (listing_visibility = 'public' OR listing_visibility IS NULL)
+          AND state IS NOT NULL AND state != ''
     """))
     for r in state_rows.mappings():
         urls.append(_url(f"{BASE_URL}/local/{r['s']}", today, "weekly", "0.9"))
 
     # City hubs
     city_rows = await db.execute(text("""
-        SELECT DISTINCT LOWER(state) as s, LOWER(REPLACE(city,' ','-')) as c
+        SELECT LOWER(state) as s, LOWER(REPLACE(city,' ','-')) as c, COUNT(*) as business_count
         FROM businesses WHERE status='active'
+          AND (listing_visibility = 'public' OR listing_visibility IS NULL)
           AND state IS NOT NULL AND state != ''
           AND city IS NOT NULL AND city != ''
+        GROUP BY LOWER(state), LOWER(REPLACE(city,' ','-'))
+        HAVING COUNT(*) >= 2
     """))
     for r in city_rows.mappings():
         urls.append(_url(f"{BASE_URL}/local/{r['s']}/{r['c']}", today, "weekly", "0.85"))
 
-    # Near-me pages
-    for slug in NEAR_ME_SLUGS:
-        urls.append(_url(f"{BASE_URL}/{slug}", today, "weekly", "0.95"))
+    # Generic national "near me" pages are intentionally kept out of XML until
+    # they have location-specific value beyond a broad trade directory template.
 
     # Find-a-trade pages
     for slug in FIND_TRADE_PAGES:
@@ -190,7 +224,10 @@ async def sitemap_profiles(db: AsyncSession = Depends(get_db)):
         SELECT slug,
                COALESCE(updated_at, created_at)::date AS lastmod
         FROM businesses
-        WHERE status='active' AND slug IS NOT NULL AND slug != ''
+        WHERE status='active'
+          AND (listing_visibility = 'public' OR listing_visibility IS NULL)
+          AND slug IS NOT NULL AND slug != ''
+          AND business_name IS NOT NULL AND business_name != ''
         ORDER BY created_at ASC
     """))
     rows = result.mappings().all()
@@ -211,19 +248,22 @@ async def sitemap_suburbs(db: AsyncSession = Depends(get_db)):
                LOWER(state) as s,
                LOWER(REPLACE(city,' ','-')) as c,
                LOWER(REPLACE(suburb,' ','-')) as sub,
-               MAX(address) as addr
+               MAX(address) as addr,
+               COUNT(*) as business_count,
+               COUNT(DISTINCT trade_category) as category_count
         FROM businesses
         WHERE status='active'
+          AND (listing_visibility = 'public' OR listing_visibility IS NULL)
           AND state IS NOT NULL AND state != ''
           AND city IS NOT NULL AND city != ''
           AND suburb IS NOT NULL AND suburb != ''
         GROUP BY LOWER(state), LOWER(REPLACE(city,' ','-')), LOWER(REPLACE(suburb,' ','-'))
+        HAVING COUNT(*) >= 2 OR COUNT(DISTINCT trade_category) >= 2
     """))
     rows = result.mappings().all()
     urls = []
     for r in rows:
-        pc = _extract_postcode(r['addr'])
-        sub = f"{r['sub']}-{pc}" if pc else r['sub']
+        sub = _suburb_segment(r['sub'], r['addr'], r['s'])
         urls.append(_url(f"{BASE_URL}/local/{r['s']}/{r['c']}/{sub}", today, "weekly", "0.75"))
     return _xml_response(_urlset(urls))
 
@@ -239,20 +279,23 @@ async def sitemap_trades(db: AsyncSession = Depends(get_db)):
                LOWER(REPLACE(suburb,' ','-')) as sub,
                trade_category,
                MAX(COALESCE(updated_at, created_at))::date AS lastmod,
-               MAX(address) as addr
+               MAX(address) as addr,
+               COUNT(*) as business_count,
+               COALESCE(SUM(total_reviews), 0) as review_count
         FROM businesses
         WHERE status='active'
+          AND (listing_visibility = 'public' OR listing_visibility IS NULL)
           AND state IS NOT NULL AND state != ''
           AND city IS NOT NULL AND city != ''
           AND suburb IS NOT NULL AND suburb != ''
           AND trade_category IS NOT NULL AND trade_category != ''
         GROUP BY LOWER(state), LOWER(REPLACE(city,' ','-')), LOWER(REPLACE(suburb,' ','-')), trade_category
+        HAVING COUNT(*) >= 2 OR COALESCE(SUM(total_reviews), 0) > 0
     """))
     rows = result.mappings().all()
     urls = []
     for r in rows:
-        pc = _extract_postcode(r['addr'])
-        sub = f"{r['sub']}-{pc}" if pc else r['sub']
+        sub = _suburb_segment(r['sub'], r['addr'], r['s'])
         trade = _slug(r['trade_category'])
         lm = str(r['lastmod']) if r['lastmod'] else today
         urls.append(_url(f"{BASE_URL}/local/{r['s']}/{r['c']}/{sub}/{trade}", lm, "weekly", "0.7"))
@@ -265,17 +308,21 @@ async def sitemap_top(db: AsyncSession = Depends(get_db)):
     from datetime import date
     today = date.today().isoformat()
     result = await db.execute(text("""
-        SELECT DISTINCT
+        SELECT
                trade_category,
                LOWER(state) as s,
-               LOWER(REPLACE(city,' ','-')) as c
+               LOWER(REPLACE(city,' ','-')) as c,
+               COUNT(*) as business_count
         FROM businesses
         WHERE status='active'
+          AND (listing_visibility = 'public' OR listing_visibility IS NULL)
           AND trade_category IS NOT NULL
           AND state IS NOT NULL
           AND city IS NOT NULL
           AND avg_rating > 0
           AND total_reviews > 0
+        GROUP BY trade_category, LOWER(state), LOWER(REPLACE(city,' ','-'))
+        HAVING COUNT(*) >= 3
         ORDER BY trade_category, s, c
     """))
     rows = result.mappings().all()
@@ -291,6 +338,8 @@ async def sitemap_jobs_chunk(chunk: int, db: AsyncSession = Depends(get_db)):
     """Chunked job-type URL sitemaps (reserved for future crawl-budget expansion)."""
     from datetime import date
     today = date.today().isoformat()
+    if os.getenv("ENABLE_JOB_SITEMAPS", "false").lower() not in {"1", "true", "yes"}:
+        return _xml_response(_urlset([]))
     if chunk < 0:
         return Response("Not Found", status_code=404)
 
@@ -302,6 +351,7 @@ async def sitemap_jobs_chunk(chunk: int, db: AsyncSession = Depends(get_db)):
                trade_category
         FROM businesses
         WHERE status='active'
+          AND (listing_visibility = 'public' OR listing_visibility IS NULL)
           AND state IS NOT NULL AND state != ''
           AND city IS NOT NULL AND city != ''
           AND suburb IS NOT NULL AND suburb != ''

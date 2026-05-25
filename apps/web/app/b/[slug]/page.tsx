@@ -51,7 +51,7 @@ import {
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { BusinessLogo } from "@/components/BusinessLogo";
@@ -430,7 +430,7 @@ export default async function PublicProfilePage({
 
     const canonicalSlug = String(business.slug || slug).trim() || slug;
     if (canonicalSlug !== slug) {
-        redirect(buildBusinessProfilePath(canonicalSlug, referralCode));
+        permanentRedirect(buildBusinessProfilePath(canonicalSlug, referralCode));
     }
 
     const [projects, googleReviews, deals, relatedBusinesses] = await Promise.all([

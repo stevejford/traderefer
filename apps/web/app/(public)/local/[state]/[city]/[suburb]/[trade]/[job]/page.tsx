@@ -4,7 +4,9 @@ import { MapPin, Star, ShieldCheck, ChevronRight, CheckCircle2, Users, ArrowRigh
 import Link from "next/link";
 import { BusinessLogo } from "@/components/BusinessLogo";
 import { Metadata } from "next";
-import { TRADE_COST_GUIDE, TRADE_FAQ_BANK, STATE_LICENSING, JOB_TYPES, jobToSlug, normalizeTradeName } from "@/lib/constants";
+import { TRADE_COST_GUIDE, TRADE_FAQ_BANK, STATE_LICENSING, JOB_TYPES, TRADE_NOUNS, jobToSlug, normalizeTradeName } from "@/lib/constants";
+import { permanentRedirect } from "next/navigation";
+import { parseSuburbSlug, getCanonicalSuburbSlug, getDisplayPostcode } from "@/lib/postcodes";
 
 export const dynamic = "force-dynamic";
 
@@ -15,31 +17,46 @@ interface PageProps {
 function formatSlug(slug: string) {
     if (!slug) return "";
     try { slug = decodeURIComponent(slug); } catch { /* already decoded */ }
-    return slug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    const { suburb: cleanSlug } = parseSuburbSlug(slug);
+    return cleanSlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+}
+
+function slugify(value: string) {
+    return value
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+}
+
+function getTradeDisplayName(tradeSlugOrName: string) {
+    const slug = slugify(tradeSlugOrName);
+    return Object.keys(TRADE_NOUNS).find((name) => slugify(name) === slug) || formatSlug(tradeSlugOrName);
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { trade, suburb, city, state, job } = await params;
-    const tradeName = formatSlug(trade);
-    const suburbName = formatSlug(suburb);
+    const canonicalSuburb = getCanonicalSuburbSlug(suburb, state);
+    const tradeName = getTradeDisplayName(trade);
+    const suburbName = formatSlug(canonicalSuburb);
     const cityName = formatSlug(city);
     const stateUpper = state.toUpperCase();
     const jobName = formatSlug(job);
     const tradeKey = normalizeTradeName(tradeName);
     const cost = TRADE_COST_GUIDE[tradeKey] || TRADE_COST_GUIDE[tradeName];
-    const priceSnippet = cost ? ` | From $${cost.low}` : "";
-    const year = new Date().getFullYear();
-    const businesses = await getBusinesses(state, city, trade, suburb);
+    const businesses = await getBusinesses(state, city, trade, canonicalSuburb);
     const count = businesses.length;
+    const postcode = getDisplayPostcode(canonicalSuburb, state);
+    const suburbWithPostcode = postcode ? `${suburbName} ${postcode}` : suburbName;
 
     return {
-        title: `${jobName} in ${suburbName} | TradeRefer`,
+        title: `${jobName} in ${suburbWithPostcode} | TradeRefer`,
         description: `Compare ${count > 0 ? count : 'verified'} ${jobName.toLowerCase()} specialists in ${suburbName}, ${cityName} ${stateUpper}.${cost ? ` Typical cost $${cost.low}–$${cost.high}${cost.unit}.` : ''} ABN-checked, community-referred. Get free quotes today.`,
-        robots: { index: true, follow: true },
-        alternates: { canonical: `https://traderefer.au/local/${state}/${city}/${suburb}/${trade}/${job}` },
+        robots: { index: false, follow: true },
+        alternates: { canonical: `https://traderefer.au/local/${state}/${city}/${canonicalSuburb}/${trade}/${job}` },
         openGraph: {
-            title: `${jobName} in ${suburbName} | TradeRefer`,
-            description: `${count > 0 ? count : 'Verified'} local ${jobName.toLowerCase()} specialists in ${suburbName}. Compare ratings, pricing and referrals.`,
+            title: `${jobName} in ${suburbWithPostcode} | TradeRefer`,
+            description: `${count > 0 ? count : 'Verified'} local ${jobName.toLowerCase()} specialists in ${suburbWithPostcode}. Compare ratings, pricing and referrals.`,
         },
     };
 }
@@ -50,7 +67,8 @@ async function getBusinesses(state: string, city: string, trade: string, suburb:
         // e.g., search for "Drainage" businesses, not "Surface Drainage Systems"
         const stateCode = state.toUpperCase();
         const cityName = formatSlug(city);
-        const tradeName = formatSlug(trade);
+        const tradeName = getTradeDisplayName(trade);
+        const tradeSlug = slugify(tradeName);
         const suburbName = formatSlug(suburb);
         const results = await sql`
             SELECT b.*,
@@ -59,9 +77,10 @@ async function getBusinesses(state: string, city: string, trade: string, suburb:
             FROM businesses b
             LEFT JOIN referrals r ON r.business_id = b.id
             WHERE b.status = 'active'
+              AND (b.listing_visibility = 'public' OR b.listing_visibility IS NULL)
               AND UPPER(b.state) = ${stateCode}
               AND LOWER(b.city) = LOWER(${cityName})
-              AND b.trade_category ILIKE ${'%' + tradeName + '%'}
+              AND TRIM(BOTH '-' FROM REGEXP_REPLACE(LOWER(b.trade_category), '[^a-z0-9]+', '-', 'g')) = ${tradeSlug}
               AND LOWER(b.suburb) = LOWER(${suburbName})
             GROUP BY b.id
             ORDER BY b.trust_score DESC, referral_count DESC
@@ -76,14 +95,16 @@ async function getBusinesses(state: string, city: string, trade: string, suburb:
 async function getNearbySuburbs(state: string, city: string, currentSuburb: string, trade: string) {
     try {
         const stateCode = state.toUpperCase();
-        const tradeName = formatSlug(trade);
+        const tradeName = getTradeDisplayName(trade);
+        const tradeSlug = slugify(tradeName);
         const cityName = formatSlug(city);
         const results = await sql`
             SELECT DISTINCT suburb FROM businesses
             WHERE status = 'active'
+              AND (listing_visibility = 'public' OR listing_visibility IS NULL)
               AND UPPER(state) = ${stateCode}
               AND LOWER(city) = LOWER(${cityName})
-              AND trade_category ILIKE ${'%' + tradeName + '%'}
+              AND TRIM(BOTH '-' FROM REGEXP_REPLACE(LOWER(trade_category), '[^a-z0-9]+', '-', 'g')) = ${tradeSlug}
               AND LOWER(suburb) != LOWER(${formatSlug(currentSuburb)})
             ORDER BY suburb ASC
             LIMIT 6
@@ -96,15 +117,22 @@ async function getNearbySuburbs(state: string, city: string, currentSuburb: stri
 
 export default async function JobTypePage({ params }: PageProps) {
     const { trade, suburb, city, state, job } = await params;
-    const tradeName = formatSlug(trade);
-    const suburbName = formatSlug(suburb);
+    const { postcode: urlPostcode, suburb: bareSuburb } = parseSuburbSlug(suburb);
+    const normalizedSuburb = urlPostcode ? `${bareSuburb}-${urlPostcode}` : bareSuburb;
+    const canonicalSuburb = getCanonicalSuburbSlug(suburb, state);
+    if (canonicalSuburb !== normalizedSuburb) {
+        permanentRedirect(`/local/${state}/${city}/${canonicalSuburb}/${trade}/${job}`);
+    }
+
+    const tradeName = getTradeDisplayName(trade);
+    const suburbName = formatSlug(canonicalSuburb);
     const cityName = formatSlug(city);
     const jobName = formatSlug(job);
     const stateName = state.toUpperCase();
 
     const [businesses, nearbySuburbs] = await Promise.all([
-        getBusinesses(state, city, trade, suburb),
-        getNearbySuburbs(state, city, suburb, trade),
+        getBusinesses(state, city, trade, canonicalSuburb),
+        getNearbySuburbs(state, city, canonicalSuburb, trade),
     ]);
 
     const avgRating = businesses.length > 0
@@ -118,7 +146,7 @@ export default async function JobTypePage({ params }: PageProps) {
     const relatedJobs = (JOB_TYPES[tradeKey] || JOB_TYPES[tradeName] || [])
         .filter(j => jobToSlug(j) !== job)
         .slice(0, 6);
-    const broaderTradeHref = `/local/${state}/${city}/${suburb}/${trade}`;
+    const broaderTradeHref = `/local/${state}/${city}/${canonicalSuburb}/${trade}`;
 
     const breadcrumbJsonLd = {
         "@context": "https://schema.org",
@@ -128,8 +156,8 @@ export default async function JobTypePage({ params }: PageProps) {
             { "@type": "ListItem", "position": 2, "name": "Directory", "item": "https://traderefer.au/local" },
             { "@type": "ListItem", "position": 3, "name": stateName, "item": `https://traderefer.au/local/${state}` },
             { "@type": "ListItem", "position": 4, "name": cityName, "item": `https://traderefer.au/local/${state}/${city}` },
-            { "@type": "ListItem", "position": 5, "name": suburbName, "item": `https://traderefer.au/local/${state}/${city}/${suburb}` },
-            { "@type": "ListItem", "position": 6, "name": tradeName, "item": `https://traderefer.au/local/${state}/${city}/${suburb}/${trade}` },
+            { "@type": "ListItem", "position": 5, "name": suburbName, "item": `https://traderefer.au/local/${state}/${city}/${canonicalSuburb}` },
+            { "@type": "ListItem", "position": 6, "name": tradeName, "item": `https://traderefer.au/local/${state}/${city}/${canonicalSuburb}/${trade}` },
             { "@type": "ListItem", "position": 7, "name": `${jobName} in ${suburbName}` },
         ]
     };
@@ -188,9 +216,9 @@ export default async function JobTypePage({ params }: PageProps) {
                         <ChevronRight className="w-3 h-3" />
                         <Link href={`/local/${state}/${city}`} className="hover:text-white transition-colors">{cityName}</Link>
                         <ChevronRight className="w-3 h-3" />
-                        <Link href={`/local/${state}/${city}/${suburb}`} className="hover:text-white transition-colors">{suburbName}</Link>
+                        <Link href={`/local/${state}/${city}/${canonicalSuburb}`} className="hover:text-white transition-colors">{suburbName}</Link>
                         <ChevronRight className="w-3 h-3" />
-                        <Link href={`/local/${state}/${city}/${suburb}/${trade}`} className="hover:text-white transition-colors">{tradeName}</Link>
+                        <Link href={`/local/${state}/${city}/${canonicalSuburb}/${trade}`} className="hover:text-white transition-colors">{tradeName}</Link>
                         <ChevronRight className="w-3 h-3" />
                         <span className="text-orange-400">{jobName}</span>
                     </nav>
@@ -361,7 +389,7 @@ export default async function JobTypePage({ params }: PageProps) {
                                 {relatedJobs.map((j) => (
                                     <Link
                                         key={j}
-                                        href={`/local/${state}/${city}/${suburb}/${trade}/${jobToSlug(j)}`}
+                                        href={`/local/${state}/${city}/${canonicalSuburb}/${trade}/${jobToSlug(j)}`}
                                         className="flex items-center justify-between px-4 py-3 bg-zinc-50 border border-zinc-100 rounded-xl text-sm font-bold text-zinc-600 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-700 transition-colors"
                                     >
                                         <span className="capitalize">{j}</span>
@@ -400,7 +428,7 @@ export default async function JobTypePage({ params }: PageProps) {
                                 {nearbySuburbs.map((s: string) => (
                                     <Link
                                         key={s}
-                                        href={`/local/${state}/${city}/${s.toLowerCase().replace(/\s+/g, '-')}/${trade}/${job}`}
+                                        href={`/local/${state}/${city}/${getCanonicalSuburbSlug(slugify(s), state)}/${trade}/${job}`}
                                         className="flex items-center justify-between px-4 py-3 bg-zinc-50 border border-zinc-100 rounded-xl text-sm font-bold text-zinc-600 hover:bg-zinc-100 hover:text-orange-600 transition-colors"
                                     >
                                         <span>{s}</span>
@@ -414,7 +442,7 @@ export default async function JobTypePage({ params }: PageProps) {
                     {/* Back to Trade */}
                     <div className="pt-4 flex flex-wrap gap-3">
                         <Link
-                            href={`/local/${state}/${city}/${suburb}/${trade}`}
+                            href={`/local/${state}/${city}/${canonicalSuburb}/${trade}`}
                             className="inline-flex items-center gap-2 text-sm font-bold text-zinc-500 hover:text-orange-600 transition-colors"
                         >
                             <ChevronRight className="w-4 h-4 rotate-180" />
@@ -422,7 +450,7 @@ export default async function JobTypePage({ params }: PageProps) {
                         </Link>
                         <span className="text-zinc-300">·</span>
                         <Link
-                            href={`/local/${state}/${city}/${suburb}`}
+                            href={`/local/${state}/${city}/${canonicalSuburb}`}
                             className="inline-flex items-center gap-2 text-sm font-bold text-zinc-500 hover:text-orange-600 transition-colors"
                         >
                             All Trades in {suburbName}

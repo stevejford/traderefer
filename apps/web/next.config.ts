@@ -57,10 +57,6 @@ const nextConfig: NextConfig = {
         source: "/ingest/:path*",
         destination: "https://us.i.posthog.com/:path*",
       },
-      {
-        source: "/sitemaps/:path*",
-        destination: "https://traderefer-api-production.up.railway.app/sitemaps/:path*",
-      },
     ];
   },
   // This is required to support PostHog trailing slash API requests

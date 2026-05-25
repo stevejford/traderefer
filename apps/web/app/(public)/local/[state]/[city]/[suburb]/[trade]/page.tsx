@@ -5,8 +5,8 @@ import Link from "next/link";
 import { BusinessLogo } from "@/components/BusinessLogo";
 import { Metadata } from "next";
 import { permanentRedirect } from "next/navigation";
-import { TRADE_COST_GUIDE, TRADE_FAQ_BANK, STATE_LICENSING, STATE_AUTHORITY_LINKS, SUBURB_CONTEXT, JOB_TYPES, jobToSlug, generateLocalizedIntro, normalizeTradeName } from "@/lib/constants";
-import { parseSuburbSlug, getPostcode } from "@/lib/postcodes";
+import { TRADE_COST_GUIDE, TRADE_FAQ_BANK, STATE_LICENSING, STATE_AUTHORITY_LINKS, SUBURB_CONTEXT, JOB_TYPES, TRADE_NOUNS, jobToSlug, generateLocalizedIntro, normalizeTradeName } from "@/lib/constants";
+import { parseSuburbSlug, getCanonicalSuburbSlug, getDisplayPostcode, isPostcodeValidForState } from "@/lib/postcodes";
 import { generateFallbackDescription } from "@/lib/business-utils";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +15,10 @@ export const revalidate = 3600; // Cache for 1 hour, ISR revalidation
 interface PageProps {
     params: Promise<{ state: string; city: string; suburb: string; trade: string }>;
 }
+
+type RelatedTradeRow = {
+    trade_category: string | null;
+};
 
 function formatSlug(slug: string) {
     if (!slug) return "";
@@ -27,29 +31,49 @@ function formatSlug(slug: string) {
         .join(" ");
 }
 
+function slugify(value: string) {
+    return value
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+}
+
 // Extract Australian 4-digit postcode from a Google Places formatted address
 // e.g. "123 Main St, Parramatta NSW 2150, Australia" → "2150"
-function extractPostcode(address: string | null | undefined): string | null {
+function extractPostcode(address: string | null | undefined, state: string): string | null {
     if (!address) return null;
-    const match = address.match(/\b([A-Z]{2,3})\s+(\d{4})\b/);
-    return match ? match[2] : null;
+    const matches = address.match(/\b\d{4}\b/g) || [];
+    return matches.find((postcode) => isPostcodeValidForState(postcode, state)) || null;
+}
+
+function getTradeDisplayName(tradeSlugOrName: string) {
+    const slug = slugify(tradeSlugOrName);
+    return Object.keys(TRADE_NOUNS).find((name) => slugify(name) === slug) || formatSlug(tradeSlugOrName);
+}
+
+function getTradeNoun(tradeName: string) {
+    const canonicalTradeName = getTradeDisplayName(tradeName);
+    const tradeKey = normalizeTradeName(canonicalTradeName);
+    return TRADE_NOUNS[tradeKey] || TRADE_NOUNS[canonicalTradeName] || (canonicalTradeName.endsWith('s') ? canonicalTradeName : canonicalTradeName + 's');
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { trade, suburb, city, state } = await params;
-    const tradeName = formatSlug(trade);
-    const tradeNamePlural = tradeName.endsWith('s') ? tradeName : tradeName + 's';
-    const suburbName = formatSlug(suburb);
+    const canonicalSuburb = getCanonicalSuburbSlug(suburb, state);
+    const tradeName = getTradeDisplayName(trade);
+    const tradeNamePlural = getTradeNoun(tradeName);
+    const suburbName = formatSlug(canonicalSuburb);
     const cityName = formatSlug(city);
     const stateUpper = state.toUpperCase();
     const tradeKey = normalizeTradeName(tradeName);
     const cost = TRADE_COST_GUIDE[tradeKey] || TRADE_COST_GUIDE[tradeName];
     const priceStr = cost ? ` | $${cost.low}\u2013$${cost.high}${cost.unit}` : "";
 
-    const businesses = await getBusinesses(state, city, trade, suburb);
+    const businesses = await getBusinesses(state, city, trade, canonicalSuburb);
     const count = businesses.length;
     const topBiz = businesses[0];
-    const postcode = businesses.map((b: any) => extractPostcode(b.address)).find(Boolean) || null;
+    const postcode = getDisplayPostcode(canonicalSuburb, state) || businesses.map((b: any) => extractPostcode(b.address, state)).find(Boolean) || null;
     const suburbWithPostcode = postcode ? `${suburbName} ${postcode}` : suburbName;
     const cityDisplay = suburbName.toLowerCase() === cityName.toLowerCase() ? '' : `, ${cityName}`;
     const avgRating = count > 0
@@ -58,12 +82,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const totalReviews = businesses.reduce((acc: number, biz: any) => acc + (parseInt(biz.total_reviews) || 0), 0);
     const topBizStr = topBiz && topBiz.avg_rating ? ` Top rated: ${topBiz.business_name} (${parseFloat(topBiz.avg_rating).toFixed(1)}\u2605).` : "";
 
-    const year = new Date().getFullYear();
     return {
-        title: `Best ${tradeNamePlural} in ${suburbWithPostcode} | TradeRefer`,
+        title: `${count > 0 ? count + ' Verified ' : 'Verified '}${tradeNamePlural} in ${suburbWithPostcode} | TradeRefer`,
         description: `Compare ${count > 0 ? count : 'verified'} ${count === 1 ? tradeName.toLowerCase() : tradeNamePlural.toLowerCase()} in ${suburbWithPostcode}${cityDisplay} ${stateUpper}.${priceStr ? ` Avg cost $${cost.low}–$${cost.high}${cost.unit}.` : ''}${topBizStr} ${totalReviews > 0 ? ' ' + totalReviews + ' reviews.' : ''} ABN-verified, community-referred. Free quotes.`,
-        robots: { index: true, follow: true },
-        alternates: { canonical: `https://traderefer.au/local/${state}/${city}/${suburb}/${trade}` },
+        robots: { index: count >= 2 || totalReviews > 0, follow: true },
+        alternates: { canonical: `https://traderefer.au/local/${state}/${city}/${canonicalSuburb}/${trade}` },
         openGraph: {
             title: `${tradeName} in ${suburbWithPostcode} | TradeRefer`,
             description: `${count > 0 ? count : 'Verified'} local ${tradeName.toLowerCase()} in ${suburbWithPostcode}. Compare ratings, pricing and referrals.`,
@@ -81,7 +104,8 @@ async function getBusinesses(state: string, city: string, trade: string, suburb:
     try {
         const stateCode = state.toUpperCase();
         const cityName = formatSlug(city);
-        const tradeName = formatSlug(trade);
+        const tradeName = getTradeDisplayName(trade);
+        const tradeSlug = slugify(tradeName);
         const suburbName = formatSlug(suburb);
 
         const businesses = await sql`
@@ -92,7 +116,7 @@ async function getBusinesses(state: string, city: string, trade: string, suburb:
               AND (b.listing_visibility = 'public' OR b.listing_visibility IS NULL)
               AND UPPER(b.state) = ${stateCode}
               AND LOWER(b.city) = LOWER(${cityName})
-              AND (b.trade_category ILIKE ${'%' + tradeName + '%'} OR b.trade_category ILIKE ${'%' + trade + '%'})
+              AND TRIM(BOTH '-' FROM REGEXP_REPLACE(LOWER(b.trade_category), '[^a-z0-9]+', '-', 'g')) = ${tradeSlug}
               AND LOWER(b.suburb) = LOWER(${suburbName})
             ORDER BY b.is_verified DESC, b.listing_rank DESC
             LIMIT 50
@@ -104,31 +128,45 @@ async function getBusinesses(state: string, city: string, trade: string, suburb:
     }
 }
 
-async function getRelatedTrades(suburb: string, currentTrade: string) {
+async function getRelatedTrades(state: string, city: string, suburb: string, currentTrade: string) {
+    const stateCode = state.toUpperCase();
+    const cityName = formatSlug(city);
     const suburbName = formatSlug(suburb);
-    const trades = await sql`
+    const trades = await sql<RelatedTradeRow[]>`
         SELECT DISTINCT trade_category 
         FROM businesses 
-        WHERE LOWER(suburb) = LOWER(${suburbName}) 
+        WHERE UPPER(state) = ${stateCode}
+          AND LOWER(city) = LOWER(${cityName})
+          AND LOWER(suburb) = LOWER(${suburbName})
           AND trade_category != ${currentTrade}
           AND status = 'active'
+          AND (listing_visibility = 'public' OR listing_visibility IS NULL)
         LIMIT 6
     `;
-    return trades;
+    return trades
+        .filter((row): row is { trade_category: string } => !!row.trade_category)
+        .filter((row) => slugify(row.trade_category) !== slugify(currentTrade))
+        .map((row) => ({
+            ...row,
+            name: formatSlug(row.trade_category),
+            slug: slugify(row.trade_category),
+        }));
 }
 
 async function getNearbySuburbs(state: string, city: string, suburb: string, currentTrade: string) {
     const stateCode = state.toUpperCase();
     const cityName = formatSlug(city);
     const suburbName = formatSlug(suburb);
+    const currentTradeSlug = slugify(currentTrade);
     const suburbs = await sql`
-        SELECT DISTINCT suburb 
-        FROM businesses 
+        SELECT DISTINCT suburb
+        FROM businesses
         WHERE UPPER(state) = ${stateCode}
-          AND LOWER(city) = LOWER(${cityName}) 
+          AND LOWER(city) = LOWER(${cityName})
           AND LOWER(suburb) != LOWER(${suburbName})
-          AND trade_category ILIKE ${'%' + currentTrade + '%'}
+          AND TRIM(BOTH '-' FROM REGEXP_REPLACE(LOWER(trade_category), '[^a-z0-9]+', '-', 'g')) = ${currentTradeSlug}
           AND status = 'active'
+          AND (listing_visibility = 'public' OR listing_visibility IS NULL)
           AND suburb IS NOT NULL
           AND suburb != ''
         LIMIT 12
@@ -153,6 +191,8 @@ async function getCityReferralCount(city: string): Promise<number> {
             SELECT COUNT(*) as count FROM referral_links rl
             JOIN businesses b ON rl.business_id = b.id
             WHERE LOWER(b.city) = LOWER(${cityName})
+              AND b.status = 'active'
+              AND (b.listing_visibility = 'public' OR b.listing_visibility IS NULL)
               AND rl.created_at > NOW() - INTERVAL '30 days'
         `;
         return parseInt(result[0]?.count ?? '0', 10);
@@ -163,25 +203,23 @@ async function getCityReferralCount(city: string): Promise<number> {
 
 export default async function TradeLocationPage({ params }: PageProps) {
     const { trade, suburb, city, state } = await params;
-    const tradeName = formatSlug(trade);
-    const tradeNamePlural = tradeName.endsWith('s') ? tradeName : tradeName + 's';
+    const tradeName = getTradeDisplayName(trade);
+    const tradeNamePlural = getTradeNoun(tradeName);
     const suburbName = formatSlug(suburb);
     const cityName = formatSlug(city);
     const stateName = state.toUpperCase();
 
-    // If URL has no postcode but we know it, 308 permanent redirect to postcode URL
     const { postcode: urlPostcode, suburb: bareSuburb } = parseSuburbSlug(suburb);
-    if (!urlPostcode) {
-        const knownPostcode = getPostcode(bareSuburb, state);
-        if (knownPostcode) {
-            permanentRedirect(`/local/${state}/${city}/${bareSuburb}-${knownPostcode}/${trade}`);
-        }
+    const normalizedSuburb = urlPostcode ? `${bareSuburb}-${urlPostcode}` : bareSuburb;
+    const canonicalSuburb = getCanonicalSuburbSlug(suburb, state);
+    if (canonicalSuburb !== normalizedSuburb) {
+        permanentRedirect(`/local/${state}/${city}/${canonicalSuburb}/${trade}`);
     }
 
     const [businesses, relatedTrades, nearbySuburbs, cityReferralCount] = await Promise.all([
-        getBusinesses(state, city, trade, suburb),
-        getRelatedTrades(suburb, tradeName),
-        getNearbySuburbs(state, city, suburb, tradeName),
+        getBusinesses(state, city, trade, canonicalSuburb),
+        getRelatedTrades(state, city, canonicalSuburb, tradeName),
+        getNearbySuburbs(state, city, canonicalSuburb, tradeName),
         getCityReferralCount(city),
     ]);
 
@@ -195,7 +233,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
     const totalReviews = businesses.reduce((acc: number, biz: any) => acc + (parseInt(biz.total_reviews) || 0), 0);
 
     // Use postcode from URL first, then extract from business addresses, then lookup
-    const postcode = urlPostcode || businesses.map((b: any) => extractPostcode(b.address)).find(Boolean) || getPostcode(bareSuburb, state);
+    const postcode = getDisplayPostcode(canonicalSuburb, state) || businesses.map((b: any) => extractPostcode(b.address, state)).find(Boolean) || null;
     const suburbWithPostcode = postcode ? `${suburbName} ${postcode}` : suburbName;
     const cityDisplay = suburbName.toLowerCase() === cityName.toLowerCase() ? '' : ', ' + cityName;
 
@@ -217,7 +255,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
     const breadcrumbs = [
         { name: stateName, href: `/local/${state}` },
         { name: cityName, href: `/local/${state}/${city}` },
-        { name: suburbWithPostcode, href: `/local/${state}/${city}/${suburb}` },
+        { name: suburbWithPostcode, href: `/local/${state}/${city}/${canonicalSuburb}` },
         { name: tradeName, href: "#" }
     ];
 
@@ -229,7 +267,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
             { "@type": "ListItem", "position": 2, "name": "Directory", "item": "https://traderefer.au/local" },
             { "@type": "ListItem", "position": 3, "name": stateName, "item": `https://traderefer.au/local/${state}` },
             { "@type": "ListItem", "position": 4, "name": cityName, "item": `https://traderefer.au/local/${state}/${city}` },
-            { "@type": "ListItem", "position": 5, "name": suburbWithPostcode, "item": `https://traderefer.au/local/${state}/${city}/${suburb}` },
+            { "@type": "ListItem", "position": 5, "name": suburbWithPostcode, "item": `https://traderefer.au/local/${state}/${city}/${canonicalSuburb}` },
             { "@type": "ListItem", "position": 6, "name": `${tradeName} in ${suburbWithPostcode}` },
         ]
     };
@@ -277,7 +315,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
         "@type": "LocalBusiness",
         "name": `${tradeName} in ${suburbWithPostcode} — TradeRefer`,
         "description": `Find verified ${tradeName.toLowerCase()} in ${suburbWithPostcode}, ${cityName}. ABN-checked, community-ranked.`,
-        "url": `https://traderefer.au/local/${state}/${city}/${suburb}/${trade}`,
+        "url": `https://traderefer.au/local/${state}/${city}/${canonicalSuburb}/${trade}`,
         "address": {
             "@type": "PostalAddress",
             "addressLocality": suburbName,
@@ -298,8 +336,8 @@ export default async function TradeLocationPage({ params }: PageProps) {
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "ItemList",
-        "name": `Top ${tradeName} in ${suburbWithPostcode}`,
-        "description": `List of highest rated and verified ${tradeName} in the ${suburbWithPostcode} area.`,
+        "name": `Verified ${tradeName} in ${suburbWithPostcode}`,
+        "description": `List of verified ${tradeName} businesses in the ${suburbWithPostcode} area.`,
         "numberOfItems": businesses.length,
         "itemListElement": businesses.map((biz: any, i: number) => ({
             "@type": "ListItem",
@@ -331,6 +369,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
             }
         }))
     };
+    const shouldEmitDirectoryLocalBusinessSchema = false;
 
     return (
         <>
@@ -340,7 +379,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }} />
             {faqJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />}
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-            {localBusinessJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }} />}
+            {shouldEmitDirectoryLocalBusinessSchema && localBusinessJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }} />}
 
             {/* ── BREADCRUMBS ── */}
             <div className="bg-gray-100 border-b border-gray-200" style={{ paddingTop: '108px', paddingBottom: '12px' }}>
@@ -492,7 +531,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                         {relatedTrades.slice(0, 3).map((rt: any) => (
                                             <Link
                                                 key={rt.slug}
-                                                href={`/local/${state}/${city}/${suburb}/${rt.slug}`}
+                                                href={`/local/${state}/${city}/${canonicalSuburb}/${rt.slug}`}
                                                 className="inline-flex items-center gap-1.5 px-4 h-12 bg-zinc-50 border-2 border-zinc-300 rounded-xl font-bold text-zinc-700 hover:border-orange-400 hover:text-orange-600 transition-colors whitespace-nowrap shrink-0"
                                                 style={{ fontSize: '14px' }}
                                             >
@@ -535,7 +574,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                     {relatedJobs.map((job) => (
                                         <Link
                                             key={job}
-                                            href={`/local/${state}/${city}/${suburb}/${trade}/${jobToSlug(job)}`}
+                                            href={`/local/${state}/${city}/${canonicalSuburb}/${trade}/${jobToSlug(job)}`}
                                             className="inline-flex items-center px-4 py-2.5 bg-white border-2 border-zinc-300 rounded-full font-bold text-zinc-700 hover:border-orange-400 hover:text-orange-600 hover:bg-orange-50 transition-all" style={{ fontSize: '14px' }}
                                         >
                                             {job.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
@@ -883,7 +922,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                             {relatedJobs.map((job) => (
                                                 <Link
                                                     key={job}
-                                                    href={`/local/${state}/${city}/${suburb}/${trade}/${jobToSlug(job)}`}
+                                                    href={`/local/${state}/${city}/${canonicalSuburb}/${trade}/${jobToSlug(job)}`}
                                                     className="flex items-center justify-between px-4 py-3 bg-zinc-50 border border-zinc-100 rounded-xl text-sm font-bold text-zinc-600 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-700 transition-colors"
                                                 >
                                                     <span className="capitalize">{job}</span>
@@ -1030,7 +1069,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                         {relatedTrades.map((t: any) => (
                                             <Link
                                                 key={t.trade_category}
-                                                href={`/local/${state}/${city}/${suburb}/${t.trade_category.toLowerCase().replace(/\s+/g, '-')}`}
+                                                href={`/local/${state}/${city}/${canonicalSuburb}/${t.slug}`}
                                                 className="px-4 py-2 bg-zinc-50 border border-zinc-100 rounded-xl text-xs font-bold text-zinc-600 hover:bg-zinc-100 transition-colors text-center"
                                             >
                                                 {formatSlug(t.trade_category)}
@@ -1049,8 +1088,8 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                     </h4>
                                     <div className="grid grid-cols-1 gap-2">
                                         {nearbySuburbs.map((s: any) => {
-                                            const nSlug = s.suburb.toLowerCase().replace(/\s+/g, '-');
-                                            const nPc = getPostcode(nSlug, state);
+                                            const nSlug = getCanonicalSuburbSlug(slugify(s.suburb), state);
+                                            const nPc = getDisplayPostcode(nSlug, state);
                                             return (
                                             <Link
                                                 key={s.suburb}

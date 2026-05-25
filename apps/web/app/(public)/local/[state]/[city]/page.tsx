@@ -4,6 +4,7 @@ import { ChevronRight, MapPin, Users, Clock, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
+import { getCanonicalSuburbSlug } from "@/lib/postcodes";
 
 interface PageProps {
     params: Promise<{ state: string; city: string }>;
@@ -29,19 +30,34 @@ function slugify(value: string) {
     return value
         .toLowerCase()
         .trim()
-        .replace(/&/g, " and ")
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "");
+}
+
+async function getCityBusinessCount(state: string, city: string): Promise<number> {
+    try {
+        const cityName = formatSlug(city);
+        const result = await sql`
+            SELECT COUNT(*) as count
+            FROM businesses
+            WHERE status = 'active'
+              AND (listing_visibility = 'public' OR listing_visibility IS NULL)
+              AND UPPER(state) = UPPER(${state})
+              AND LOWER(city) = LOWER(${cityName})
+        `;
+        return parseInt(result[0]?.count ?? '0', 10);
+    } catch { return 0; }
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { state, city } = await params;
     const cityName = formatSlug(city);
     const stateUpper = state.toUpperCase();
-    const year = new Date().getFullYear();
+    const totalBusinesses = await getCityBusinessCount(state, city);
     return {
-        title: `Trusted Tradies in ${cityName} ${stateUpper} | TradeRefer`,
-        description: `Find ABN-verified trade businesses across ${cityName}, ${stateUpper}. Browse by suburb to discover top-rated plumbers, electricians, painters & more. Free quotes.`,
+        title: `${totalBusinesses > 0 ? totalBusinesses + ' ' : ''}Trusted Tradies in ${cityName} ${stateUpper} | TradeRefer`,
+        description: `Find ${totalBusinesses > 0 ? totalBusinesses + ' ' : ''}ABN-verified trade businesses across ${cityName}, ${stateUpper}. Browse by suburb to discover top-rated plumbers, electricians, painters & more. Free quotes.`,
+        robots: { index: totalBusinesses >= 2, follow: true },
         alternates: { canonical: `https://traderefer.au/local/${state}/${city}` },
         openGraph: {
             title: `Trusted Tradies in ${cityName} ${stateUpper} | TradeRefer`,
@@ -64,23 +80,12 @@ async function getSuburbsInCity(state: string, city: string): Promise<string[]> 
             WHERE b.status = 'active'
               AND b.suburb IS NOT NULL
               AND b.suburb != ''
+              AND (b.listing_visibility = 'public' OR b.listing_visibility IS NULL)
               AND UPPER(b.state) = UPPER(${state})
               AND LOWER(b.city) = LOWER(${cityName})
             ORDER BY b.suburb ASC
         `;
-        const suburbs = results.map((r) => r.suburb).filter(Boolean);
-        if (suburbs.length > 0) return suburbs;
-
-        const fallbackResults = await sql<SuburbRow[]>`
-            SELECT DISTINCT lr.name AS suburb
-            FROM locations_reference lr
-            WHERE lr.is_active = true
-              AND lr.type = 'suburb'
-              AND UPPER(lr.state_code) = UPPER(${state})
-              AND LOWER(lr.parent_city_name) = LOWER(${cityName})
-            ORDER BY lr.name ASC
-        `;
-        return fallbackResults.map((r) => r.suburb).filter(Boolean);
+        return results.map((r) => r.suburb).filter(Boolean);
     } catch { return []; }
 }
 
@@ -92,6 +97,7 @@ async function getBusinessCountsBySuburb(state: string, city: string, suburbs: s
             SELECT suburb, COUNT(*) as count
             FROM businesses
             WHERE status = 'active'
+              AND (listing_visibility = 'public' OR listing_visibility IS NULL)
               AND UPPER(state) = UPPER(${state})
               AND LOWER(city) = LOWER(${cityName})
               AND suburb = ANY(${suburbs})
@@ -110,6 +116,8 @@ async function getCityReferralCount(city: string): Promise<number> {
             SELECT COUNT(*) as count FROM referral_links rl
             JOIN businesses b ON rl.business_id = b.id
             WHERE LOWER(b.city) = LOWER(${cityName})
+              AND b.status = 'active'
+              AND (b.listing_visibility = 'public' OR b.listing_visibility IS NULL)
               AND rl.created_at > NOW() - INTERVAL '30 days'
         `;
         return parseInt(result[0]?.count ?? '0', 10);
@@ -143,24 +151,34 @@ export default async function CityDirectoryPage({ params, searchParams }: PagePr
         ]
     };
 
-    const localBusinessJsonLd = {
+    const collectionPageJsonLd = {
         "@context": "https://schema.org",
-        "@type": "LocalBusiness",
-        "name": `Trade Services in ${cityName}`,
-        "description": `Verified local tradies across ${cityName}, ${stateUpper}. ABN-checked, community-ranked.`,
+        "@type": "CollectionPage",
+        "name": `Trade Services in ${cityName} ${stateUpper}`,
+        "description": `${totalBusinesses.toLocaleString()} verified local trade businesses across ${suburbs.length} ${cityName} suburbs.`,
         "url": `https://traderefer.au/local/${state}/${city}`,
-        "areaServed": {
-            "@type": "City",
-            "name": cityName,
-            "containedInPlace": { "@type": "AdministrativeArea", "name": stateUpper }
-        }
+        "isPartOf": { "@type": "WebSite", "name": "TradeRefer", "url": "https://traderefer.au" }
+    };
+
+    const suburbItemListJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "name": `Trade suburbs in ${cityName}`,
+        "numberOfItems": suburbs.length,
+        "itemListElement": suburbs.slice(0, 100).map((suburb, index) => ({
+            "@type": "ListItem",
+            "position": index + 1,
+            "name": suburb,
+            "url": `https://traderefer.au/local/${state}/${city}/${getCanonicalSuburbSlug(slugify(suburb), state)}`
+        }))
     };
 
     return (
         <>
         <main className="min-h-screen bg-[#FCFCFC]">
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageJsonLd) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(suburbItemListJsonLd) }} />
 
             {/* ── BREADCRUMBS ── */}
             <div className="bg-gray-100 border-b border-gray-200" style={{ paddingTop: '108px', paddingBottom: '12px' }}>
@@ -261,7 +279,7 @@ export default async function CityDirectoryPage({ params, searchParams }: PagePr
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                 {suburbs.map((suburb) => {
                                     const count = businessCounts[suburb] || 0;
-                                    const suburbSlug = slugify(suburb);
+                                    const suburbSlug = getCanonicalSuburbSlug(slugify(suburb), state);
                                     return (
                                         <Link key={suburb} href={`/local/${state}/${city}/${suburbSlug}${catParam}`} className="group">
                                             <div className="bg-white rounded-2xl border-2 border-zinc-200 hover:border-[#FF6600] hover:shadow-lg transition-all duration-300 p-5">

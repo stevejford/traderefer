@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BusinessLogo } from "@/components/BusinessLogo";
 import { Button } from "@/components/ui/button";
-import { TRADE_COST_GUIDE, TRADE_FAQ_BANK, STATE_LICENSING, HOW_TO_CHOOSE } from "@/lib/constants";
+import { TRADE_COST_GUIDE, TRADE_FAQ_BANK, STATE_LICENSING, HOW_TO_CHOOSE, TRADE_NOUNS } from "@/lib/constants";
 import {
     Star, ShieldCheck, MapPin, ChevronRight, Users, Award,
     DollarSign, FileText, ArrowRight, Trophy
@@ -24,6 +24,11 @@ function tradeToSlug(trade: string) {
     return trade.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
+function getTradeDisplayName(trade: string) {
+    const slug = tradeToSlug(trade);
+    return Object.keys(TRADE_NOUNS).find((name) => tradeToSlug(name) === slug) || formatSlug(trade);
+}
+
 const STATE_NAMES: Record<string, string> = {
     vic: "Victoria", nsw: "New South Wales", qld: "Queensland",
     wa: "Western Australia", sa: "South Australia", tas: "Tasmania",
@@ -32,7 +37,7 @@ const STATE_NAMES: Record<string, string> = {
 
 async function getTopBusinesses(trade: string, state: string, suburb: string) {
     try {
-        const tradeName = formatSlug(trade);
+        const tradeSlug = tradeToSlug(trade);
         const suburbName = formatSlug(suburb);
         const stateUpper = state.toUpperCase();
         const results = await sql`
@@ -41,7 +46,7 @@ async function getTopBusinesses(trade: string, state: string, suburb: string) {
             FROM businesses b
             WHERE b.status = 'active'
               AND (b.listing_visibility = 'public' OR b.listing_visibility IS NULL)
-              AND b.trade_category ILIKE ${'%' + tradeName + '%'}
+              AND TRIM(BOTH '-' FROM REGEXP_REPLACE(LOWER(b.trade_category), '[^a-z0-9]+', '-', 'g')) = ${tradeSlug}
               AND b.suburb ILIKE ${'%' + suburbName + '%'}
               AND b.state = ${stateUpper}
               AND b.avg_rating IS NOT NULL
@@ -56,7 +61,7 @@ async function getTopBusinesses(trade: string, state: string, suburb: string) {
 
 async function getNearbySuburbsWithTrade(trade: string, state: string, city: string, currentSuburb: string) {
     try {
-        const tradeName = formatSlug(trade);
+        const tradeSlug = tradeToSlug(trade);
         const stateUpper = state.toUpperCase();
         const cityName = formatSlug(city);
         const suburbName = formatSlug(currentSuburb);
@@ -64,7 +69,7 @@ async function getNearbySuburbsWithTrade(trade: string, state: string, city: str
             SELECT DISTINCT suburb, state, city, COUNT(*) as cnt
             FROM businesses
             WHERE status = 'active'
-              AND trade_category ILIKE ${'%' + tradeName + '%'}
+              AND TRIM(BOTH '-' FROM REGEXP_REPLACE(LOWER(trade_category), '[^a-z0-9]+', '-', 'g')) = ${tradeSlug}
               AND city ILIKE ${'%' + cityName + '%'}
               AND state = ${stateUpper}
               AND suburb NOT ILIKE ${'%' + suburbName + '%'}
@@ -86,7 +91,7 @@ async function getNearbySuburbsWithTrade(trade: string, state: string, city: str
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { trade, state, city, suburb } = await params;
-    const tradeName = formatSlug(trade);
+    const tradeName = getTradeDisplayName(trade);
     const cityName = formatSlug(city);
     const suburbName = formatSlug(suburb);
     const stateName = STATE_NAMES[state] || state.toUpperCase();
@@ -102,6 +107,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
         title: `Top ${tradeName} in ${suburbName} | TradeRefer`,
         description: `The ${businesses.length} highest-rated ${tradeName.toLowerCase()} in ${suburbName}, ${cityName} ${stateName} ranked by ${totalReviews.toLocaleString()} verified reviews.${topBizStr} Get free quotes today.`,
+        robots: { index: businesses.length >= 3, follow: true },
+        alternates: { canonical: `https://traderefer.au/top/${trade}/${state}/${city}/${suburb}` },
         openGraph: {
             title: `Top ${tradeName} in ${suburbName} | TradeRefer`,
             description: `Ranked by verified Google reviews. Best ${tradeName.toLowerCase()} in ${suburbName}.`,
@@ -111,7 +118,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function Top10SuburbPage({ params }: PageProps) {
     const { trade, state, city, suburb } = await params;
-    const tradeName = formatSlug(trade);
+    const tradeName = getTradeDisplayName(trade);
     const cityName = formatSlug(city);
     const suburbName = formatSlug(suburb);
     const stateName = STATE_NAMES[state] || state.toUpperCase();

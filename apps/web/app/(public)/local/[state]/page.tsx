@@ -54,6 +54,20 @@ const STATE_NAMES: Record<string, string> = {
 
 };
 
+function slugify(value: string) {
+
+    return value
+
+        .toLowerCase()
+
+        .trim()
+
+        .replace(/[^a-z0-9]+/g, "-")
+
+        .replace(/^-+|-+$/g, "");
+
+}
+
 
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -64,11 +78,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
     if (!stateName) return {};
 
+    const businessCount = await getBusinessCountForState(state);
+
     return {
 
         title: `Verified Trade Services in ${stateName} | TradeRefer`,
 
         description: `Browse ${stateName}'s top ABN-verified local trade businesses. Find plumbers, electricians, builders and more in your city or suburb.`,
+        robots: { index: businessCount > 0, follow: true },
+        alternates: { canonical: `https://traderefer.au/local/${state}` },
 
     };
 
@@ -82,23 +100,25 @@ async function getCitiesInState(state: string): Promise<{ city: string; count: n
 
         const results = await sql<CityCountRow[]>`
 
-            SELECT lr.parent_city_name AS city, COUNT(*) as count
+            SELECT city, COUNT(*) as count
 
-            FROM locations_reference lr
+            FROM businesses
 
-            WHERE lr.is_active = true
+            WHERE status = 'active'
 
-              AND lr.type = 'suburb'
+              AND (listing_visibility = 'public' OR listing_visibility IS NULL)
 
-              AND UPPER(lr.state_code) = UPPER(${state})
+              AND UPPER(state) = UPPER(${state})
 
-              AND lr.parent_city_name IS NOT NULL
+              AND city IS NOT NULL
 
-              AND lr.parent_city_name != ''
+              AND city != ''
 
-            GROUP BY lr.parent_city_name
+            GROUP BY city
 
-            ORDER BY lr.parent_city_name ASC
+            HAVING COUNT(*) >= 2
+
+            ORDER BY city ASC
 
         `;
 
@@ -118,7 +138,9 @@ async function getBusinessCountForState(state: string): Promise<number> {
 
             SELECT COUNT(*) as count FROM businesses
 
-            WHERE status = 'active' AND state ILIKE ${state}
+            WHERE status = 'active'
+              AND (listing_visibility = 'public' OR listing_visibility IS NULL)
+              AND state ILIKE ${state}
 
         `;
 
@@ -140,9 +162,12 @@ async function getTopTradesForState(state: string): Promise<{ trade: string; cou
 
             FROM businesses
 
-            WHERE status = 'active' AND state ILIKE ${state}
+            WHERE status = 'active'
+              AND (listing_visibility = 'public' OR listing_visibility IS NULL)
+              AND state ILIKE ${state}
 
               AND trade_category IS NOT NULL
+              AND trade_category != ''
 
             GROUP BY trade_category
 
@@ -396,7 +421,7 @@ export default async function StateDirectoryPage({ params, searchParams }: PageP
 
                                 {cities.map(({ city, count }) => (
 
-                                    <Link key={city} href={`/local/${state}/${city.toLowerCase().replace(/ /g, '-')}${catParam}`} className="group">
+                                    <Link key={city} href={`/local/${state}/${slugify(city)}${catParam}`} className="group">
 
                                         <div className="bg-white rounded-2xl border-2 border-zinc-200 hover:border-[#FF6600] hover:shadow-xl transition-all duration-300 p-6 flex items-center justify-between">
 
@@ -410,7 +435,7 @@ export default async function StateDirectoryPage({ params, searchParams }: PageP
 
                                                 <p className="text-3xl font-black text-[#FF6600]">{count.toLocaleString()}</p>
 
-                                                <p className="text-gray-400 font-bold uppercase tracking-wider" style={{ fontSize: '16px' }}>Suburbs</p>
+                                                <p className="text-gray-400 font-bold uppercase tracking-wider" style={{ fontSize: '16px' }}>Verified Pros</p>
 
                                             </div>
 

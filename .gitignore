@@ -20,6 +20,8 @@ build/
 .vscode/
 *.swp
 .turbo/
+.codegraph/
+.codex-logs/
 __pycache__/
 *.pyc
 venv/

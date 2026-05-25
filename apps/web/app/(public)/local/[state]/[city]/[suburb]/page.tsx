@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Metadata } from "next";
 import { permanentRedirect, redirect } from "next/navigation";
 import { SUBURB_CONTEXT } from "@/lib/constants";
-import { parseSuburbSlug, getPostcode } from "@/lib/postcodes";
+import { parseSuburbSlug, getPostcode, getCanonicalSuburbSlug, getDisplayPostcode } from "@/lib/postcodes";
 
 interface PageProps {
     params: Promise<{ state: string; city: string; suburb: string }>;
@@ -53,19 +53,18 @@ function formatSlug(slug: string) {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { state, city, suburb } = await params;
-    const suburbName = formatSlug(suburb);
+    const canonicalSuburb = getCanonicalSuburbSlug(suburb, state);
+    const suburbName = formatSlug(canonicalSuburb);
     const cityName = formatSlug(city);
     const stateUpper = state.toUpperCase();
-    const { postcode } = parseSuburbSlug(suburb);
-    const pc = postcode || getPostcode(parseSuburbSlug(suburb).suburb, state);
+    const pc = getDisplayPostcode(canonicalSuburb, state);
     const pcLabel = pc ? ` ${stateUpper} ${pc}` : ` ${stateUpper}`;
-    const year = new Date().getFullYear();
-    const stats = await getSuburbStats(state, city, suburb);
+    const stats = await getSuburbStats(state, city, canonicalSuburb);
     return {
         title: `${stats.total > 0 ? stats.total + ' ' : ''}Trusted Tradies in ${suburbName}${pcLabel} | TradeRefer`,
         description: `Compare ${stats.total > 0 ? stats.total : 'verified'} local tradespeople in ${suburbName}, ${cityName}${pcLabel}. Browse ${stats.categories > 0 ? stats.categories + ' trade categories' : 'plumbers, electricians, builders & more'} — ABN-checked with real community referrals. Free quotes.`,
-        robots: { index: true, follow: true },
-        alternates: { canonical: `https://traderefer.au/local/${state}/${city}/${suburb}` },
+        robots: { index: stats.total >= 2 || stats.categories >= 2, follow: true },
+        alternates: { canonical: `https://traderefer.au/local/${state}/${city}/${canonicalSuburb}` },
         openGraph: {
             title: `${stats.total > 0 ? stats.total + ' ' : ''}Trusted Tradies in ${suburbName}${pcLabel} | TradeRefer`,
             description: `Compare ${stats.total > 0 ? stats.total : 'verified'} local tradespeople in ${suburbName}${pcLabel}. ABN-checked, community-ranked.`,
@@ -142,37 +141,29 @@ export default async function SuburbDirectoryPage({ params, searchParams }: Page
     const cityName = formatSlug(city);
     const suburbName = formatSlug(suburb);
     const stateUpper = state.toUpperCase();
-    const quoteHref = `/quotes?suburb=${encodeURIComponent(suburbName)}&city=${encodeURIComponent(cityName)}&state=${stateUpper}&source=${encodeURIComponent(`/local/${state}/${city}/${suburb}`)}`;
 
-    // If URL has no postcode but we know it, 308 permanent redirect to postcode URL
     const { postcode: urlPostcode, suburb: bareSuburb } = parseSuburbSlug(suburb);
-    if (!urlPostcode) {
-        const knownPostcode = getPostcode(bareSuburb, state);
-        if (knownPostcode) {
-            permanentRedirect(`/local/${state}/${city}/${bareSuburb}-${knownPostcode}`);
-        }
+    const normalizedSuburb = urlPostcode ? `${bareSuburb}-${urlPostcode}` : bareSuburb;
+    const canonicalSuburb = getCanonicalSuburbSlug(suburb, state);
+    if (canonicalSuburb !== normalizedSuburb) {
+        permanentRedirect(`/local/${state}/${city}/${canonicalSuburb}`);
     }
-    const postcode = urlPostcode || getPostcode(bareSuburb, state);
+    const postcode = getDisplayPostcode(canonicalSuburb, state);
+    const quoteHref = `/quotes?suburb=${encodeURIComponent(suburbName)}&city=${encodeURIComponent(cityName)}&state=${stateUpper}&source=${encodeURIComponent(`/local/${state}/${city}/${canonicalSuburb}`)}`;
 
     // If user already selected a trade (via ?category param), skip trade selection and go directly
     if (category) {
         const tradeSlug = category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-        redirect(`/local/${state}/${city}/${suburb}/${tradeSlug}`);
+        redirect(`/local/${state}/${city}/${canonicalSuburb}/${tradeSlug}`);
     }
 
     const [suburbStats, tradesWithCounts, nearbySuburbs] = await Promise.all([
-        getSuburbStats(state, city, suburb),
-        getTradesWithCounts(state, city, suburb),
-        getNearbySuburbs(state, city, suburb),
+        getSuburbStats(state, city, canonicalSuburb),
+        getTradesWithCounts(state, city, canonicalSuburb),
+        getNearbySuburbs(state, city, canonicalSuburb),
     ]);
 
-    const displayTrades = tradesWithCounts.length > 0 ? tradesWithCounts : [
-        { trade: "Plumber", count: 0 },
-        { trade: "Electrician", count: 0 },
-        { trade: "Carpenter", count: 0 },
-        { trade: "Handyman", count: 0 },
-        { trade: "Painter", count: 0 },
-    ];
+    const displayTrades = tradesWithCounts;
 
     const suburbCtxKey = suburbName.toLowerCase().replace(/\s+/g, "-");
     const suburbCtx = SUBURB_CONTEXT[suburbCtxKey];
@@ -265,37 +256,41 @@ export default async function SuburbDirectoryPage({ params, searchParams }: Page
                                     Submit your job once and we&apos;ll match you with up to 3 verified local businesses in {suburbName}, {cityName}.
                                 </p>
                             </div>
-                            <PublicMultiQuoteForm initialState={stateUpper} initialCity={cityName} initialSuburb={suburbName} initialSourcePage={`/local/${state}/${city}/${suburb}`} />
+                            <PublicMultiQuoteForm initialState={stateUpper} initialCity={cityName} initialSuburb={suburbName} initialSourcePage={`/local/${state}/${city}/${canonicalSuburb}`} />
                         </section>
 
                         {/* Trade category grid — oversized 120px icons */}
                         <section>
                             <h2 className="font-black text-[#1A1A1A] mb-2 font-display" style={{ fontSize: '32px' }}>Select a Trade Category</h2>
                             <p className="text-gray-500 mb-8" style={{ fontSize: '20px', lineHeight: 1.7 }}>Find verified local specialists in {suburbName} for your project.</p>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
-                                {displayTrades.map(({ trade, count }) => {
-                                    const Icon = TRADE_ICONS[trade] || Wrench;
-                                    const tradeSlug = trade.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-                                    const tradeUrl = `/local/${state}/${city}/${suburb}/${tradeSlug}`;
-                                    return (
-                                        <Link key={trade} href={tradeUrl} className="group">
-                                            <div className="bg-white rounded-2xl border border-zinc-200 hover:border-orange-500 hover:shadow-xl transition-all duration-300 p-5 flex flex-col items-center text-center gap-4">
-                                                <div className="w-[120px] h-[120px] bg-zinc-50 rounded-2xl flex items-center justify-center text-zinc-400 group-hover:bg-orange-50 group-hover:text-orange-600 transition-colors">
-                                                    <Icon className="w-12 h-12" />
-                                                </div>
-                                                <div>
-                                                    <p className="font-black text-[#1A1A1A] group-hover:text-[#FF6600] transition-colors leading-tight mb-1" style={{ fontSize: '22px' }}>
-                                                        {trade}
-                                                    </p>
-                                                    {count > 0 && (
+                            {displayTrades.length > 0 ? (
+                                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+                                    {displayTrades.map(({ trade, count }) => {
+                                        const Icon = TRADE_ICONS[trade] || Wrench;
+                                        const tradeSlug = trade.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                                        const tradeUrl = `/local/${state}/${city}/${canonicalSuburb}/${tradeSlug}`;
+                                        return (
+                                            <Link key={trade} href={tradeUrl} className="group">
+                                                <div className="bg-white rounded-2xl border border-zinc-200 hover:border-orange-500 hover:shadow-xl transition-all duration-300 p-5 flex flex-col items-center text-center gap-4">
+                                                    <div className="w-[120px] h-[120px] bg-zinc-50 rounded-2xl flex items-center justify-center text-zinc-400 group-hover:bg-orange-50 group-hover:text-orange-600 transition-colors">
+                                                        <Icon className="w-12 h-12" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-black text-[#1A1A1A] group-hover:text-[#FF6600] transition-colors leading-tight mb-1" style={{ fontSize: '22px' }}>
+                                                            {trade}
+                                                        </p>
                                                         <p className="font-bold text-[#FF6600]" style={{ fontSize: '16px' }}>{count} verified</p>
-                                                    )}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </Link>
-                                    );
-                                })}
-                            </div>
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <p className="text-gray-500" style={{ fontSize: '18px', lineHeight: 1.7 }}>
+                                    Trade-specific listings for {suburbName} are being reviewed before they are added to the public index.
+                                </p>
+                            )}
                         </section>
 
                         {/* Local knowledge from SUBURB_CONTEXT */}
