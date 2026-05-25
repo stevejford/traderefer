@@ -8,6 +8,8 @@
         "dev": "turbo dev",
         "lint": "turbo lint",
         "seo:rescue-audit": "node scripts/seo_rescue_audit.mjs",
+        "seo:monitor": "node scripts/seo_rescue_monitor.mjs",
+        "gsc:submit-sitemap": "node scripts/gsc_submit_sitemap.mjs",
         "format": "prettier --write \"**/*.{ts,tsx,md}\""
     },
     "workspaces": [

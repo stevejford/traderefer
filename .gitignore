@@ -40,3 +40,4 @@ logos-cache/
 # Google OAuth credentials & tokens
 client_secret_*.json
 gsc_token.json
+gsc_token_webmasters.json
