@@ -105,9 +105,9 @@
   select:focus-visible,
   [role="button"]:focus,
   [role="button"]:focus-visible {
-    outline: 3px solid #111827;
-    outline-offset: 3px;
-    box-shadow: 0 0 0 6px rgba(194, 65, 12, 0.25);
+    outline: 3px solid #111827 !important;
+    outline-offset: 3px !important;
+    box-shadow: 0 0 0 6px rgba(194, 65, 12, 0.25) !important;
   }
 
   /* Standard input focus states */
