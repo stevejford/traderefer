@@ -1,13 +1,13 @@
 # TradeRefer SEO Rescue Status
 
-Last updated: 2026-05-25
+Last updated: 2026-05-26
 
 ## Current Live State
 
-The first SEO rescue pass is deployed to production on Vercel and merged to the upstream GitHub repository.
+The first SEO rescue pass and the first DeepSyte-driven metadata/accessibility uplift are deployed to production on Vercel and merged to the upstream GitHub repository.
 
 - Production domain: `https://traderefer.au`
-- Vercel deployment: `dpl_9AigpD6pW6Fs4tE2H9FSHaHYBEUP`
+- Vercel deployment: `dpl_FTMBM6G6GuxTD93CN6trnPKKqnbm`
 - Upstream PR: `https://github.com/maddonsteve2-blip/traderefer/pull/1` (merged)
 - Fork containing rescue commits: `https://github.com/stevejford/traderefer`
 - Railway API deployment: `828c4e70-3422-4c62-b3e5-a7ad2a1cc4d8` for commit `4abaddb4`
@@ -17,8 +17,11 @@ Local commits:
 - `cfa6fa98 Rescue TradeRefer SEO indexation`
 - `eee3c1ee Add TradeRefer SEO rescue monitoring`
 - `4abaddb4 Document TradeRefer SEO rescue status`
+- `52e79312 Improve SEO metadata and accessibility signals`
+- `c4a77e6f Strengthen visible focus styles`
+- `bdde8997 Force visible focus outline`
 
-The upstream repository is now at commit `4abaddb4`.
+The upstream repository is now at commit `bdde8997`.
 
 ## Live Sitemap Counts
 
@@ -52,7 +55,7 @@ The monitor currently checks these URLs:
 
 Latest GSC cache seen during rescue monitor:
 
-- Pulled at: `2026-05-25T13:58:58.020062+00:00`
+- Pulled at: `2026-05-25T20:09:28.711608+00:00`
 - Last 28 days: 11 clicks, 3,458 impressions, 0.32% CTR, average position 15.3
 
 The existing `gsc_token.json` has readonly scope only. Sitemap listing works, but submitting the sitemap fails with `403 insufficient authentication scopes`.
@@ -71,22 +74,24 @@ https://traderefer.au/sitemap.xml
 
 ## DeepSyte State
 
-DeepSyte was not available for the final visual/performance sample audit in this session.
+DeepSyte MCP is connected and was used for sampled public-page audits across homepage, local trade, suburb, top, profile, and generic near-me templates.
 
-Observed state:
+Observed state and fixes:
 
-- Codex MCP config lists `deepsyte` at `https://api.deepsyte.com/mcp`.
-- Native `mcp__deepsyte` tools were not mounted in this running thread.
-- `deepsyte whoami` reported the website OAuth session was expired.
-- `codex mcp login deepsyte` timed out waiting for OAuth completion.
+- DeepSyte run evidence: `https://www.deepsyte.com/dashboard/runs/Fbv29oZ7TbD7-83yvGvnl` and `https://www.deepsyte.com/dashboard/runs/fl2kCPImF01cyYApXDbys`.
+- Homepage description is shorter and clearer.
+- Local trade page title is shorter; sampled page changed from `2 Verified Air Conditioning Specialists in Caringbah 2229 | TradeRefer` to `2 Air Conditioning Specialists in Caringbah 2229`.
+- Suburb, top, profile, and generic near-me templates now emit complete OG/Twitter image metadata.
+- Public profile pages now include the shared footer landmark.
+- App-wide skip link is present.
+- Orange-on-white CTA contrast now passes DeepSyte sampled contrast checks.
+- Live computed styles confirm focused CTA links receive a 3px outline plus 6px focus halo.
 
-Next step:
+Residual DeepSyte findings:
 
-```bash
-codex mcp login deepsyte
-```
-
-Then start a fresh Codex session or retry once the `mcp__deepsyte` tools are mounted.
+- DeepSyte still reports `WCAG 2.4.7` focus indicator failures in its aggregate audit despite computed focus styles showing a visible outline. Treat this as needing a follow-up selector-level audit before closing accessibility.
+- All sampled pages still share `https://traderefer.au/og-default.jpg`; add template-specific OG images next.
+- Mobile Lighthouse lab performance remains weak on heavier pages, especially profiles. Latest sampled scores: home 66, local trade 65, top 69, profile 49.
 
 ## Daily Monitoring
 
@@ -114,5 +119,7 @@ Watch for:
 ## Next Recovery Gates
 
 1. Complete writable GSC OAuth and resubmit `https://traderefer.au/sitemap.xml`.
-2. Reconnect DeepSyte and run visual/performance/SEO samples across home, profile, local trade, suburb, top, and generic near-me pages.
-3. Monitor GSC at 7, 14, and 28 days before adding any new programmatic page sets.
+2. Add differentiated OG images for profile, local trade, suburb, top, and generic trade templates.
+3. Investigate profile/mobile performance: large JS payload, LCP, TTI, and resource count.
+4. Follow up on selector-level focus indicator audit.
+5. Monitor GSC at 7, 14, and 28 days before adding any new programmatic page sets.
