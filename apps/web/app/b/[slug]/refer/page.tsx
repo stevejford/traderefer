@@ -27,11 +27,27 @@ export async function generateMetadata({
     const business = await getBusiness(slug);
     const canonicalSlug = String(business?.slug || slug).trim() || slug;
     const businessName = String(business?.business_name || "TradeRefer business").trim();
+    const shortName = businessName.length > 42 ? `${businessName.slice(0, 39).trim()}...` : businessName;
+    const title = `Refer ${shortName} | TradeRefer`;
+    const description = `Apply to refer ${shortName} on TradeRefer.`;
+    const profileUrl = `${BASE_URL}/b/${canonicalSlug}`;
 
     return {
-        title: `${businessName} Referral Program | TradeRefer`,
-        description: `Apply to refer ${businessName} on TradeRefer.`,
-        alternates: { canonical: `${BASE_URL}/b/${canonicalSlug}` },
+        title,
+        description,
+        alternates: { canonical: profileUrl },
+        openGraph: {
+            title,
+            description,
+            url: profileUrl,
+            type: "website",
+            siteName: "TradeRefer",
+        },
+        twitter: {
+            card: "summary_large_image",
+            title,
+            description,
+        },
         robots: { index: false, follow: true },
     };
 }
