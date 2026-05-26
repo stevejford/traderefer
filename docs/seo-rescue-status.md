@@ -12,10 +12,10 @@ The latest route-flow rescue pass is deployed and verified on production. It fix
 
 The selector-level focus follow-up is also deployed. The homepage rewards marquee no longer injects duplicated off-screen carousel cards into the keyboard tab order; the visible `/rewards` path is now the normal "See all 335 brands" CTA.
 
-The latest sitemap cleanup pass responds to a GSC zero-click/indexation contradiction: `/local/act/canberra/queanbeyan/excavation` was `noindex, follow` live but still present in the trade sitemap while the canonical NSW Queanbeyan page was also submitted. The sitemap generator now only emits suburb and suburb/trade URLs when the suburb segment has a valid state/postcode signal from the canonical lookup or the business address, keeping unsupported state/suburb combinations out of XML.
+The latest sitemap cleanup pass is deployed and verified. It responds to a GSC zero-click/indexation contradiction: `/local/act/canberra/queanbeyan/excavation` was `noindex, follow` live but still present in the trade sitemap while the canonical NSW Queanbeyan page was also submitted. The sitemap generator now only emits suburb and suburb/trade URLs when the suburb segment has a valid state/postcode signal from the canonical lookup or the business address, keeping unsupported state/suburb combinations out of XML.
 
 - Production domain: `https://traderefer.au`
-- Vercel deployment: `https://traderefer-4ihvdad5e-stevejfords-projects.vercel.app` (`dpl_FadiQLXcUTEWgZxXzm2ogoS5HXYk`)
+- Vercel deployment: `https://traderefer-gt5cyuoo3-stevejfords-projects.vercel.app` for commit `30a5c66a`
 - Upstream PR: `https://github.com/maddonsteve2-blip/traderefer/pull/1` (merged)
 - Active upstream PR for dynamic OG images: `https://github.com/maddonsteve2-blip/traderefer/pull/2`
 - Fork containing rescue commits: `https://github.com/stevejford/traderefer`
@@ -43,8 +43,9 @@ Local commits:
 - `9bf62f3b Clean up refer indexation flow`
 - `edb9f70c Tighten refer page metadata`
 - `4a806d5c Add refer social metadata`
+- `30a5c66a Exclude invalid local URLs from sitemaps`
 
-The upstream repository is still behind the fork rescue branch. The fork branch has deployed rescue commits through `4a806d5c`; PR #2 is open, clean, and mergeable, but a merge attempt from `stevejford` failed with `does not have the correct permissions to execute MergePullRequest`, so upstream merge still needs a repo maintainer.
+The upstream repository is still behind the fork rescue branch. The fork branch has deployed rescue commits through `30a5c66a`; PR #2 is open, clean, and mergeable, but a merge attempt from `stevejford` failed with `does not have the correct permissions to execute MergePullRequest`, so upstream merge still needs a repo maintainer.
 
 ## Live Sitemap Counts
 
@@ -58,17 +59,19 @@ Current verified counts:
 
 - `general`: 812 URLs
 - `profiles`: 33,632 URLs
-- `suburbs`: 1,178 URLs
-- `trades`: 14,560 URLs
+- `suburbs`: 1,175 URLs
+- `trades`: 14,551 URLs
 - `top`: 1,264 URLs
 
-The generic national near-me URLs are no longer in the XML sitemap. Known bad postcode variants such as `/local/nsw/epping/epping-3076/...` are no longer in XML.
+The generic national near-me URLs are no longer in the XML sitemap. Known bad postcode variants such as `/local/nsw/epping/epping-3076/...` are no longer in XML. The invalid ACT Queanbeyan trade URL `/local/act/canberra/queanbeyan/excavation` is also gone from XML while `/local/nsw/queanbeyan/queanbeyan-2620/excavation` remains submitted.
 
 ## Verified Live Behaviors
 
 The monitor currently checks these URLs:
 
 - `/local/nsw/epping/epping-3076/drainage` redirects with `308` to `/local/nsw/epping/epping-2118/drainage`.
+- `/local/act/canberra/queanbeyan/excavation` remains `noindex, follow` and is absent from XML.
+- `/local/nsw/queanbeyan/queanbeyan-2620/excavation` remains `index, follow` and present in XML.
 - `/local/nsw/sydney/caringbah-2229/air-conditioning-heating` is `index, follow`.
 - `/local/nsw/sydney/caringbah-2229/air-conditioning-heating/split-system-air-conditioner-electrical` is `noindex, follow`.
 - `/top/air-conditioning-heating/nsw/parramatta` is `index, follow`.
@@ -180,7 +183,7 @@ Observed state and fixes:
 
 Latest local/live checks:
 
-- Vercel GitHub deployment for fork commit `4a806d5c` completed successfully and aliases `https://traderefer.au`.
+- Vercel GitHub deployment for fork commit `30a5c66a` completed successfully and aliases `https://traderefer.au`.
 - `https://traderefer.au/businesses` returns `200`, renders `Find Verified Trades Near You`, and keeps `robots: index, follow`.
 - `https://traderefer.au/remove` returns `200`, renders `Request a business listing removal`, and keeps `robots: noindex, follow`.
 - DeepSyte live focus check confirms the homepage rewards marquee is no longer in the keyboard tab order and representative public templates show 0 invisible focus indicators in sampled tab stops.
@@ -210,7 +213,7 @@ Latest local/live checks:
 - Live HTML checks confirm profile pages no longer contain `maps.google.com/maps?...output=embed`, profile pages include `Open location in Google Maps`, and local trade pages use `/images/hero-construction.webp` instead of the remote Unsplash hero.
 - Live HTML checks confirm home, profile, local, and top SEO pages do not include Clerk, Google Tag Manager, or PostHog markers; `/login` still includes Clerk as expected.
 - `git diff --check` passed.
-- `node scripts/seo_rescue_monitor.mjs` returned `Status: OK` after deploy with sitemap counts unchanged and watched URL indexation/redirect rules stable.
+- `node scripts/seo_rescue_monitor.mjs` returned `Status: OK` after the invalid local URL sitemap cleanup deployed; watched URL indexation/redirect rules are stable.
 - `pnpm --filter web build` completed successfully after the sitemap eligibility patch.
 - Repo-wide `pnpm --filter web lint` still fails on pre-existing legacy lint debt; this pass did not add new lint failures in the touched files.
 - Broad targeted lint across old directory templates still reports pre-existing `any`, unused import, React set-state-in-effect, and `<img>` warnings/errors unrelated to this performance pass.
