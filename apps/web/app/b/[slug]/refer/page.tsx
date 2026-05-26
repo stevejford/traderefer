@@ -1,18 +1,39 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { ArrowRight, DollarSign, ShieldCheck, Star } from "lucide-react";
+import { notFound, permanentRedirect } from "next/navigation";
+import { ArrowRight, ShieldCheck, Star } from "lucide-react";
 import { BusinessLogo } from "@/components/BusinessLogo";
 
-export const metadata: Metadata = {
-    robots: { index: false, follow: false },
-};
+const BASE_URL = "https://traderefer.au";
 
 async function getBusiness(slug: string) {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
     const res = await fetch(`${apiUrl}/businesses/${slug}`, { cache: "no-store" });
     if (!res.ok) return null;
     return res.json();
+}
+
+function buildReferPath(slug: string, src?: string) {
+    const query = src ? `?src=${encodeURIComponent(src)}` : "";
+    return `/b/${slug}/refer${query}`;
+}
+
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+    const { slug } = await params;
+    const business = await getBusiness(slug);
+    const canonicalSlug = String(business?.slug || slug).trim() || slug;
+    const businessName = String(business?.business_name || "TradeRefer business").trim();
+
+    return {
+        title: `${businessName} Referral Program | TradeRefer`,
+        description: `Apply to refer ${businessName} on TradeRefer.`,
+        alternates: { canonical: `${BASE_URL}/b/${canonicalSlug}` },
+        robots: { index: false, follow: true },
+    };
 }
 
 export default async function ReferPublicPage({
@@ -26,11 +47,16 @@ export default async function ReferPublicPage({
     const business = await getBusiness(slug);
     if (!business) notFound();
 
+    const canonicalSlug = String(business.slug || slug).trim() || slug;
+    if (canonicalSlug !== slug) {
+        permanentRedirect(buildReferPath(canonicalSlug, sp?.src));
+    }
+
     const fee = business.referral_fee_cents
         ? `$${(business.referral_fee_cents / 100).toFixed(0)}`
         : null;
 
-    const srcParam = sp?.src ? `&src=${sp.src}` : "";
+    const dashboardReferralPath = `/dashboard/referrer/refer/${canonicalSlug}${sp?.src ? `?src=${encodeURIComponent(sp.src)}` : ""}`;
 
     return (
         <main className="min-h-screen bg-zinc-50 flex items-center justify-center p-6 md:p-8">
@@ -78,7 +104,7 @@ export default async function ReferPublicPage({
                 </div>
 
                 <Link
-                    href={`/join/referrer?next=/dashboard/referrer/refer/${slug}${srcParam}`}
+                    href={`/join/referrer?next=${encodeURIComponent(dashboardReferralPath)}`}
                     className="w-full flex items-center justify-center gap-3 bg-orange-600 hover:bg-orange-700 text-white font-black text-lg md:text-xl rounded-2xl h-16 md:h-18 transition-all shadow-xl shadow-orange-500/20 active:scale-95"
                 >
                     Join & Start Earning <ArrowRight className="w-5 h-5" />
@@ -86,7 +112,7 @@ export default async function ReferPublicPage({
                 <div className="mt-6 flex flex-col gap-2">
                     <p className="text-sm text-zinc-500 font-bold">
                         Already a member?{" "}
-                        <Link href={`/sign-in?redirect_url=/dashboard/referrer/refer/${slug}${srcParam}`} className="text-orange-500 hover:text-orange-600 font-black">
+                        <Link href={`/login?redirect_url=${encodeURIComponent(dashboardReferralPath)}`} className="text-orange-500 hover:text-orange-600 font-black">
                             Sign in here
                         </Link>
                     </p>

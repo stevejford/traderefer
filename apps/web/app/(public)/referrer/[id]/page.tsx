@@ -6,7 +6,7 @@ import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import {
     MapPin, Award, Star, TrendingUp, Briefcase,
-    MessageSquare, ArrowLeft, CheckCircle, ExternalLink
+    MessageSquare, ArrowLeft, CheckCircle
 } from "lucide-react";
 import { PageTransition } from "@/components/ui/PageTransition";
 
@@ -36,7 +36,7 @@ export default function PublicReferrerProfilePage() {
     useEffect(() => {
         if (!isLoaded) return;
         if (!isSignedIn) {
-            router.push(`/sign-in?redirect_url=/referrer/${id}`);
+            router.push(`/login?redirect_url=${encodeURIComponent(`/referrer/${id}`)}`);
             return;
         }
         if (!id) return;
