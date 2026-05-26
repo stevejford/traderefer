@@ -8,10 +8,10 @@ The first SEO rescue pass and the first DeepSyte-driven metadata/accessibility u
 
 The next rescue pass added dynamic, template-specific Open Graph image generation for homepage, profile, local trade, suburb, top-list, near-me, and trade/job guide templates. The current live pass also reduces public-page mobile weight by removing the embedded Google Maps iframe from profile pages, lazy-loading address autocomplete, disabling eager route prefetches on key public directory templates, replacing the oversized remote local-page hero image with the existing local WebP asset, and deferring Clerk/PostHog/Google Analytics away from anonymous SEO routes.
 
-The latest route-flow rescue pass is locally verified but not yet live. It fixes public navigation from the landing page, restores the public business directory render path, adds a real noindex listing-removal support page, and prevents homepage popular-search links from emitting bad city/postcode combinations. Live deployment is currently blocked because the configured Vercel CLI token is invalid.
+The latest route-flow rescue pass is deployed and verified on production. It fixes public navigation from the landing page, restores the public business directory render path, adds a real noindex listing-removal support page, prevents homepage popular-search links from emitting bad city/postcode combinations, and adds repo-side Vercel monorepo build config for the GitHub-connected deployment.
 
 - Production domain: `https://traderefer.au`
-- Vercel deployment: `dpl_CPafjEzfG38QuaGGvB75GyU8JtGD`
+- Vercel deployment: `https://vercel.com/stevejfords-projects/traderefer/93PbjEindTeUE7bBer4cGQRZD4r7`
 - Upstream PR: `https://github.com/maddonsteve2-blip/traderefer/pull/1` (merged)
 - Active upstream PR for dynamic OG images: `https://github.com/maddonsteve2-blip/traderefer/pull/2`
 - Fork containing rescue commits: `https://github.com/stevejford/traderefer`
@@ -56,26 +56,21 @@ The monitor currently checks these URLs:
 - `/top/air-conditioning-heating/nsw/parramatta` is `index, follow`.
 - `/air-conditioning-specialists-near-me` is `noindex, follow`.
 
-## Current Live Route-Flow Blockers
+## Live Route-Flow Verification
 
-Rendered Chrome sweep from the production landing page on 2026-05-26 found 84 unique internal routes and 48 issues that are fixed locally in PR #2 but not live yet:
+Rendered Chrome sweep from the production landing page on 2026-05-26 after deployment found 84 unique internal routes and 0 route-flow issues:
 
-- `/businesses` returns `200` but hydrates to `This page couldn't load`.
-- Visible `/businesses?category=...` category links also hydrate to `This page couldn't load`.
-- Several live directory category pages still trigger `/api/enrich-business` from public browsing.
-- The public header still exposes `/signup`, which redirects to `/register`.
-- 15 visible homepage `/local/...` popular-search links still redirect from bad city/postcode combinations such as `/local/vic/melbourne/melbourne-3186/building` to `/local/vic/melbourne/melbourne-3000/building`.
-- `/remove` is still a `404` on production.
+- `/businesses` returns `200` and renders `Find Verified Trades Near You`.
+- Visible `/businesses?category=...` category links render the directory page.
+- Public directory browsing no longer triggers `/api/enrich-business`.
+- The public header and mobile menu expose `/register`, not `/signup`.
+- Visible homepage `/local/...` popular-search links no longer redirect from bad city/postcode combinations.
+- `/remove` returns `200`, renders `Request a business listing removal`, and emits `noindex, follow`.
 
-DeepSyte CLI confirmation run: `https://web-phi-eight-56.vercel.app/dashboard/runs/KL7dmkvXgLi_0-k363S76`.
+DeepSyte CLI confirmation runs:
 
-Local build evidence for commit `fb0441df` proves these same checks are fixed before deployment:
-
-- `/businesses` renders `Find Verified Trades Near You`.
-- `/remove` renders `Request a business listing removal` with `noindex, follow`.
-- No visible landing-page links point to `/signup`.
-- No visible homepage `/local/` links redirect due to bad city/postcode combinations.
-- Public `/businesses` navigation no longer triggers `/api/enrich-business`.
+- Broken production before deploy: `https://web-phi-eight-56.vercel.app/dashboard/runs/KL7dmkvXgLi_0-k363S76`.
+- Fixed production after deploy: `https://web-phi-eight-56.vercel.app/dashboard/runs/zCpe_1eljoZEXrdG-ciHA`.
 
 ## GSC State
 
@@ -145,6 +140,11 @@ Residual DeepSyte findings:
 
 Latest local/live checks:
 
+- Vercel GitHub deployment for fork commit `7a06b4a2` completed successfully.
+- `https://traderefer.au/businesses` returns `200`, renders `Find Verified Trades Near You`, and keeps `robots: index, follow`.
+- `https://traderefer.au/remove` returns `200`, renders `Request a business listing removal`, and keeps `robots: noindex, follow`.
+- Production route-flow sweep from `https://traderefer.au/` found 84 visible internal routes and 0 issues.
+- Production route-flow sweep found 0 `/signup` links, 0 bad `/local/` redirecting popular-search links, and 0 `/api/enrich-business` calls from public directory browsing.
 - `pnpm.cmd --dir apps/web exec eslint app/page.tsx "app/(public)/businesses/page.tsx" app/remove/page.tsx components/RuntimeShell.tsx lib/public-routes.ts` passed with one existing `<img>` performance warning on directory thumbnails.
 - `pnpm.cmd --dir apps/web build` completed successfully after the route-flow changes.
 - Built local app served at `http://localhost:3020` and was swept from the landing page with rendered Chrome.
@@ -192,9 +192,8 @@ Watch for:
 
 ## Next Recovery Gates
 
-1. Refresh Vercel authentication, deploy the route-flow rescue pass, and verify the same 84-route sweep against `https://traderefer.au`.
-2. Complete writable GSC OAuth and resubmit `https://traderefer.au/sitemap.xml`.
-3. Push/merge the live performance, JS deferral, and route-flow passes upstream so the deployed production state is reflected in GitHub.
-4. Follow up on selector-level focus indicator audit.
-5. Reduce remaining first-party JS/font/icon weight where it materially affects crawl/render cost.
-6. Monitor GSC at 7, 14, and 28 days before adding any new programmatic page sets.
+1. Complete writable GSC OAuth and resubmit `https://traderefer.au/sitemap.xml`.
+2. Merge the fork rescue commits upstream so `maddonsteve2-blip/traderefer` reflects the deployed production state.
+3. Follow up on selector-level focus indicator audit.
+4. Reduce remaining first-party JS/font/icon weight where it materially affects crawl/render cost.
+5. Monitor GSC at 7, 14, and 28 days before adding any new programmatic page sets.
