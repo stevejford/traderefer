@@ -12,6 +12,8 @@ The latest route-flow rescue pass is deployed and verified on production. It fix
 
 The selector-level focus follow-up is also deployed. The homepage rewards marquee no longer injects duplicated off-screen carousel cards into the keyboard tab order; the visible `/rewards` path is now the normal "See all 335 brands" CTA.
 
+The latest sitemap cleanup pass responds to a GSC zero-click/indexation contradiction: `/local/act/canberra/queanbeyan/excavation` was `noindex, follow` live but still present in the trade sitemap while the canonical NSW Queanbeyan page was also submitted. The sitemap generator now only emits suburb and suburb/trade URLs when the suburb segment has a valid state/postcode signal from the canonical lookup or the business address, keeping unsupported state/suburb combinations out of XML.
+
 - Production domain: `https://traderefer.au`
 - Vercel deployment: `https://traderefer-4ihvdad5e-stevejfords-projects.vercel.app` (`dpl_FadiQLXcUTEWgZxXzm2ogoS5HXYk`)
 - Upstream PR: `https://github.com/maddonsteve2-blip/traderefer/pull/1` (merged)
@@ -209,6 +211,8 @@ Latest local/live checks:
 - Live HTML checks confirm home, profile, local, and top SEO pages do not include Clerk, Google Tag Manager, or PostHog markers; `/login` still includes Clerk as expected.
 - `git diff --check` passed.
 - `node scripts/seo_rescue_monitor.mjs` returned `Status: OK` after deploy with sitemap counts unchanged and watched URL indexation/redirect rules stable.
+- `pnpm --filter web build` completed successfully after the sitemap eligibility patch.
+- Repo-wide `pnpm --filter web lint` still fails on pre-existing legacy lint debt; this pass did not add new lint failures in the touched files.
 - Broad targeted lint across old directory templates still reports pre-existing `any`, unused import, React set-state-in-effect, and `<img>` warnings/errors unrelated to this performance pass.
 - `pnpm.cmd --dir apps/web exec eslint 'app/b/[slug]/page.tsx'` still reports pre-existing `any`/unused-import errors in that legacy profile file; the production `pnpm.cmd --dir apps/web build` passed after the profile image patch.
 

@@ -15,6 +15,8 @@ const EXPECTED_LIMITS = {
 
 const WATCH_URLS = [
   "/local/nsw/epping/epping-3076/drainage",
+  "/local/act/canberra/queanbeyan/excavation",
+  "/local/nsw/queanbeyan/queanbeyan-2620/excavation",
   "/local/nsw/sydney/caringbah-2229/air-conditioning-heating",
   "/local/nsw/sydney/caringbah-2229/air-conditioning-heating/split-system-air-conditioner-electrical",
   "/top/air-conditioning-heating/nsw/parramatta",
@@ -107,18 +109,24 @@ async function main() {
     const count = locs.length;
     const nearMeLeak = text.includes("air-conditioning-specialists-near-me");
     const badPostcodeLeak = text.includes("/local/nsw/epping/epping-3076/");
+    const badStateSuburbLeak = text.includes("/local/act/canberra/queanbeyan/");
+    const canonicalQueanbeyanPresent = text.includes("/local/nsw/queanbeyan/queanbeyan-2620/excavation");
     sitemapSummary[sitemap] = {
       status: response.status,
       count,
       sample: locs.slice(0, SAMPLE_LIMIT),
       nearMeLeak,
       badPostcodeLeak,
+      badStateSuburbLeak,
+      canonicalQueanbeyanPresent,
     };
     if (!response.ok) issues.push(`${sitemap} sitemap returned ${response.status}`);
     if (limits.min && count < limits.min) issues.push(`${sitemap} sitemap count ${count} is below expected minimum ${limits.min}`);
     if (limits.max && count > limits.max) issues.push(`${sitemap} sitemap count ${count} is above expected maximum ${limits.max}`);
     if (nearMeLeak) issues.push(`${sitemap} sitemap includes generic near-me URLs`);
     if (badPostcodeLeak) issues.push(`${sitemap} sitemap includes invalid NSW/VIC Epping postcode URL`);
+    if (badStateSuburbLeak) issues.push(`${sitemap} sitemap includes invalid ACT/NSW Queanbeyan URL`);
+    if (sitemap === "trades" && !canonicalQueanbeyanPresent) issues.push(`${sitemap} sitemap is missing canonical NSW Queanbeyan excavation URL`);
   }
 
   const inspections = [];
@@ -134,6 +142,14 @@ async function main() {
     {
       label: "valid local trade page remains indexable",
       ok: inspections.find((item) => item.url.endsWith("/local/nsw/sydney/caringbah-2229/air-conditioning-heating"))?.robots === "index, follow",
+    },
+    {
+      label: "canonical Queanbeyan trade page remains indexable",
+      ok: inspections.find((item) => item.url.endsWith("/local/nsw/queanbeyan/queanbeyan-2620/excavation"))?.robots === "index, follow",
+    },
+    {
+      label: "invalid ACT Queanbeyan page stays out of the index",
+      ok: inspections.find((item) => item.url.endsWith("/local/act/canberra/queanbeyan/excavation"))?.robots === "noindex, follow",
     },
     {
       label: "job subtype pages stay noindex",

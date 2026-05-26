@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { JOB_TYPES } from "@/lib/constants";
-import { getCanonicalSuburbSlug, isPostcodeValidForState } from "@/lib/postcodes";
+import { getCanonicalSuburbSlug, isPostcodeValidForState, parseSuburbSlug } from "@/lib/postcodes";
 
 export const runtime = "nodejs";
 export const revalidate = 86400;
@@ -81,11 +81,13 @@ function postcodeFromAddress(address: string | null, state: string) {
     return matches.find((postcode) => isPostcodeValidForState(postcode, state)) || null;
 }
 
-function suburbSegment(suburbSlug: string, state: string, address: string | null) {
+function sitemapSuburbSegment(suburbSlug: string, state: string, address: string | null) {
     const canonical = getCanonicalSuburbSlug(suburbSlug, state);
-    if (canonical !== suburbSlug) return canonical;
-    const postcode = postcodeFromAddress(address, state);
-    return postcode ? `${suburbSlug}-${postcode}` : suburbSlug;
+    const { postcode } = parseSuburbSlug(canonical);
+    if (postcode && isPostcodeValidForState(postcode, state)) return canonical;
+
+    const addressPostcode = postcodeFromAddress(address, state);
+    return addressPostcode ? `${canonical}-${addressPostcode}` : null;
 }
 
 async function generalSitemap() {
@@ -181,7 +183,13 @@ async function suburbsSitemap() {
         GROUP BY LOWER(state), LOWER(REPLACE(city, ' ', '-')), LOWER(REPLACE(suburb, ' ', '-'))
         HAVING COUNT(*) >= 2 OR COUNT(DISTINCT trade_category) >= 2
     `;
-    return rows.map((row) => url(`${BASE_URL}/local/${row.s}/${row.c}/${suburbSegment(row.sub, row.s, row.addr)}`, today, "weekly", "0.75"));
+    const entries: UrlEntry[] = [];
+    for (const row of rows) {
+        const suburb = sitemapSuburbSegment(row.sub, row.s, row.addr);
+        if (!suburb) continue;
+        entries.push(url(`${BASE_URL}/local/${row.s}/${row.c}/${suburb}`, today, "weekly", "0.75"));
+    }
+    return entries;
 }
 
 async function tradesSitemap() {
@@ -209,12 +217,18 @@ async function tradesSitemap() {
         GROUP BY LOWER(state), LOWER(REPLACE(city, ' ', '-')), LOWER(REPLACE(suburb, ' ', '-')), trade_category
         HAVING COUNT(*) >= 2 OR COALESCE(SUM(total_reviews), 0) > 0
     `;
-    return rows.map((row) => url(
-        `${BASE_URL}/local/${row.s}/${row.c}/${suburbSegment(row.sub, row.s, row.addr)}/${slugify(row.trade_category)}`,
-        dateString(row.lastmod, today),
-        "weekly",
-        "0.7"
-    ));
+    const entries: UrlEntry[] = [];
+    for (const row of rows) {
+        const suburb = sitemapSuburbSegment(row.sub, row.s, row.addr);
+        if (!suburb) continue;
+        entries.push(url(
+            `${BASE_URL}/local/${row.s}/${row.c}/${suburb}/${slugify(row.trade_category)}`,
+            dateString(row.lastmod, today),
+            "weekly",
+            "0.7"
+        ));
+    }
+    return entries;
 }
 
 async function topSitemap() {
