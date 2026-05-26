@@ -398,13 +398,13 @@ export default async function TradeLocationPage({ params }: PageProps) {
             <div className="bg-gray-100 border-b border-gray-200" style={{ paddingTop: '108px', paddingBottom: '12px' }}>
                 <div className="container mx-auto px-4">
                     <nav className="flex items-center flex-wrap gap-2 font-bold text-gray-500 uppercase tracking-widest" style={{ fontSize: '16px' }}>
-                        <Link href="/" className="hover:text-[#FF6600] transition-colors">Home</Link>
+                        <Link prefetch={false} href="/" className="hover:text-[#FF6600] transition-colors">Home</Link>
                         <ChevronRight className="w-3 h-3" />
                         {breadcrumbs.map((bc, i) => (
                             <div key={i} className="flex items-center gap-2">
                                 {i > 0 && <ChevronRight className="w-3 h-3" />}
                                 {bc.href !== "#" ? (
-                                    <Link href={bc.href} className="hover:text-[#FF6600] transition-colors">{bc.name}</Link>
+                                    <Link prefetch={false} href={bc.href} className="hover:text-[#FF6600] transition-colors">{bc.name}</Link>
                                 ) : (
                                     <span className="text-[#FF6600]">{bc.name}</span>
                                 )}
@@ -416,7 +416,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
 
             {/* ── HERO SECTION ── */}
             <div className="bg-[#FCFCFC] pb-20 pt-12 relative overflow-hidden border-b border-gray-200">
-                <div className="absolute inset-0 z-0 bg-cover bg-center" style={{ backgroundImage: 'url(\'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=2670&auto=format&fit=crop\')' }} />
+                <div className="absolute inset-0 z-0 bg-cover bg-center" style={{ backgroundImage: "url('/images/hero-construction.webp')" }} />
                 <div className="absolute inset-0 z-0 bg-[#FCFCFC]/88" />
                 <div className="container mx-auto px-4 relative z-10">
                     <div className="max-w-4xl">
@@ -434,19 +434,19 @@ export default async function TradeLocationPage({ params }: PageProps) {
                             </div>
                         )}
                         <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
-                            <Link href="/register?type=homeowner"
+                            <Link prefetch={false} href="/register?type=homeowner"
                                 className="inline-flex items-center justify-center gap-2 bg-[#FF6600] hover:bg-[#E65C00] text-white font-black rounded-xl px-8 transition-all hover:scale-105 active:scale-95 font-cta w-full sm:w-auto"
                                 style={{ minHeight: '64px', fontSize: '20px' }}
                             >
                                 Request a Free {tradeName} Quote
                             </Link>
-                            <Link href="#businesses"
+                            <Link prefetch={false} href="#businesses"
                                 className="inline-flex items-center justify-center gap-2 bg-white border-2 border-gray-200 hover:border-[#FF6600] text-[#1A1A1A] font-black rounded-xl px-8 transition-all w-full sm:w-auto"
                                 style={{ minHeight: '64px', fontSize: '20px' }}
                             >
                                 View Top {businesses.length > 0 ? businesses.length : ''} Trades
                             </Link>
-                            <Link href="/register?type=business" className="inline-flex items-center justify-center text-sm font-bold text-zinc-600 hover:text-[#FF6600] transition-colors px-1 py-1 sm:py-3">
+                            <Link prefetch={false} href="/register?type=business" className="inline-flex items-center justify-center text-sm font-bold text-zinc-600 hover:text-[#FF6600] transition-colors px-1 py-1 sm:py-3">
                                 Are you a {tradeName.toLowerCase()}? List your business free →
                             </Link>
                         </div>
@@ -542,7 +542,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                     </div>
                                     <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
                                         {relatedTrades.slice(0, 3).map((rt: any) => (
-                                            <Link
+                                            <Link prefetch={false}
                                                 key={rt.slug}
                                                 href={`/local/${state}/${city}/${canonicalSuburb}/${rt.slug}`}
                                                 className="inline-flex items-center gap-1.5 px-4 h-12 bg-zinc-50 border-2 border-zinc-300 rounded-xl font-bold text-zinc-700 hover:border-orange-400 hover:text-orange-600 transition-colors whitespace-nowrap shrink-0"
@@ -585,7 +585,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                         <Search className="w-3.5 h-3.5" /> All {tradeNamePlural}
                                     </span>
                                     {relatedJobs.map((job) => (
-                                        <Link
+                                        <Link prefetch={false}
                                             key={job}
                                             href={`/local/${state}/${city}/${canonicalSuburb}/${trade}/${jobToSlug(job)}`}
                                             className="inline-flex items-center px-4 py-2.5 bg-white border-2 border-zinc-300 rounded-full font-bold text-zinc-700 hover:border-orange-400 hover:text-orange-600 hover:bg-orange-50 transition-all" style={{ fontSize: '14px' }}
@@ -618,7 +618,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                         </div>
                                     </div>
                                     <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold h-12 px-6 border-none whitespace-nowrap">
-                                        <Link href="/register?type=business">Claim Your Listing →</Link>
+                                        <Link prefetch={false} href="/register?type=business">Claim Your Listing →</Link>
                                     </Button>
                                 </div>
                             )}
@@ -635,11 +635,11 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                         </p>
                                         <div className="flex flex-col sm:flex-row justify-center gap-3 mb-6">
                                             <Button asChild size="lg" className="bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-bold px-8 h-14 text-lg">
-                                                <Link href="/register?type=homeowner">Get Free Quotes →</Link>
+                                                <Link prefetch={false} href="/register?type=homeowner">Get Free Quotes →</Link>
                                             </Button>
                                             {nearbySuburbs.length > 0 && (
                                                 <Button asChild size="lg" variant="outline" className="rounded-xl font-bold px-8 h-14 border-2">
-                                                    <Link href={broaderCityTradeHref}>Browse Nearby Areas</Link>
+                                                    <Link prefetch={false} href={broaderCityTradeHref}>Browse Nearby Areas</Link>
                                                 </Button>
                                             )}
                                         </div>
@@ -655,8 +655,8 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                             <h3 className="text-2xl font-black text-zinc-900 mb-4">Find {tradeName} in Nearby Suburbs</h3>
                                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                                                 {nearbySuburbs.map((s: any) => (
-                                                    <Link 
-                                                        key={s.suburb} 
+                                                    <Link prefetch={false}
+                                                        key={s.suburb}
                                                         href={`/local/${state}/${city}/${s.suburb.toLowerCase().replace(/\s+/g, '-')}/${trade}`}
                                                         className="px-4 py-3 bg-zinc-50 hover:bg-orange-50 border border-zinc-200 hover:border-orange-300 rounded-xl text-center font-bold text-zinc-700 hover:text-orange-600 transition-all"
                                                     >
@@ -724,12 +724,12 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                                 {biz.photo_urls?.length > 0 && (
                                                     <div className="flex items-center gap-2 mb-5">
                                                         {biz.photo_urls.slice(0, 4).map((url: string, i: number) => (
-                                                            <Link key={i} href={`/b/${biz.slug}`} className="relative w-[72px] h-[72px] md:w-20 md:h-20 rounded-xl overflow-hidden border border-zinc-200 shrink-0 hover:border-orange-300 transition-colors">
+                                                            <Link prefetch={false} key={i} href={`/b/${biz.slug}`} className="relative w-[72px] h-[72px] md:w-20 md:h-20 rounded-xl overflow-hidden border border-zinc-200 shrink-0 hover:border-orange-300 transition-colors">
                                                                 <img src={url} alt={`${biz.business_name} work ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
                                                             </Link>
                                                         ))}
                                                         {biz.photo_urls.length > 4 && (
-                                                            <Link href={`/b/${biz.slug}`} className="w-[72px] h-[72px] md:w-20 md:h-20 rounded-xl bg-zinc-100 border border-zinc-200 flex flex-col items-center justify-center shrink-0 hover:border-orange-300 transition-colors">
+                                                            <Link prefetch={false} href={`/b/${biz.slug}`} className="w-[72px] h-[72px] md:w-20 md:h-20 rounded-xl bg-zinc-100 border border-zinc-200 flex flex-col items-center justify-center shrink-0 hover:border-orange-300 transition-colors">
                                                                 <Camera className="w-4 h-4 text-zinc-400 mb-0.5" />
                                                                 <span className="text-xs font-bold text-zinc-500">+{biz.photo_urls.length - 4}</span>
                                                             </Link>
@@ -748,10 +748,10 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                                 {/* CTA buttons */}
                                                 <div className="flex flex-wrap items-center gap-3">
                                                     <Button asChild size="lg" className="bg-[#FF6600] hover:bg-[#E65C00] text-white rounded-xl font-bold h-12 px-6 border-none">
-                                                        <Link href={`/b/${biz.slug}`}>View Profile</Link>
+                                                        <Link prefetch={false} href={`/b/${biz.slug}`}>View Profile</Link>
                                                     </Button>
                                                     <Button asChild variant="outline" size="lg" className="border-2 border-zinc-300 hover:bg-zinc-50 hover:border-zinc-400 rounded-xl font-bold h-12 px-6">
-                                                        <Link href={`/b/${biz.slug}#enquiry-form`}>Request Quote</Link>
+                                                        <Link prefetch={false} href={`/b/${biz.slug}#enquiry-form`}>Request Quote</Link>
                                                     </Button>
                                                 </div>
                                             </div>
@@ -815,7 +815,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                         <p className="text-zinc-500 mb-6" style={{ fontSize: '16px' }}>Highest rated by Google reviews from real customers</p>
                                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                             {reviewSnippets.map((r: any, i: number) => (
-                                                <Link key={r.slug} href={`/b/${r.slug}`} className="bg-white rounded-2xl border border-zinc-100 p-5 hover:shadow-lg hover:border-orange-200 transition-all group">
+                                                <Link prefetch={false} key={r.slug} href={`/b/${r.slug}`} className="bg-white rounded-2xl border border-zinc-100 p-5 hover:shadow-lg hover:border-orange-200 transition-all group">
                                                     <div className="flex items-center gap-1 mb-2">
                                                         {[1,2,3,4,5].map(s => {
                                                             const rating = parseFloat(r.rating);
@@ -933,7 +933,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                         <p className="text-lg text-zinc-500 mb-6">Looking for a specific type of {tradeName.toLowerCase()} work? Browse by service:</p>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                             {relatedJobs.map((job) => (
-                                                <Link
+                                                <Link prefetch={false}
                                                     key={job}
                                                     href={`/local/${state}/${city}/${canonicalSuburb}/${trade}/${jobToSlug(job)}`}
                                                     className="flex items-center justify-between px-4 py-3 bg-zinc-50 border border-zinc-100 rounded-xl text-sm font-bold text-zinc-600 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-700 transition-colors"
@@ -1039,7 +1039,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                     <div>
                                         <p className="text-sm font-black text-zinc-900">Verified by TradeRefer</p>
                                         <p className="text-xs text-zinc-500 mt-1 leading-relaxed">Market insights on this page are reviewed by our Verification Team — ABN, licence, and community referral checks since 2024.</p>
-                                        <Link href="/about" className="inline-flex items-center gap-1 mt-2 text-xs font-bold text-orange-600 hover:underline">
+                                        <Link prefetch={false} href="/about" className="inline-flex items-center gap-1 mt-2 text-xs font-bold text-orange-600 hover:underline">
                                             How we verify <ArrowRight className="w-3 h-3" />
                                         </Link>
                                     </div>
@@ -1066,7 +1066,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                         </li>
                                     </ul>
                                     <Button asChild size="lg" className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold h-12 border-none">
-                                        <Link href="/about">How It Works <ArrowRight className="w-4 h-4 ml-2" /></Link>
+                                        <Link prefetch={false} href="/about">How It Works <ArrowRight className="w-4 h-4 ml-2" /></Link>
                                     </Button>
                                 </div>
                             </div>
@@ -1080,7 +1080,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                     </h4>
                                     <div className="grid grid-cols-2 gap-2">
                                         {relatedTrades.map((t: any) => (
-                                            <Link
+                                            <Link prefetch={false}
                                                 key={t.trade_category}
                                                 href={`/local/${state}/${city}/${canonicalSuburb}/${t.slug}`}
                                                 className="px-4 py-2 bg-zinc-50 border border-zinc-100 rounded-xl text-xs font-bold text-zinc-600 hover:bg-zinc-100 transition-colors text-center"
@@ -1104,7 +1104,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                             const nSlug = getCanonicalSuburbSlug(slugify(s.suburb), state);
                                             const nPc = getDisplayPostcode(nSlug, state);
                                             return (
-                                            <Link
+                                            <Link prefetch={false}
                                                 key={s.suburb}
                                                 href={`/local/${state}/${city}/${nSlug}${nPc ? `-${nPc}` : ''}/${trade}`}
                                                 className="flex items-center justify-between px-4 py-3 bg-zinc-50 border border-zinc-100 rounded-xl text-xs font-bold text-zinc-600 hover:bg-zinc-100 transition-colors"
@@ -1123,7 +1123,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                 <h3 className="text-xl font-black mb-2">Are you a {tradeName}?</h3>
                                 <p className="text-white/80 text-sm mb-6">Build your trust score and grow your business with referrals that actually close in {suburbName}.</p>
                                 <Button asChild size="lg" className="bg-white text-orange-600 hover:bg-zinc-100 rounded-xl font-bold px-8 h-12 w-full shadow-lg shadow-black/10 border-none">
-                                    <Link href="/register?type=business">Apply to Join</Link>
+                                    <Link prefetch={false} href="/register?type=business">Apply to Join</Link>
                                 </Button>
                             </div>
                         </div>
@@ -1144,10 +1144,10 @@ export default async function TradeLocationPage({ params }: PageProps) {
                     </div>
                     <div className="flex items-center gap-3 w-full sm:w-auto">
                         <Button asChild size="lg" className="bg-[#FF6600] hover:bg-[#E65C00] text-white rounded-xl font-bold h-12 px-6 border-none flex-1 sm:flex-initial">
-                            <Link href={`/b/${businesses[0]?.slug}#enquiry-form`}>Get a Quote</Link>
+                            <Link prefetch={false} href={`/b/${businesses[0]?.slug}#enquiry-form`}>Get a Quote</Link>
                         </Button>
                         <Button asChild variant="outline" size="lg" className="border-2 border-zinc-300 hover:bg-zinc-50 rounded-xl font-bold h-12 px-6 hidden sm:flex">
-                            <Link href="/register?type=business">List Your Business</Link>
+                            <Link prefetch={false} href="/register?type=business">List Your Business</Link>
                         </Button>
                     </div>
                 </div>

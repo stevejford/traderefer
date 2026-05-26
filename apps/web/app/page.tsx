@@ -163,6 +163,7 @@ export default async function HomePage() {
                 signedOut={
                   <Link
                     href="/register?type=referrer"
+                    prefetch={false}
                     className="w-full bg-[#FF6600] hover:bg-[#E65C00] text-white rounded-xl shadow-lg transition-all active:scale-95 font-cta text-2xl font-bold uppercase tracking-wider flex items-center justify-center gap-2"
                   >
                     Get Paid to Refer <ArrowRight className="w-6 h-6" />
@@ -171,6 +172,7 @@ export default async function HomePage() {
                 signedIn={
                   <Link
                     href="/dashboard/referrer"
+                    prefetch={false}
                     className="w-full bg-[#FF6600] hover:bg-[#E65C00] text-white rounded-xl shadow-lg transition-all active:scale-95 font-cta text-2xl font-bold uppercase tracking-wider flex items-center justify-center gap-2"
                   >
                     My Dashboard <ArrowRight className="w-6 h-6" />
@@ -195,6 +197,7 @@ export default async function HomePage() {
                 signedOut={
                   <Link
                     href="/register?type=business"
+                    prefetch={false}
                     className="w-full bg-[#FF6600] hover:bg-[#E65C00] text-white rounded-xl shadow-lg transition-all active:scale-95 font-cta text-[22px] font-bold uppercase tracking-wider z-10 flex items-center justify-center gap-2"
                     style={{ minHeight: "64px" }}
                   >
@@ -204,6 +207,7 @@ export default async function HomePage() {
                 signedIn={
                   <Link
                     href="/dashboard/business"
+                    prefetch={false}
                     className="w-full bg-[#FF6600] hover:bg-[#E65C00] text-white rounded-xl shadow-lg transition-all active:scale-95 font-cta text-[22px] font-bold uppercase tracking-wider z-10 flex items-center justify-center gap-2"
                     style={{ minHeight: "64px" }}
                   >
@@ -300,11 +304,11 @@ export default async function HomePage() {
           
           <div className="mt-6 flex flex-wrap justify-center gap-2 md:gap-3 text-gray-400">
             <span className="text-gray-500 text-sm hidden sm:inline">Popular:</span>
-            <Link className="text-sm hover:text-[#FF6600] underline decoration-[#FF6600] decoration-2 underline-offset-4 transition-all" href="/businesses?category=Plumbing">Plumbers</Link>
-            <Link className="text-sm hover:text-[#FF6600] underline decoration-[#FF6600] decoration-2 underline-offset-4 transition-all" href="/businesses?category=Electrical">Electricians</Link>
-            <Link className="text-sm hover:text-[#FF6600] underline decoration-[#FF6600] decoration-2 underline-offset-4 transition-all" href="/businesses?category=Building">Builders</Link>
-            <Link className="text-sm hover:text-[#FF6600] underline decoration-[#FF6600] decoration-2 underline-offset-4 transition-all" href="/businesses?category=Painting">Painters</Link>
-            <Link className="text-sm hover:text-[#FF6600] underline decoration-[#FF6600] decoration-2 underline-offset-4 transition-all" href="/businesses?category=Landscaping">Landscapers</Link>
+            <Link className="text-sm hover:text-[#FF6600] underline decoration-[#FF6600] decoration-2 underline-offset-4 transition-all" href="/businesses?category=Plumbing" prefetch={false}>Plumbers</Link>
+            <Link className="text-sm hover:text-[#FF6600] underline decoration-[#FF6600] decoration-2 underline-offset-4 transition-all" href="/businesses?category=Electrical" prefetch={false}>Electricians</Link>
+            <Link className="text-sm hover:text-[#FF6600] underline decoration-[#FF6600] decoration-2 underline-offset-4 transition-all" href="/businesses?category=Building" prefetch={false}>Builders</Link>
+            <Link className="text-sm hover:text-[#FF6600] underline decoration-[#FF6600] decoration-2 underline-offset-4 transition-all" href="/businesses?category=Painting" prefetch={false}>Painters</Link>
+            <Link className="text-sm hover:text-[#FF6600] underline decoration-[#FF6600] decoration-2 underline-offset-4 transition-all" href="/businesses?category=Landscaping" prefetch={false}>Landscapers</Link>
           </div>
         </div>
       </section>
@@ -418,6 +422,7 @@ export default async function HomePage() {
             </div>
             <Link
               href="/rewards"
+              prefetch={false}
               className="shrink-0 inline-flex items-center gap-2 bg-[#FF6600] hover:bg-[#E65C00] text-white font-black px-7 py-3 rounded-full transition-colors shadow-lg"
             >
               See all 335 brands <ArrowRight className="w-4 h-4" />
@@ -447,6 +452,7 @@ export default async function HomePage() {
                 <Link
                   key={trade}
                   href={`/businesses?category=${encodeURIComponent(trade)}`}
+                  prefetch={false}
                   className="group flex items-center gap-2.5 bg-white border border-zinc-200 rounded-2xl px-4 py-3.5 font-bold text-zinc-700 hover:border-orange-500 hover:text-orange-600 hover:shadow-md transition-all duration-200 text-base"
                 >
                   <Wrench className="w-3.5 h-3.5 text-zinc-400 group-hover:text-orange-500 shrink-0 transition-colors" />
@@ -458,6 +464,7 @@ export default async function HomePage() {
           <div className="text-center mt-10">
             <Link
               href="/categories"
+              prefetch={false}
               className="inline-flex items-center gap-2 font-bold text-orange-600 hover:text-orange-700 transition-colors text-base"
             >
               Browse All Trades <ChevronRight className="w-4 h-4" />
@@ -487,6 +494,7 @@ export default async function HomePage() {
               <Link
                 key={slug}
                 href={`/local/${slug}`}
+                prefetch={false}
                 className="group bg-zinc-50 border border-zinc-200 rounded-2xl p-5 hover:border-orange-500 hover:shadow-lg transition-all duration-300"
               >
                 <div className="flex items-start justify-between mb-2">
@@ -507,13 +515,13 @@ export default async function HomePage() {
           <h2 className="text-2xl font-black text-zinc-900 mb-8 text-center font-display">Popular Local Searches</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 max-w-6xl mx-auto text-sm">
             {popularSearches.map(({ label, href }) => (
-              <Link key={label} href={href} className="px-3 py-2 bg-white border border-zinc-200 rounded-lg font-bold text-zinc-600 hover:border-orange-400 hover:text-orange-600 transition-colors text-center">
+              <Link key={label} href={href} prefetch={false} className="px-3 py-2 bg-white border border-zinc-200 rounded-lg font-bold text-zinc-600 hover:border-orange-400 hover:text-orange-600 transition-colors text-center">
                 {label}
               </Link>
             ))}
           </div>
           <div className="text-center mt-8">
-            <Link href="/local" className="inline-flex items-center gap-2 font-bold text-orange-600 hover:text-orange-700 transition-colors">
+            <Link href="/local" prefetch={false} className="inline-flex items-center gap-2 font-bold text-orange-600 hover:text-orange-700 transition-colors">
               View Full Directory <ChevronRight className="w-4 h-4" />
             </Link>
           </div>

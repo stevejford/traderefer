@@ -100,13 +100,6 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en-AU" suppressHydrationWarning>
         <head>
-          <link
-            rel="preload"
-            as="image"
-            type="image/webp"
-            href="/images/hero-construction.webp"
-            fetchPriority="high"
-          />
           <Script
             src="https://www.googletagmanager.com/gtag/js?id=G-YQ1SSL3MQF"
             strategy="lazyOnload"

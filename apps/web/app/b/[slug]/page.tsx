@@ -592,6 +592,8 @@ export default async function PublicProfilePage({
     if (business.suburb) compareQuoteParams.set("suburb", String(business.suburb));
     compareQuoteParams.set("source", `/b/${canonicalSlug}`);
     const compareQuotesHref = `/quotes?${compareQuoteParams.toString()}`;
+    const mapQuery = `${business.address ? `${business.address}, ` : ""}${business.suburb || ""}${business.state ? `, ${business.state}` : ""}, Australia`;
+    const mapHref = business.google_maps_url || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
     const visibleTrustDetails = [
         hasYearsExperience ? `${business.years_experience} years of experience` : "",
         business.licence_number ? `licence ${business.licence_number}` : "",
@@ -678,17 +680,18 @@ export default async function PublicProfilePage({
                 <div className="bg-white border-b border-zinc-100 pt-20 md:pt-28 pb-3">
                     <div className="container mx-auto px-4">
                         <nav className="flex items-center gap-1.5 text-sm text-zinc-500">
-                            <Link href="/" className="hover:text-zinc-800 transition-colors">Home</Link>
+                            <Link href="/" prefetch={false} className="hover:text-zinc-800 transition-colors">Home</Link>
                             <ChevronRight className="w-3.5 h-3.5 text-zinc-300" />
                             {business.state && business.suburb && business.trade_category ? (
                                 <Link
                                     href={breadcrumbLink}
+                                    prefetch={false}
                                     className="hover:text-zinc-800 transition-colors"
                                 >
                                     {business.trade_category} in {business.suburb}
                                 </Link>
                             ) : (
-                                <Link href="/businesses" className="hover:text-zinc-800 transition-colors">Directory</Link>
+                                <Link href="/businesses" prefetch={false} className="hover:text-zinc-800 transition-colors">Directory</Link>
                             )}
                             <ChevronRight className="w-3.5 h-3.5 text-zinc-300" />
                             <span className="text-zinc-900 font-semibold">{business.business_name}</span>
@@ -838,11 +841,11 @@ export default async function PublicProfilePage({
                             {/* CTA Buttons */}
                             <div className="space-y-2">
                                 {business.is_claimed === false && !isOwner && (
-                                    <Link data-claim-banner href={`/claim/${slug}`} className="w-full bg-[#FF6600] hover:bg-[#E65C00] text-white rounded-xl font-black border-none shadow-md shadow-orange-200 transition-all active:scale-95 flex items-center justify-center mb-2" style={{ minHeight: '64px', fontSize: '18px' }}>Claim This Business</Link>
+                                    <Link data-claim-banner href={`/claim/${slug}`} prefetch={false} className="w-full bg-[#FF6600] hover:bg-[#E65C00] text-white rounded-xl font-black border-none shadow-md shadow-orange-200 transition-all active:scale-95 flex items-center justify-center mb-2" style={{ minHeight: '64px', fontSize: '18px' }}>Claim This Business</Link>
                                 )}
                                 <Link href="#enquiry-form" className="w-full bg-[#FF6600] hover:bg-[#E65C00] text-white rounded-xl font-black border-none shadow-md shadow-orange-200 transition-all active:scale-95 flex items-center justify-center" style={{ minHeight: '64px', fontSize: '18px' }}>Get a Free Quote</Link>
-                                <Link href={compareQuotesHref} className="w-full bg-white border-2 border-orange-200 text-[#FF6600] hover:bg-orange-50 rounded-xl font-black shadow-sm flex items-center justify-center gap-2" style={{ minHeight: '64px', fontSize: '16px' }}>Compare 3 Quotes <ArrowRight className="w-4 h-4" /></Link>
-                                <Link href={`/dashboard/referrer/refer/${slug}`} className="w-full bg-white border-2 border-zinc-200 text-zinc-700 hover:bg-zinc-50 rounded-xl font-black shadow-sm flex items-center justify-center gap-2" style={{ minHeight: '64px', fontSize: '16px' }}>Refer &amp; Earn <ArrowRight className="w-4 h-4" /></Link>
+                                <Link href={compareQuotesHref} prefetch={false} className="w-full bg-white border-2 border-orange-200 text-[#FF6600] hover:bg-orange-50 rounded-xl font-black shadow-sm flex items-center justify-center gap-2" style={{ minHeight: '64px', fontSize: '16px' }}>Compare 3 Quotes <ArrowRight className="w-4 h-4" /></Link>
+                                <Link href={`/dashboard/referrer/refer/${slug}`} prefetch={false} className="w-full bg-white border-2 border-zinc-200 text-zinc-700 hover:bg-zinc-50 rounded-xl font-black shadow-sm flex items-center justify-center gap-2" style={{ minHeight: '64px', fontSize: '16px' }}>Refer &amp; Earn <ArrowRight className="w-4 h-4" /></Link>
                             </div>
 
                             {/* Contact details */}
@@ -925,17 +928,22 @@ export default async function PublicProfilePage({
 
                             {/* Location Map */}
                             {(business.address || business.suburb) && (
-                                <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-sm">
-                                    <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest px-5 pt-5 pb-2">Location</h3>
-                                    <iframe
-                                        title={`${business.business_name} location`}
-                                        width="100%"
-                                        height="200"
-                                        style={{ border: 0 }}
-                                        loading="lazy"
-                                        referrerPolicy="no-referrer-when-downgrade"
-                                        src={`https://maps.google.com/maps?q=${encodeURIComponent((business.address ? business.address + ', ' : '') + (business.suburb || '') + (business.state ? ', ' + business.state : '') + ', Australia')}&output=embed`}
-                                    />
+                                <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm">
+                                    <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest pb-3">Location</h3>
+                                    <a
+                                        href={mapHref}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-start gap-3 rounded-xl border border-zinc-100 bg-zinc-50 p-4 hover:border-orange-200 hover:bg-orange-50 transition-colors"
+                                    >
+                                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-orange-600 shadow-sm">
+                                            <MapPin className="h-5 w-5" />
+                                        </span>
+                                        <span className="min-w-0">
+                                            <span className="block text-sm font-black text-zinc-900">Open location in Google Maps</span>
+                                            <span className="mt-1 block text-sm font-semibold leading-snug text-zinc-500">{mapQuery}</span>
+                                        </span>
+                                    </a>
                                 </div>
                             )}
 
@@ -1140,7 +1148,7 @@ export default async function PublicProfilePage({
                                             <span className="text-2xl font-black text-zinc-900">{formatCurrencyFromCents(business.referral_fee_cents || 1000)}</span>
                                         </div>
                                     </div>
-                                    <Link href={`/b/${slug}/refer`} className="w-full bg-[#FF6600] hover:bg-[#E65C00] text-white rounded-xl font-black border-none shadow-md shadow-orange-200 flex items-center justify-center gap-2" style={{ minHeight: '64px', fontSize: '18px' }}>Apply to Refer <ArrowRight className="w-5 h-5" /></Link>
+                                    <Link href={`/b/${slug}/refer`} prefetch={false} className="w-full bg-[#FF6600] hover:bg-[#E65C00] text-white rounded-xl font-black border-none shadow-md shadow-orange-200 flex items-center justify-center gap-2" style={{ minHeight: '64px', fontSize: '18px' }}>Apply to Refer <ArrowRight className="w-5 h-5" /></Link>
                                 </div>
                             </div>
 
@@ -1158,16 +1166,16 @@ export default async function PublicProfilePage({
                                         <div>
                                             <h3 className="font-bold text-zinc-500 text-xs uppercase tracking-widest mb-3">Browse More</h3>
                                             <div className="flex flex-wrap gap-2">
-                                                <Link href={`/local/${stateSlug}/${citySlug}/${suburbWithPostcode}/${tradeSlug}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-sm font-bold text-zinc-600 hover:border-orange-400 hover:text-orange-600 transition-colors">
+                                                <Link href={`/local/${stateSlug}/${citySlug}/${suburbWithPostcode}/${tradeSlug}`} prefetch={false} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-sm font-bold text-zinc-600 hover:border-orange-400 hover:text-orange-600 transition-colors">
                                                     <MapPin className="w-3 h-3" /> {business.trade_category} in {business.suburb}
                                                 </Link>
-                                                <Link href={`/top/${tradeSlug}/${stateSlug}/${citySlug}/${suburbWithPostcode}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-sm font-bold text-zinc-600 hover:border-orange-400 hover:text-orange-600 transition-colors">
+                                                <Link href={`/top/${tradeSlug}/${stateSlug}/${citySlug}/${suburbWithPostcode}`} prefetch={false} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-sm font-bold text-zinc-600 hover:border-orange-400 hover:text-orange-600 transition-colors">
                                                     <Star className="w-3 h-3" /> Top Rated in {business.suburb}
                                                 </Link>
-                                                <Link href={`/local/${stateSlug}/${citySlug}/${suburbWithPostcode}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-sm font-bold text-zinc-600 hover:border-orange-400 hover:text-orange-600 transition-colors">
+                                                <Link href={`/local/${stateSlug}/${citySlug}/${suburbWithPostcode}`} prefetch={false} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-sm font-bold text-zinc-600 hover:border-orange-400 hover:text-orange-600 transition-colors">
                                                     <MapPin className="w-3 h-3" /> All Trades in {business.suburb}
                                                 </Link>
-                                                <Link href={`/local/${stateSlug}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-sm font-bold text-zinc-600 hover:border-orange-400 hover:text-orange-600 transition-colors">
+                                                <Link href={`/local/${stateSlug}`} prefetch={false} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-sm font-bold text-zinc-600 hover:border-orange-400 hover:text-orange-600 transition-colors">
                                                     <MapPin className="w-3 h-3" /> {(business.state || 'NSW').toUpperCase()} Directory
                                                 </Link>
                                             </div>
@@ -1180,6 +1188,7 @@ export default async function PublicProfilePage({
                                                         <Link
                                                             key={biz.slug}
                                                             href={`/b/${biz.slug}`}
+                                                            prefetch={false}
                                                             className="flex items-center justify-between px-3 py-2.5 bg-white border border-zinc-200 rounded-lg hover:border-orange-400 hover:text-orange-600 transition-colors group"
                                                         >
                                                             <span className="text-sm font-bold text-zinc-700 group-hover:text-orange-600 truncate">{biz.business_name}</span>

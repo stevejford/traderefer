@@ -230,11 +230,11 @@ export default async function Top10SuburbPage({ params }: PageProps) {
             <div className="bg-zinc-900 pt-32 pb-4">
                 <div className="container mx-auto px-4">
                     <nav className="flex items-center gap-2 text-xs font-bold text-zinc-500 uppercase tracking-widest flex-wrap">
-                        <Link href="/" className="hover:text-white transition-colors">Home</Link>
+                        <Link prefetch={false} href="/" className="hover:text-white transition-colors">Home</Link>
                         <ChevronRight className="w-3 h-3" />
-                        <Link href={`/local/${state}/${citySlug}/${suburb}`} className="hover:text-white transition-colors">{suburbName}</Link>
+                        <Link prefetch={false} href={`/local/${state}/${citySlug}/${suburb}`} className="hover:text-white transition-colors">{suburbName}</Link>
                         <ChevronRight className="w-3 h-3" />
-                        <Link href={`/local/${state}/${citySlug}/${suburb}/${tradeSlug}`} className="hover:text-white transition-colors">{tradeName}</Link>
+                        <Link prefetch={false} href={`/local/${state}/${citySlug}/${suburb}/${tradeSlug}`} className="hover:text-white transition-colors">{tradeName}</Link>
                         <ChevronRight className="w-3 h-3" />
                         <span className="text-orange-400">Top 10</span>
                     </nav>
@@ -266,10 +266,10 @@ export default async function Top10SuburbPage({ params }: PageProps) {
                         )}
                         <div className="flex flex-wrap gap-4">
                             <Button asChild size="lg" className="bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold h-14 px-8 text-lg border-none">
-                                <Link href="#ranked-list">See the Ranked List</Link>
+                                <Link prefetch={false} href="#ranked-list">See the Ranked List</Link>
                             </Button>
                             <Button asChild variant="outline" size="lg" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl font-bold h-14 px-8 text-lg">
-                                <Link href={`/top/${tradeSlug}/${state}/${citySlug}`}>Top 10 in {cityName}</Link>
+                                <Link prefetch={false} href={`/top/${tradeSlug}/${state}/${citySlug}`}>Top 10 in {cityName}</Link>
                             </Button>
                         </div>
                     </div>
@@ -357,10 +357,10 @@ export default async function Top10SuburbPage({ params }: PageProps) {
                                                 </div>
                                                 <div className="flex flex-wrap gap-3">
                                                     <Button asChild size="sm" className="bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-bold px-5 border-none">
-                                                        <Link href={`/b/${biz.slug}`}>View Profile</Link>
+                                                        <Link prefetch={false} href={`/b/${biz.slug}`}>View Profile</Link>
                                                     </Button>
                                                     <Button asChild variant="outline" size="sm" className="border-zinc-200 hover:bg-zinc-50 rounded-xl font-bold px-5">
-                                                        <Link href={`/b/${biz.slug}#enquiry-form`}>Get Quote</Link>
+                                                        <Link prefetch={false} href={`/b/${biz.slug}#enquiry-form`}>Get Quote</Link>
                                                     </Button>
                                                 </div>
                                             </div>
@@ -459,7 +459,7 @@ export default async function Top10SuburbPage({ params }: PageProps) {
                                         const nearCitySlug = nearCity.toLowerCase().replace(/\s+/g, '-');
                                         const nearStateSlug = nearState.toLowerCase();
                                         return (
-                                            <Link
+                                            <Link prefetch={false}
                                                 key={nearSub}
                                                 href={`/top/${tradeSlug}/${nearStateSlug}/${nearCitySlug}/${nearSubSlug}`}
                                                 className="flex items-center justify-between px-4 py-3 bg-zinc-50 border border-zinc-100 rounded-xl text-xs font-bold text-zinc-600 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-700 transition-colors"
@@ -481,7 +481,7 @@ export default async function Top10SuburbPage({ params }: PageProps) {
                                 Get listed on TradeRefer and rank in the top {tradeName.toLowerCase()} for {suburbName}. Free to join.
                             </p>
                             <Button asChild size="lg" className="bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold px-8 h-12 border-none">
-                                <Link href="/register?type=business">List Your Business Free</Link>
+                                <Link prefetch={false} href="/register?type=business">List Your Business Free</Link>
                             </Button>
                         </section>
                     </div>

@@ -221,13 +221,13 @@ export default async function Top10CityPage({ params }: PageProps) {
             <div className="bg-[#1A1A1A] pt-32 pb-4">
                 <div className="container mx-auto px-4">
                     <nav className="flex items-center gap-2 font-bold text-zinc-400 uppercase tracking-widest" style={{ fontSize: '16px' }}>
-                        <Link href="/" className="hover:text-white transition-colors">Home</Link>
+                        <Link prefetch={false} href="/" className="hover:text-white transition-colors">Home</Link>
                         <ChevronRight className="w-4 h-4" />
-                        <Link href="/categories" className="hover:text-white transition-colors">Categories</Link>
+                        <Link prefetch={false} href="/categories" className="hover:text-white transition-colors">Categories</Link>
                         <ChevronRight className="w-4 h-4" />
-                        <Link href={`/local/${state}/${city}`} className="hover:text-white transition-colors">{cityName}</Link>
+                        <Link prefetch={false} href={`/local/${state}/${city}`} className="hover:text-white transition-colors">{cityName}</Link>
                         <ChevronRight className="w-4 h-4" />
-                        <Link href={`/local/${state}/${city}/${tradeSlug}`} className="hover:text-white transition-colors">{tradeName}</Link>
+                        <Link prefetch={false} href={`/local/${state}/${city}/${tradeSlug}`} className="hover:text-white transition-colors">{tradeName}</Link>
                         <ChevronRight className="w-4 h-4" />
                         <span className="text-[#FF6600]">Top 10</span>
                     </nav>
@@ -258,9 +258,9 @@ export default async function Top10CityPage({ params }: PageProps) {
                             </div>
                         )}
                         <div className="flex flex-wrap gap-4">
-                            <Link href="#ranked-list" className="bg-[#FF6600] hover:bg-[#E65C00] text-white font-black px-8 rounded-xl transition-colors inline-flex items-center justify-center" style={{ minHeight: '64px', fontSize: '18px' }}>See the Ranked List</Link>
-                            <Link href={`/local/${state}/${city}/${tradeSlug}`} className="bg-white/10 hover:bg-white/20 text-white font-black px-8 rounded-xl border border-white/20 transition-colors inline-flex items-center justify-center" style={{ minHeight: '64px', fontSize: '18px' }}>All {tradeName} in {cityName}</Link>
-                            <Link href={quotesHref} className="bg-[#FF6600] hover:bg-[#E65C00] text-white font-black px-8 rounded-xl transition-colors inline-flex items-center justify-center" style={{ minHeight: '64px', fontSize: '18px' }}>Get 3 Free Quotes</Link>
+                            <Link prefetch={false} href="#ranked-list" className="bg-[#FF6600] hover:bg-[#E65C00] text-white font-black px-8 rounded-xl transition-colors inline-flex items-center justify-center" style={{ minHeight: '64px', fontSize: '18px' }}>See the Ranked List</Link>
+                            <Link prefetch={false} href={`/local/${state}/${city}/${tradeSlug}`} className="bg-white/10 hover:bg-white/20 text-white font-black px-8 rounded-xl border border-white/20 transition-colors inline-flex items-center justify-center" style={{ minHeight: '64px', fontSize: '18px' }}>All {tradeName} in {cityName}</Link>
+                            <Link prefetch={false} href={quotesHref} className="bg-[#FF6600] hover:bg-[#E65C00] text-white font-black px-8 rounded-xl transition-colors inline-flex items-center justify-center" style={{ minHeight: '64px', fontSize: '18px' }}>Get 3 Free Quotes</Link>
                         </div>
                     </div>
                 </div>
@@ -351,9 +351,9 @@ export default async function Top10CityPage({ params }: PageProps) {
                                                     )}
                                                 </div>
                                                 <div className="flex flex-wrap gap-3">
-                                                    <Link href={`/b/${biz.slug}`} className="bg-[#1A1A1A] hover:bg-black text-white font-black px-6 rounded-xl transition-colors inline-flex items-center justify-center" style={{ minHeight: '48px', fontSize: '16px' }}>View Profile</Link>
-                                                    <Link href={`/b/${biz.slug}#enquiry-form`} className="border-2 border-zinc-200 hover:bg-zinc-50 font-black px-6 rounded-xl transition-colors inline-flex items-center justify-center" style={{ minHeight: '48px', fontSize: '16px' }}>Get Quote</Link>
-                                                    <Link href={quotesHref} className="border-2 border-orange-200 text-[#FF6600] hover:bg-orange-50 font-black px-6 rounded-xl transition-colors inline-flex items-center justify-center" style={{ minHeight: '48px', fontSize: '16px' }}>Get 3 Quotes</Link>
+                                                    <Link prefetch={false} href={`/b/${biz.slug}`} className="bg-[#1A1A1A] hover:bg-black text-white font-black px-6 rounded-xl transition-colors inline-flex items-center justify-center" style={{ minHeight: '48px', fontSize: '16px' }}>View Profile</Link>
+                                                    <Link prefetch={false} href={`/b/${biz.slug}#enquiry-form`} className="border-2 border-zinc-200 hover:bg-zinc-50 font-black px-6 rounded-xl transition-colors inline-flex items-center justify-center" style={{ minHeight: '48px', fontSize: '16px' }}>Get Quote</Link>
+                                                    <Link prefetch={false} href={quotesHref} className="border-2 border-orange-200 text-[#FF6600] hover:bg-orange-50 font-black px-6 rounded-xl transition-colors inline-flex items-center justify-center" style={{ minHeight: '48px', fontSize: '16px' }}>Get 3 Quotes</Link>
                                                 </div>
                                             </div>
                                         </div>
@@ -450,7 +450,7 @@ export default async function Top10CityPage({ params }: PageProps) {
                                         const nearCitySlug = nearCity.toLowerCase().replace(/\s+/g, '-');
                                         const nearStateSlug = nearState.toLowerCase();
                                         return (
-                                            <Link
+                                            <Link prefetch={false}
                                                 key={nearCity}
                                                 href={`/top/${tradeSlug}/${nearStateSlug}/${nearCitySlug}`}
                                                 className="flex items-center justify-between px-5 py-4 bg-zinc-50 border-2 border-zinc-200 rounded-xl font-bold text-zinc-700 hover:bg-orange-50 hover:border-[#FF6600] hover:text-[#FF6600] transition-colors" style={{ fontSize: '16px' }}
@@ -471,7 +471,7 @@ export default async function Top10CityPage({ params }: PageProps) {
                             <p className="text-zinc-400 mb-6 max-w-md mx-auto" style={{ fontSize: '20px', lineHeight: 1.7 }}>
                                 Join {businesses.length}+ verified {tradeName.toLowerCase()} already listed on TradeRefer. Build your trust score and rank higher for free.
                             </p>
-                            <Link href="/register?type=business" className="bg-[#FF6600] hover:bg-[#E65C00] text-white font-black px-8 rounded-xl transition-colors inline-flex items-center justify-center" style={{ minHeight: '64px', fontSize: '18px' }}>List Your Business Free</Link>
+                            <Link prefetch={false} href="/register?type=business" className="bg-[#FF6600] hover:bg-[#E65C00] text-white font-black px-8 rounded-xl transition-colors inline-flex items-center justify-center" style={{ minHeight: '64px', fontSize: '18px' }}>List Your Business Free</Link>
                         </section>
 
                     </div>
