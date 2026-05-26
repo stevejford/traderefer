@@ -56,6 +56,27 @@ The monitor currently checks these URLs:
 - `/top/air-conditioning-heating/nsw/parramatta` is `index, follow`.
 - `/air-conditioning-specialists-near-me` is `noindex, follow`.
 
+## Current Live Route-Flow Blockers
+
+Rendered Chrome sweep from the production landing page on 2026-05-26 found 84 unique internal routes and 48 issues that are fixed locally in PR #2 but not live yet:
+
+- `/businesses` returns `200` but hydrates to `This page couldn't load`.
+- Visible `/businesses?category=...` category links also hydrate to `This page couldn't load`.
+- Several live directory category pages still trigger `/api/enrich-business` from public browsing.
+- The public header still exposes `/signup`, which redirects to `/register`.
+- 15 visible homepage `/local/...` popular-search links still redirect from bad city/postcode combinations such as `/local/vic/melbourne/melbourne-3186/building` to `/local/vic/melbourne/melbourne-3000/building`.
+- `/remove` is still a `404` on production.
+
+DeepSyte CLI confirmation run: `https://web-phi-eight-56.vercel.app/dashboard/runs/KL7dmkvXgLi_0-k363S76`.
+
+Local build evidence for commit `fb0441df` proves these same checks are fixed before deployment:
+
+- `/businesses` renders `Find Verified Trades Near You`.
+- `/remove` renders `Request a business listing removal` with `noindex, follow`.
+- No visible landing-page links point to `/signup`.
+- No visible homepage `/local/` links redirect due to bad city/postcode combinations.
+- Public `/businesses` navigation no longer triggers `/api/enrich-business`.
+
 ## GSC State
 
 Latest GSC cache seen during rescue monitor:
