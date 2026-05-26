@@ -16,6 +16,7 @@ export function isAnonymousSeoPath(pathname: string | null | undefined) {
   if (path === "/categories" || path.startsWith("/categories/")) return true;
   if (path === "/businesses" || path.startsWith("/businesses/")) return true;
   if (path === "/locations" || path.startsWith("/locations/")) return true;
+  if (path === "/remove") return true;
 
   if (path.startsWith("/b/") && !path.endsWith("/refer")) return true;
 

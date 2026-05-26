@@ -10,6 +10,7 @@ import {
 import { TRADE_CATEGORIES } from "@/lib/constants";
 import { sql } from "@/lib/db";
 import { buildOgImageUrl } from "@/lib/og-image";
+import { getCanonicalSuburbSlug } from "@/lib/postcodes";
 
 const SmartSearch = dynamic(() => import("@/components/SmartSearch").then((m) => m.SmartSearch), {
   loading: () => <div className="h-14 rounded-xl bg-white/10 animate-pulse" />,
@@ -61,14 +62,6 @@ const PrezzeeCarousel = dynamic(() => import("@/components/home/PrezzeeCarousel"
   loading: () => <div className="min-h-[360px] rounded-2xl bg-[#F8F8F8] border border-gray-200 animate-pulse" />,
 });
 
-// Fetch popular city+trade combinations from database
-// Uses ROW_NUMBER to pick max 2 trades per city for diversity across Australia
-function extractPostcode(address: string): string | null {
-  if (!address) return null;
-  const match = address.match(/\b(\d{4})\b/);
-  return match ? match[1] : null;
-}
-
 async function getPopularSearches() {
   try {
     const result = await sql<PopularSearchRow[]>`
@@ -95,8 +88,7 @@ async function getPopularSearches() {
       const citySlug = row.city.toLowerCase().replace(/\s+/g, '-');
       const tradeSlug = row.trade_category.toLowerCase().replace(/\s+&?\s*/g, '-');
       const stateSlug = row.state.toLowerCase();
-      const postcode = extractPostcode(row.sample_address || "");
-      const cityWithPostcode = postcode ? `${citySlug}-${postcode}` : citySlug;
+      const cityWithPostcode = getCanonicalSuburbSlug(citySlug, stateSlug);
       
       return {
         label: `${row.trade_category} in ${row.city}`,

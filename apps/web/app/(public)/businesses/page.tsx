@@ -1,21 +1,47 @@
 import { sql } from "@/lib/db";
 import { Button } from "@/components/ui/button";
-import { Search, MapPin, Star, ShieldCheck, ChevronRight, ChevronLeft, DollarSign, Gift, Zap, Flame, Clock, ExternalLink, Phone, Filter } from "lucide-react";
+import { Search, MapPin, Star, ShieldCheck, ChevronRight, ChevronLeft, DollarSign, Gift, Zap, Flame, Clock, Phone, Filter } from "lucide-react";
 import Link from "next/link";
 import { BusinessLogo } from "@/components/BusinessLogo";
-import { proxyLogoUrl } from "@/lib/logo";
 import { BusinessDirectorySidebar } from "@/components/BusinessDirectorySidebar";
 import { Suspense } from "react";
-import { BackToDashboard } from "@/components/BackToDashboard";
 import { generateFallbackDescription } from "@/lib/business-utils";
-import { getBusinessHoursStatus, toOpeningHoursSchema } from "@/lib/business-hours";
+import { getBusinessHoursStatus, toOpeningHoursSchema, type OpeningHours } from "@/lib/business-hours";
 import { Metadata } from "next";
 import { TRADE_COST_GUIDE, TRADE_NOUNS } from "@/lib/constants";
-import { EnrichTrigger } from "@/components/EnrichTrigger";
 
 export const dynamic = "force-dynamic";
 
 const PAGE_SIZE = 15;
+
+type DirectoryBusiness = {
+    id: string;
+    business_name: string;
+    slug: string;
+    trade_category: string;
+    suburb?: string;
+    city?: string;
+    state?: string;
+    referral_fee_cents?: number;
+    logo_url?: string | null;
+    logo_bg_color?: string | null;
+    photo_urls?: string[];
+    description?: string;
+    avg_rating?: string | number;
+    total_reviews?: string | number;
+    opening_hours?: OpeningHours | string | null;
+    business_phone?: string;
+    website?: string;
+    address?: string;
+    lat?: string | number;
+    lng?: string | number;
+    google_maps_url?: string;
+    deal_count?: string | number;
+    campaign_count?: string | number;
+    avg_response_minutes?: number;
+    is_verified?: boolean;
+    is_claimed?: boolean;
+};
 
 function mapCategory(sCat: string) {
     if (sCat === "Plumbing") return "Plumb";
@@ -268,7 +294,7 @@ export async function generateMetadata({
     searchParams: Promise<{ category?: string; suburb?: string; q?: string; state?: string; city?: string; page?: string }>;
 }): Promise<Metadata> {
     const params = await searchParams;
-    const { category, suburb, state, city, page } = params;
+    const { category, suburb, state, city } = params;
 
     const tradeNoun = category ? (TRADE_NOUNS[category] || category) : null;
     const parts: string[] = [];
@@ -287,9 +313,6 @@ export async function generateMetadata({
     const description = parts.length > 0
         ? `Compare top rated ${(tradeNoun || 'tradespeople').toLowerCase()}${suburb ? ` in ${suburb}` : city ? ` in ${city}` : ''}${state ? `, ${STATE_LABELS[state] || state}` : ''}. ABN-verified, Google-reviewed local businesses. Get free quotes today on TradeRefer.`
         : "Browse 14,000+ verified Australian tradespeople. Compare ratings, reviews, and prices. Get free quotes from local businesses on TradeRefer.";
-
-    // Add noindex to paginated pages to prevent duplicate content
-    const isPaginated = page && parseInt(page) > 1;
 
     return {
         title,
@@ -325,16 +348,9 @@ export default async function BusinessDirectory({
         getBusinesses(category, suburb, q, state, city, page, openNow, is24h),
         getCounts(),
     ]);
+    const directoryBusinesses = businesses as DirectoryBusiness[];
 
     const hasFilters = category || suburb || q || state || city || openNow || is24h;
-
-    // Collect businesses needing enrichment (no photos, not yet enriched) — max 3 per page
-    const needsEnrichment = businesses.filter((b: any) => {
-        const photoCount = Array.isArray(b.photo_urls) ? b.photo_urls.length : 0;
-        return photoCount < 1 && !b.enriched_at;
-    }).map((b: any) => ({
-        id: b.id, business_name: b.business_name, suburb: b.suburb, state: b.state, slug: b.slug,
-    }));
 
     // Dynamic H1
     const h1Parts: string[] = [];
@@ -377,8 +393,13 @@ export default async function BusinessDirectory({
         "@type": "ItemList",
         "name": h1,
         "description": subHeading,
-        "numberOfItems": businesses.length,
-        "itemListElement": businesses.map((biz: any, i: number) => ({
+        "numberOfItems": directoryBusinesses.length,
+        "itemListElement": directoryBusinesses.map((biz, i) => {
+            const rating = Number(biz.avg_rating ?? 0);
+            const reviewCount = Number(biz.total_reviews ?? 0);
+            const hoursSchema = toOpeningHoursSchema(biz.opening_hours);
+
+            return {
             "@type": "ListItem",
             "position": i + 1,
             "url": `https://traderefer.au/b/${biz.slug}`,
@@ -399,28 +420,26 @@ export default async function BusinessDirectory({
                 ...(biz.lat && biz.lng ? {
                     "geo": {
                         "@type": "GeoCoordinates",
-                        "latitude": parseFloat(biz.lat),
-                        "longitude": parseFloat(biz.lng),
+                        "latitude": Number(biz.lat),
+                        "longitude": Number(biz.lng),
                     }
                 } : {}),
-                ...(parseFloat(biz.avg_rating) > 0 && parseInt(biz.total_reviews) > 0 ? {
+                ...(rating > 0 && reviewCount > 0 ? {
                     "aggregateRating": {
                         "@type": "AggregateRating",
-                        "ratingValue": parseFloat(biz.avg_rating).toFixed(1),
-                        "reviewCount": parseInt(biz.total_reviews),
+                        "ratingValue": rating.toFixed(1),
+                        "reviewCount": reviewCount,
                         "bestRating": "5",
                         "worstRating": "1",
                     }
                 } : {}),
-                ...(() => {
-                    const hoursSchema = toOpeningHoursSchema(biz.opening_hours);
-                    return hoursSchema.length > 0 ? { "openingHoursSpecification": hoursSchema } : {};
-                })(),
+                ...(hoursSchema.length > 0 ? { "openingHoursSpecification": hoursSchema } : {}),
                 ...(biz.logo_url ? { "image": biz.logo_url } : {}),
                 ...(biz.google_maps_url ? { "hasMap": biz.google_maps_url } : {}),
                 "priceRange": cost ? `$${cost.low}–$${cost.high}${cost.unit}` : "$$",
             },
-        })),
+            };
+        }),
     };
 
     const serviceJsonLd = category && cost ? {
@@ -465,19 +484,24 @@ export default async function BusinessDirectory({
         "sameAs": ["https://www.facebook.com/traderefer", "https://www.instagram.com/traderefer"],
     };
 
+    const canonicalQuery = new URLSearchParams(
+        Object.entries(params).filter((entry): entry is [string, string] =>
+            typeof entry[1] === "string" && entry[1].length > 0
+        )
+    ).toString();
+
     const webPageJsonLd = {
         "@context": "https://schema.org",
         "@type": "WebPage",
         "name": h1,
         "description": subHeading,
-        "url": `https://traderefer.au/businesses${hasFilters ? `?${new URLSearchParams(params as any).toString()}` : ''}`,
+        "url": `https://traderefer.au/businesses${canonicalQuery ? `?${canonicalQuery}` : ''}`,
         "isPartOf": { "@type": "WebSite", "name": "TradeRefer", "url": "https://traderefer.au" },
         "about": { "@type": "Thing", "name": category || "Trade Services" },
     };
 
     return (
         <>
-        {needsEnrichment.length > 0 && <EnrichTrigger businesses={needsEnrichment} />}
         <main className="flex-1 pt-20 md:pt-28 pb-12 bg-zinc-50 min-h-screen">
             {/* ── JSON-LD SCHEMA (7 types) ── */}
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
@@ -488,8 +512,6 @@ export default async function BusinessDirectory({
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
 
             <div className="max-w-screen-2xl mx-auto px-4 md:px-8">
-                <Suspense fallback={null}><BackToDashboard /></Suspense>
-
                 {/* ── BREADCRUMBS ── */}
                 <nav className="flex items-center flex-wrap gap-1.5 text-base text-zinc-500 mb-6" aria-label="Breadcrumb">
                     {breadcrumbs.map((bc, i) => (
@@ -556,15 +578,17 @@ export default async function BusinessDirectory({
                         )}
 
                         {/* ── BUSINESS CARDS (single column, horizontal layout) ── */}
-                        {businesses.map((biz: any) => {
+                        {directoryBusinesses.map((biz) => {
                             const hoursStatus = getBusinessHoursStatus(biz.opening_hours);
                             const photos = Array.isArray(biz.photo_urls) ? biz.photo_urls : [];
+                            const rating = Number(biz.avg_rating ?? 0);
+                            const reviewCount = Number(biz.total_reviews ?? 0);
                             return (
                             <div key={biz.id} className="bg-white rounded-2xl border border-zinc-200 p-5 sm:p-7 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group">
                                 <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                                     {/* Logo */}
-                                    <BusinessLogo logoUrl={biz.logo_url} name={biz.business_name} photoUrls={biz.photo_urls} size="sm" bgColor={biz.logo_bg_color} className="sm:hidden" />
-                                    <BusinessLogo logoUrl={biz.logo_url} name={biz.business_name} photoUrls={biz.photo_urls} size="md" bgColor={biz.logo_bg_color} className="hidden sm:flex" />
+                                    <BusinessLogo logoUrl={biz.logo_url ?? null} name={biz.business_name} photoUrls={photos} size="sm" bgColor={biz.logo_bg_color ?? null} className="sm:hidden" />
+                                    <BusinessLogo logoUrl={biz.logo_url ?? null} name={biz.business_name} photoUrls={photos} size="md" bgColor={biz.logo_bg_color ?? null} className="hidden sm:flex" />
 
                                     {/* Content */}
                                     <div className="flex-1 min-w-0">
@@ -615,16 +639,16 @@ export default async function BusinessDirectory({
                                         </div>
 
                                         {/* Google Rating */}
-                                        {parseFloat(biz.avg_rating) > 0 && (
+                                        {rating > 0 && (
                                             <div className="flex items-center gap-2 mb-2">
                                                 <div className="flex items-center gap-0.5">
                                                     {[1,2,3,4,5].map(s => (
-                                                        <Star key={s} className={`w-5 h-5 ${s <= Math.round(parseFloat(biz.avg_rating)) ? 'fill-orange-400 text-orange-400' : 'text-zinc-200'}`} />
+                                                        <Star key={s} className={`w-5 h-5 ${s <= Math.round(rating) ? 'fill-orange-400 text-orange-400' : 'text-zinc-200'}`} />
                                                     ))}
                                                 </div>
-                                                <span className="font-bold text-zinc-900 text-base">{parseFloat(biz.avg_rating).toFixed(1)}</span>
-                                                {parseInt(biz.total_reviews) > 0 && (
-                                                    <span className="text-zinc-500 text-base">({biz.total_reviews} reviews)</span>
+                                                <span className="font-bold text-zinc-900 text-base">{rating.toFixed(1)}</span>
+                                                {reviewCount > 0 && (
+                                                    <span className="text-zinc-500 text-base">({reviewCount} reviews)</span>
                                                 )}
                                             </div>
                                         )}
@@ -710,7 +734,7 @@ export default async function BusinessDirectory({
                         })}
 
                         {/* Empty State */}
-                        {businesses.length === 0 && (
+                        {directoryBusinesses.length === 0 && (
                             <div className="bg-white rounded-2xl border border-zinc-200 p-16 text-center">
                                 <div className="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <Search className="w-8 h-8 text-zinc-200" />
@@ -795,7 +819,7 @@ export default async function BusinessDirectory({
         </main>
 
         {/* ── STICKY GET QUOTES CTA BAR ── */}
-        {businesses.length > 0 && (
+        {directoryBusinesses.length > 0 && (
             <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-zinc-200 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] py-3 px-4 md:px-6 lg:hidden">
                 <div className="container mx-auto flex items-center justify-between gap-4">
                     <div>

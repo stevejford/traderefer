@@ -48,7 +48,7 @@ function PublicSeoHeader() {
             Sign In
           </Link>
           <Link
-            href="/signup"
+            href="/register"
             prefetch={false}
             className="rounded-full bg-orange-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-orange-500/20 transition-colors hover:bg-orange-700"
           >
@@ -109,7 +109,7 @@ function PublicSeoHeader() {
                 Sign In
               </Link>
               <Link
-                href="/signup"
+                href="/register"
                 prefetch={false}
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex min-h-[52px] w-full items-center justify-center rounded-xl bg-[#FF6600] text-[17px] font-black text-white transition-colors hover:bg-[#E65C00]"

@@ -8,6 +8,8 @@ The first SEO rescue pass and the first DeepSyte-driven metadata/accessibility u
 
 The next rescue pass added dynamic, template-specific Open Graph image generation for homepage, profile, local trade, suburb, top-list, near-me, and trade/job guide templates. The current live pass also reduces public-page mobile weight by removing the embedded Google Maps iframe from profile pages, lazy-loading address autocomplete, disabling eager route prefetches on key public directory templates, replacing the oversized remote local-page hero image with the existing local WebP asset, and deferring Clerk/PostHog/Google Analytics away from anonymous SEO routes.
 
+The latest route-flow rescue pass is locally verified but not yet live. It fixes public navigation from the landing page, restores the public business directory render path, adds a real noindex listing-removal support page, and prevents homepage popular-search links from emitting bad city/postcode combinations. Live deployment is currently blocked because the configured Vercel CLI token is invalid.
+
 - Production domain: `https://traderefer.au`
 - Vercel deployment: `dpl_CPafjEzfG38QuaGGvB75GyU8JtGD`
 - Upstream PR: `https://github.com/maddonsteve2-blip/traderefer/pull/1` (merged)
@@ -108,11 +110,30 @@ Residual DeepSyte findings:
   - Top-list `/top/air-conditioning-heating/nsw/parramatta`: 20 resources, 0 fetches, 587 KB transfer, LCP 704ms, no failed requests, and no Clerk/GTM/GA/PostHog/ingest resources.
 - DeepSyte run evidence for anonymous-route JS deferral: `https://www.deepsyte.com/dashboard/runs/Mw6BYZ3Hfrkx_a0st3R2V`, `https://www.deepsyte.com/dashboard/runs/gv9xOuO8fRBrdNo8Ia5Od`, and `https://www.deepsyte.com/dashboard/runs/MJ9K2RgecrZ-Z3q4lFLkH`.
 - Remaining mobile weight is mostly first-party Next.js chunks, font files, large icon/favicon transfer, and template images/logos.
+- Route-flow pass DeepSyte state:
+  - MCP browser navigation still fails with `No value provided for input HTTP label: Bucket`.
+  - MCP `ux_review` timed out after 120 seconds.
+  - DeepSyte CLI `doctor` now passes API reachability and API-key validity against `https://api.deepsyte.com`.
+  - DeepSyte CLI controlled local Chrome successfully against the built local app.
+  - DeepSyte CLI verified `/businesses` renders `Find Verified Trades Near You` instead of `This page couldn't load`.
+  - DeepSyte CLI verified `/remove` renders `Request a business listing removal`, emits `robots: noindex, follow`, and canonicalizes to `https://traderefer.au/remove`.
+  - DeepSyte route-flow run: `https://web-phi-eight-56.vercel.app/dashboard/runs/-goQxtCsY94UWQepDypD-`.
+  - Some DeepSyte snapshot upload attempts returned API `502`, so keep the local Chrome route-sweep output as the primary route evidence for this pass.
 
 ## Current Local Validation
 
 Latest local/live checks:
 
+- `pnpm.cmd --dir apps/web exec eslint app/page.tsx "app/(public)/businesses/page.tsx" app/remove/page.tsx components/RuntimeShell.tsx lib/public-routes.ts` passed with one existing `<img>` performance warning on directory thumbnails.
+- `pnpm.cmd --dir apps/web build` completed successfully after the route-flow changes.
+- Built local app served at `http://localhost:3020` and was swept from the landing page with rendered Chrome.
+- Route-flow sweep found 84 unique internal routes exposed from desktop/mobile landing-page navigation and content links.
+- Route-flow sweep found zero real failures after retrying two transient category navigations.
+- Verified no visible landing-page links point to `/signup`; public header and mobile menu point to `/register`.
+- Verified no visible `/local/` popular-search links redirect because of bad city/postcode combinations.
+- Verified `/businesses` and visible `/businesses?category=...` links render the directory shell instead of the generic client error state.
+- Verified `/businesses` no longer triggers public `/api/enrich-business` requests during rendered navigation.
+- Verified `/remove` is a real support route and noindexed.
 - `pnpm.cmd --dir apps/web build` completed with `LASTEXITCODE=0`.
 - `pnpm.cmd --dir apps/web exec eslint app/layout.tsx app/page.tsx components/RuntimeShell.tsx components/AuthenticatedRuntimeShell.tsx components/GoogleAnalytics.tsx components/ClientProviders.tsx components/PostHogPageView.tsx components/LeadForm.tsx instrumentation-client.ts lib/public-routes.ts` passed.
 - `pnpm.cmd --dir apps/web exec eslint components/AddressAutocomplete.tsx` passed.
@@ -150,8 +171,9 @@ Watch for:
 
 ## Next Recovery Gates
 
-1. Complete writable GSC OAuth and resubmit `https://traderefer.au/sitemap.xml`.
-2. Push/merge the live performance and JS deferral passes upstream so the deployed production state is reflected in GitHub.
-3. Follow up on selector-level focus indicator audit.
-4. Reduce remaining first-party JS/font/icon weight where it materially affects crawl/render cost.
-5. Monitor GSC at 7, 14, and 28 days before adding any new programmatic page sets.
+1. Refresh Vercel authentication, deploy the route-flow rescue pass, and verify the same 84-route sweep against `https://traderefer.au`.
+2. Complete writable GSC OAuth and resubmit `https://traderefer.au/sitemap.xml`.
+3. Push/merge the live performance, JS deferral, and route-flow passes upstream so the deployed production state is reflected in GitHub.
+4. Follow up on selector-level focus indicator audit.
+5. Reduce remaining first-party JS/font/icon weight where it materially affects crawl/render cost.
+6. Monitor GSC at 7, 14, and 28 days before adding any new programmatic page sets.
