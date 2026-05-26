@@ -79,19 +79,16 @@ Latest GSC cache seen during rescue monitor:
 - Pulled at: `2026-05-25T20:58:54.996111+00:00`
 - Last 28 days: 11 clicks, 3,458 impressions, 0.32% CTR, average position 15.3
 
-The existing `gsc_token.json` has readonly scope only. Sitemap listing works, but submitting the sitemap fails with `403 insufficient authentication scopes`.
+The existing `gsc_token.json` has readonly scope only. Sitemap listing works, but submitting from this workspace still fails with `403 insufficient authentication scopes`.
 
-To submit the cleaned sitemap after approving writable Search Console scope:
+The cleaned sitemap has been resubmitted in Google Search Console. Readonly verification shows:
 
-```bash
-npm run gsc:submit-sitemap -- --reauth
-```
-
-This writes the writable token to ignored file `gsc_token_webmasters.json`, then submits:
-
-```text
-https://traderefer.au/sitemap.xml
-```
+- Path: `https://traderefer.au/sitemap.xml`
+- Last submitted: `2026-05-26T08:13:44.856Z`
+- Last downloaded: `2026-05-26T08:13:46.375Z`
+- Pending: `false`
+- Warnings: `0`
+- Errors: `0`
 
 ## DeepSyte State
 
@@ -145,6 +142,7 @@ Latest local/live checks:
 - `https://traderefer.au/remove` returns `200`, renders `Request a business listing removal`, and keeps `robots: noindex, follow`.
 - Production route-flow sweep from `https://traderefer.au/` found 84 visible internal routes and 0 issues.
 - Production route-flow sweep found 0 `/signup` links, 0 bad `/local/` redirecting popular-search links, and 0 `/api/enrich-business` calls from public directory browsing.
+- GSC sitemap listing confirms `https://traderefer.au/sitemap.xml` was submitted and downloaded on `2026-05-26` with 0 errors and 0 warnings.
 - `pnpm.cmd --dir apps/web exec eslint app/page.tsx "app/(public)/businesses/page.tsx" app/remove/page.tsx components/RuntimeShell.tsx lib/public-routes.ts` passed with one existing `<img>` performance warning on directory thumbnails.
 - `pnpm.cmd --dir apps/web build` completed successfully after the route-flow changes.
 - Built local app served at `http://localhost:3020` and was swept from the landing page with rendered Chrome.
@@ -192,8 +190,7 @@ Watch for:
 
 ## Next Recovery Gates
 
-1. Complete writable GSC OAuth and resubmit `https://traderefer.au/sitemap.xml`.
-2. Merge the fork rescue commits upstream so `maddonsteve2-blip/traderefer` reflects the deployed production state.
-3. Follow up on selector-level focus indicator audit.
-4. Reduce remaining first-party JS/font/icon weight where it materially affects crawl/render cost.
-5. Monitor GSC at 7, 14, and 28 days before adding any new programmatic page sets.
+1. Merge the fork rescue commits upstream so `maddonsteve2-blip/traderefer` reflects the deployed production state.
+2. Follow up on selector-level focus indicator audit.
+3. Reduce remaining first-party JS/font/icon weight where it materially affects crawl/render cost.
+4. Monitor GSC at 7, 14, and 28 days before adding any new programmatic page sets.
