@@ -48,11 +48,11 @@ export async function DirectoryFooter() {
 
                     {/* Brand Section */}
                     <div className="space-y-6">
-                        <Link href="/">
+                        <Link href="/" prefetch={false}>
                             <Logo size="sm" variant="white" />
                         </Link>
                         <p className="text-zinc-400 leading-relaxed" style={{ fontSize: '16px' }}>
-                            Australia's trusted referral network for local trades. We connect you with verified experts recommended by your own community.
+                            Australia&apos;s trusted referral network for local trades. We connect you with verified experts recommended by your own community.
                         </p>
                         <div className="flex gap-4">
                             {/* Social Icons Placeholder */}
@@ -70,6 +70,7 @@ export async function DirectoryFooter() {
                                 <li key={city.name}>
                                     <Link
                                         href={`/local/${city.state}/${city.name.toLowerCase().replace(/ /g, '-')}`}
+                                        prefetch={false}
                                         className="text-zinc-400 hover:text-orange-500 transition-colors flex items-center group" style={{ fontSize: '16px' }}
                                     >
                                         <ArrowRight className="w-3 h-3 mr-2 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all" />
@@ -90,6 +91,7 @@ export async function DirectoryFooter() {
                                 <li key={state.slug}>
                                     <Link
                                         href={`/local/${state.slug}`}
+                                        prefetch={false}
                                         className="text-zinc-400 hover:text-orange-500 transition-colors flex items-center group" style={{ fontSize: '16px' }}
                                     >
                                         <ArrowRight className="w-3 h-3 mr-2 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all" />
@@ -110,6 +112,7 @@ export async function DirectoryFooter() {
                                 <li key={cat.category}>
                                     <Link
                                         href={cat.href ?? `/businesses?category=${encodeURIComponent(cat.category)}`}
+                                        prefetch={false}
                                         className="text-zinc-400 hover:text-orange-500 transition-colors flex items-center group" style={{ fontSize: '16px' }}
                                     >
                                         <ArrowRight className="w-3 h-3 mr-2 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all" />
@@ -118,7 +121,7 @@ export async function DirectoryFooter() {
                                 </li>
                             ))}
                             <li>
-                                <Link href="/categories" className="text-orange-500 hover:text-orange-400 font-bold uppercase tracking-widest transition-colors" style={{ fontSize: '16px' }}>
+                                <Link href="/categories" prefetch={false} className="text-orange-500 hover:text-orange-400 font-bold uppercase tracking-widest transition-colors" style={{ fontSize: '16px' }}>
                                     View All Categories →
                                 </Link>
                             </li>
@@ -132,12 +135,12 @@ export async function DirectoryFooter() {
                         </h4>
                         <ul className="space-y-4">
                             <li>
-                                <Link href="/register?type=business" className="bg-orange-500 hover:bg-orange-600 text-white px-6 rounded-xl font-bold inline-flex items-center justify-center w-full text-center transition-all" style={{ fontSize: '16px', minHeight: '48px' }}>
+                                <Link href="/register?type=business" prefetch={false} className="bg-orange-500 hover:bg-orange-600 text-white px-6 rounded-xl font-bold inline-flex items-center justify-center w-full text-center transition-all" style={{ fontSize: '16px', minHeight: '48px' }}>
                                     List Your Business
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/claim" className="text-zinc-400 hover:text-white transition-colors block text-center" style={{ fontSize: '16px' }}>
+                                <Link href="/claim" prefetch={false} className="text-zinc-400 hover:text-white transition-colors block text-center" style={{ fontSize: '16px' }}>
                                     Claim Your Profile
                                 </Link>
                             </li>
@@ -168,11 +171,11 @@ export async function DirectoryFooter() {
                         </p>
                     </div>
                     <div className="flex flex-wrap gap-6 text-zinc-600 font-bold uppercase tracking-widest" style={{ fontSize: '14px' }}>
-                        <Link href="/privacy" className="hover:text-zinc-400">Privacy</Link>
-                        <Link href="/terms" className="hover:text-zinc-400">Terms</Link>
-                        <Link href="/cookies" className="hover:text-zinc-400">Cookies</Link>
-                        <Link href="/compare" className="hover:text-zinc-400">Compare</Link>
-                        <Link href="/remove" className="text-zinc-700 hover:text-zinc-500 transition-colors">Request Removal</Link>
+                        <Link href="/privacy" prefetch={false} className="hover:text-zinc-400">Privacy</Link>
+                        <Link href="/terms" prefetch={false} className="hover:text-zinc-400">Terms</Link>
+                        <Link href="/cookies" prefetch={false} className="hover:text-zinc-400">Cookies</Link>
+                        <Link href="/compare" prefetch={false} className="hover:text-zinc-400">Compare</Link>
+                        <Link href="/remove" prefetch={false} className="text-zinc-700 hover:text-zinc-500 transition-colors">Request Removal</Link>
                     </div>
                 </div>
             </div>
