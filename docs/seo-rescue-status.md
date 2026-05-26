@@ -9,8 +9,9 @@ The first SEO rescue pass and the first DeepSyte-driven metadata/accessibility u
 The next rescue pass now adds dynamic, template-specific Open Graph image generation for homepage, profile, local trade, suburb, top-list, near-me, and trade/job guide templates. This replaces the shared `og-default.jpg` fallback in app metadata with `/api/og` URLs carrying page-specific title, location, trade, count, review, and pricing signals.
 
 - Production domain: `https://traderefer.au`
-- Vercel deployment: `dpl_FTMBM6G6GuxTD93CN6trnPKKqnbm`
+- Vercel deployment: `dpl_4k9Kn3jQmEhxFDkUTX7tMJ5L6q2N`
 - Upstream PR: `https://github.com/maddonsteve2-blip/traderefer/pull/1` (merged)
+- Active upstream PR for dynamic OG images: `https://github.com/maddonsteve2-blip/traderefer/pull/2`
 - Fork containing rescue commits: `https://github.com/stevejford/traderefer`
 - Railway API deployment: `828c4e70-3422-4c62-b3e5-a7ad2a1cc4d8` for commit `4abaddb4`
 
@@ -23,7 +24,7 @@ Local commits:
 - `c4a77e6f Strengthen visible focus styles`
 - `bdde8997 Force visible focus outline`
 
-The upstream repository is now at commit `bdde8997`.
+The upstream repository is now at commit `ddd6ef6e`. The fork branch has the current deploy commits through `f6363997`.
 
 ## Live Sitemap Counts
 
@@ -92,7 +93,9 @@ Observed state and fixes:
 Residual DeepSyte findings:
 
 - DeepSyte still reports `WCAG 2.4.7` focus indicator failures in its aggregate audit despite computed focus styles showing a visible outline. Treat this as needing a follow-up selector-level audit before closing accessibility.
-- Template-specific OG images are implemented in the current workspace via `apps/web/app/api/og/route.tsx` and `apps/web/lib/og-image.ts`; verify on production with DeepSyte after deployment.
+- Template-specific OG images are live on production via `apps/web/app/api/og/route.tsx` and `apps/web/lib/og-image.ts`.
+- Live metadata checks show homepage, local trade, top-list, near-me, and plumber guide pages now emit `/api/og?...` image URLs instead of `og-default.jpg`.
+- DeepSyte OG preview for `/local/nsw/sydney/caringbah-2229/air-conditioning-heating` scored `100/100`, found `og:image` and `twitter:image` using `/api/og`, validated 1200x630 dimensions, and rendered the local trade card successfully.
 - Mobile Lighthouse lab performance remains weak on heavier pages, especially profiles. Latest sampled scores: home 66, local trade 65, top 69, profile 49.
 
 ## Current Local Validation
@@ -102,6 +105,7 @@ Latest local checks for the dynamic OG image pass:
 - `pnpm.cmd --dir apps/web build` completed with `LASTEXITCODE=0`.
 - `pnpm.cmd --dir apps/web exec eslint app/api/og/route.tsx lib/og-image.ts app/page.tsx app/layout.tsx` passed.
 - `curl -I http://localhost:3000/api/og?...` returned `200` with `content-type: image/png`.
+- `curl -I https://traderefer.au/api/og?...` returned `200` with `content-type: image/png` after deployment.
 - `git diff --check` passed.
 - Broad targeted lint across old directory templates still reports pre-existing `any`, unused import, and `<img>` warnings/errors unrelated to this OG change.
 
@@ -131,7 +135,7 @@ Watch for:
 ## Next Recovery Gates
 
 1. Complete writable GSC OAuth and resubmit `https://traderefer.au/sitemap.xml`.
-2. Deploy differentiated OG images for profile, local trade, suburb, top, near-me, and generic trade/job templates, then verify sampled production metadata with DeepSyte.
+2. Merge upstream PR #2 so the live dynamic OG image deployment is reflected in the upstream repository.
 3. Investigate profile/mobile performance: large JS payload, LCP, TTI, and resource count.
 4. Follow up on selector-level focus indicator audit.
 5. Monitor GSC at 7, 14, and 28 days before adding any new programmatic page sets.
