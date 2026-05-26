@@ -10,8 +10,10 @@ The next rescue pass added dynamic, template-specific Open Graph image generatio
 
 The latest route-flow rescue pass is deployed and verified on production. It fixes public navigation from the landing page, restores the public business directory render path, adds a real noindex listing-removal support page, prevents homepage popular-search links from emitting bad city/postcode combinations, and adds repo-side Vercel monorepo build config for the GitHub-connected deployment.
 
+The selector-level focus follow-up is also deployed. The homepage rewards marquee no longer injects duplicated off-screen carousel cards into the keyboard tab order; the visible `/rewards` path is now the normal "See all 335 brands" CTA.
+
 - Production domain: `https://traderefer.au`
-- Vercel deployment: `https://vercel.com/stevejfords-projects/traderefer/93PbjEindTeUE7bBer4cGQRZD4r7`
+- Vercel deployment: `https://traderefer-rak2vdpr8-stevejfords-projects.vercel.app` (`dpl_AgAwtUhtaWNhUCMsoFRSN8qQorcg`)
 - Upstream PR: `https://github.com/maddonsteve2-blip/traderefer/pull/1` (merged)
 - Active upstream PR for dynamic OG images: `https://github.com/maddonsteve2-blip/traderefer/pull/2`
 - Fork containing rescue commits: `https://github.com/stevejford/traderefer`
@@ -25,8 +27,9 @@ Local commits:
 - `52e79312 Improve SEO metadata and accessibility signals`
 - `c4a77e6f Strengthen visible focus styles`
 - `bdde8997 Force visible focus outline`
+- `9cd430b7 Fix homepage rewards carousel focus order`
 
-The upstream repository is now at commit `ddd6ef6e`. The fork branch has the current merged/deploy commits through `f6363997`; the performance and anonymous-route JS deferral passes are deployed live and should be pushed/merged upstream next.
+The upstream repository is now at commit `ddd6ef6e`. The fork branch has the deployed rescue commits through `9cd430b7`; PR #2 is clean and should be merged upstream next.
 
 ## Live Sitemap Counts
 
@@ -105,9 +108,12 @@ Observed state and fixes:
 - Orange-on-white CTA contrast now passes DeepSyte sampled contrast checks.
 - Live computed styles confirm focused CTA links receive a 3px outline plus 6px focus halo.
 
-Residual DeepSyte findings:
-
-- DeepSyte still reports `WCAG 2.4.7` focus indicator failures in its aggregate audit despite computed focus styles showing a visible outline. Treat this as needing a follow-up selector-level audit before closing accessibility.
+- Selector-level focus follow-up completed on 2026-05-26:
+  - Local DeepSyte check after patch: homepage first 45 focus stops had 0 invisible focus indicators and no off-screen rewards-card links. Only the intended skip link starts offscreen.
+  - Live DeepSyte check after deployment: homepage first 45 focus stops had 0 invisible focus indicators, 122 focusable elements, and the only `/rewards` tab stop was the visible "See all 335 brands" link.
+  - Live template samples for `/businesses`, `/local/nsw/sydney/caringbah-2229/air-conditioning-heating`, `/top/air-conditioning-heating/nsw/parramatta`, and `/b/derek-son-painting-group` had 0 invisible focus indicators in the checked tab stops.
+  - Evidence: `https://web-phi-eight-56.vercel.app/dashboard/runs/3i7mz5JzbvYmBL7VxDgwm` and `https://www.deepsyte.com/dashboard/runs/kjGqEzXwtzLYdGklZx9kK`.
+- Residual DeepSyte aggregate finding should be treated as superseded for the checked selectors, but a future full aggregate a11y run can confirm the scanner no longer reports the old `WCAG 2.4.7` item.
 - Template-specific OG images are live on production via `apps/web/app/api/og/route.tsx` and `apps/web/lib/og-image.ts`.
 - Live metadata checks show homepage, local trade, top-list, near-me, and plumber guide pages now emit `/api/og?...` image URLs instead of `og-default.jpg`.
 - DeepSyte OG preview for `/local/nsw/sydney/caringbah-2229/air-conditioning-heating` scored `100/100`, found `og:image` and `twitter:image` using `/api/og`, validated 1200x630 dimensions, and rendered the local trade card successfully.
@@ -124,8 +130,7 @@ Residual DeepSyte findings:
 - DeepSyte run evidence for anonymous-route JS deferral: `https://www.deepsyte.com/dashboard/runs/Mw6BYZ3Hfrkx_a0st3R2V`, `https://www.deepsyte.com/dashboard/runs/gv9xOuO8fRBrdNo8Ia5Od`, and `https://www.deepsyte.com/dashboard/runs/MJ9K2RgecrZ-Z3q4lFLkH`.
 - Remaining mobile weight is mostly first-party Next.js chunks, font files, large icon/favicon transfer, and template images/logos.
 - Route-flow pass DeepSyte state:
-  - MCP browser navigation still fails with `No value provided for input HTTP label: Bucket`.
-  - MCP `ux_review` timed out after 120 seconds.
+  - DeepSyte MCP browser navigation is working again; session evidence from the resumed audit: `https://www.deepsyte.com/dashboard/runs/MoGzlDxfwJcuYRAi_kMsO`.
   - DeepSyte CLI `doctor` now passes API reachability and API-key validity against `https://api.deepsyte.com`.
   - DeepSyte CLI controlled local Chrome successfully against the built local app.
   - DeepSyte CLI verified `/businesses` renders `Find Verified Trades Near You` instead of `This page couldn't load`.
@@ -137,14 +142,15 @@ Residual DeepSyte findings:
 
 Latest local/live checks:
 
-- Vercel GitHub deployment for fork commit `7a06b4a2` completed successfully.
+- Vercel GitHub deployment for fork commit `9cd430b7` completed successfully and aliases `https://traderefer.au`.
 - `https://traderefer.au/businesses` returns `200`, renders `Find Verified Trades Near You`, and keeps `robots: index, follow`.
 - `https://traderefer.au/remove` returns `200`, renders `Request a business listing removal`, and keeps `robots: noindex, follow`.
+- DeepSyte live focus check confirms the homepage rewards marquee is no longer in the keyboard tab order and representative public templates show 0 invisible focus indicators in sampled tab stops.
 - Production route-flow sweep from `https://traderefer.au/` found 84 visible internal routes and 0 issues.
 - Production route-flow sweep found 0 `/signup` links, 0 bad `/local/` redirecting popular-search links, and 0 `/api/enrich-business` calls from public directory browsing.
 - GSC sitemap listing confirms `https://traderefer.au/sitemap.xml` was submitted and downloaded on `2026-05-26` with 0 errors and 0 warnings.
 - `pnpm.cmd --dir apps/web exec eslint app/page.tsx "app/(public)/businesses/page.tsx" app/remove/page.tsx components/RuntimeShell.tsx lib/public-routes.ts` passed with one existing `<img>` performance warning on directory thumbnails.
-- `pnpm.cmd --dir apps/web build` completed successfully after the route-flow changes.
+- `pnpm.cmd --dir apps/web build` completed successfully after the route-flow and focus-order changes.
 - Built local app served at `http://localhost:3020` and was swept from the landing page with rendered Chrome.
 - Route-flow sweep found 84 unique internal routes exposed from desktop/mobile landing-page navigation and content links.
 - Route-flow sweep found zero real failures after retrying two transient category navigations.
@@ -191,6 +197,5 @@ Watch for:
 ## Next Recovery Gates
 
 1. Merge the fork rescue commits upstream so `maddonsteve2-blip/traderefer` reflects the deployed production state.
-2. Follow up on selector-level focus indicator audit.
-3. Reduce remaining first-party JS/font/icon weight where it materially affects crawl/render cost.
-4. Monitor GSC at 7, 14, and 28 days before adding any new programmatic page sets.
+2. Reduce remaining first-party JS/font/icon weight where it materially affects crawl/render cost.
+3. Monitor GSC at 7, 14, and 28 days before adding any new programmatic page sets.
