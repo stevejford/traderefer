@@ -313,24 +313,19 @@ export function BusinessLogo({
             )}
             {/* Visible logo */}
             {useOptimizedVisibleLogo ? (
-                <Image
-                    src={displaySrc}
-                    alt={name}
-                    width={config.w || 240}
-                    height={config.h || 136}
-                    loading={imageLoading}
-                    fetchPriority={fetchPriority}
-                    quality={72}
-                    sizes={`${config.w || 240}px`}
-                    style={{
-                        maxWidth: "100%",
-                        maxHeight: "100%",
-                        objectFit: "contain",
-                        display: "block",
-                        transition: "opacity 0.2s ease",
-                    }}
-                    onError={() => setLogoState({ logoUrl, stats: null, error: true })}
-                />
+                <span className="relative block h-full w-full">
+                    <Image
+                        src={displaySrc}
+                        alt={name}
+                        fill
+                        loading={imageLoading}
+                        fetchPriority={fetchPriority}
+                        quality={72}
+                        sizes={`${config.w || 240}px`}
+                        className="object-contain"
+                        onError={() => setLogoState({ logoUrl, stats: null, error: true })}
+                    />
+                </span>
             ) : (
                 <img
                     src={displaySrc}
