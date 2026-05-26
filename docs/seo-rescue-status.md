@@ -13,7 +13,7 @@ The latest route-flow rescue pass is deployed and verified on production. It fix
 The selector-level focus follow-up is also deployed. The homepage rewards marquee no longer injects duplicated off-screen carousel cards into the keyboard tab order; the visible `/rewards` path is now the normal "See all 335 brands" CTA.
 
 - Production domain: `https://traderefer.au`
-- Vercel deployment: `https://traderefer-rak2vdpr8-stevejfords-projects.vercel.app` (`dpl_AgAwtUhtaWNhUCMsoFRSN8qQorcg`)
+- Vercel deployment: `https://traderefer-2b4m3edd4-stevejfords-projects.vercel.app` (`dpl_au8T7qf3svw4apMy87B4Gn8S5WYB`)
 - Upstream PR: `https://github.com/maddonsteve2-blip/traderefer/pull/1` (merged)
 - Active upstream PR for dynamic OG images: `https://github.com/maddonsteve2-blip/traderefer/pull/2`
 - Fork containing rescue commits: `https://github.com/stevejford/traderefer`
@@ -28,8 +28,12 @@ Local commits:
 - `c4a77e6f Strengthen visible focus styles`
 - `bdde8997 Force visible focus outline`
 - `9cd430b7 Fix homepage rewards carousel focus order`
+- `41bf84aa Include public web assets in Vercel deploys`
+- `79f34d7a Use lightweight business logo placeholders`
+- `9e6ec85e Disable footer prefetch on public SEO pages`
+- `89123c22 Disable directory page link prefetch`
 
-The upstream repository is now at commit `ddd6ef6e`. The fork branch has the deployed rescue commits through `9cd430b7`; PR #2 is clean and should be merged upstream next.
+The upstream repository is now at commit `ddd6ef6e`. The fork branch has the deployed rescue commits through `89123c22`; PR #2 is clean and should be merged upstream next. A merge attempt from `stevejford` failed with `does not have the correct permissions to execute MergePullRequest`, so upstream merge still needs a repo maintainer.
 
 ## Live Sitemap Counts
 
@@ -128,7 +132,14 @@ Observed state and fixes:
   - Local trade `/local/nsw/sydney/caringbah-2229/air-conditioning-heating`: 20 resources, 0 fetches, 599 KB transfer, LCP 672ms, no failed requests, and no Clerk/GTM/GA/PostHog/ingest resources.
   - Top-list `/top/air-conditioning-heating/nsw/parramatta`: 20 resources, 0 fetches, 587 KB transfer, LCP 704ms, no failed requests, and no Clerk/GTM/GA/PostHog/ingest resources.
 - DeepSyte run evidence for anonymous-route JS deferral: `https://www.deepsyte.com/dashboard/runs/Mw6BYZ3Hfrkx_a0st3R2V`, `https://www.deepsyte.com/dashboard/runs/gv9xOuO8fRBrdNo8Ia5Od`, and `https://www.deepsyte.com/dashboard/runs/MJ9K2RgecrZ-Z3q4lFLkH`.
-- Remaining mobile weight is mostly first-party Next.js chunks, font files, large icon/favicon transfer, and template images/logos.
+- Public asset and directory performance pass is live on production. DeepSyte evidence:
+  - Before the Vercel ignore fix, `/businesses` returned 404s for `/logo.png`, `/logo-dark.png`, and `/images/hero-construction.webp` because root `.vercelignore` excluded `*.png` and `*.webp`.
+  - After the public asset allow-list, those asset URLs return `200` and failed network requests are gone.
+  - Before the fallback-logo patch, `/businesses` downloaded raw `/logo.png` at ~799 KB as repeated business-card fallback imagery.
+  - After the fallback-logo patch, `/businesses` no longer includes raw `/logo.png`; only optimized 64px logo variants remain at ~2 KB each.
+  - After disabling footer and directory-card prefetches, `/businesses` dropped from 49 captured resources / ~1,792 KB network to 32 resources / 516 KB in DeepSyte perf, with 0 failed requests and no `_rsc`, homepage hero, or raw-logo resource entries in the targeted check.
+  - Evidence: `https://www.deepsyte.com/dashboard/runs/3kKRBK1N-PRBwD0SeA_HW`, `https://www.deepsyte.com/dashboard/runs/24KW2na69XcDHoVxvpC5C`, `https://www.deepsyte.com/dashboard/runs/17IK_-TtjSfpvT4V5Bctj`, `https://www.deepsyte.com/dashboard/runs/hBhTeYvOe_BWRMJlu56bO`, and `https://www.deepsyte.com/dashboard/runs/PAYcm8-MQl-llPAK3yLwk`.
+- Remaining public-page weight is mostly first-party Next.js chunks, font files, favicon/icon transfer, and remote business media served from the Railway API.
 - Route-flow pass DeepSyte state:
   - DeepSyte MCP browser navigation is working again; session evidence from the resumed audit: `https://www.deepsyte.com/dashboard/runs/MoGzlDxfwJcuYRAi_kMsO`.
   - DeepSyte CLI `doctor` now passes API reachability and API-key validity against `https://api.deepsyte.com`.
@@ -142,15 +153,17 @@ Observed state and fixes:
 
 Latest local/live checks:
 
-- Vercel GitHub deployment for fork commit `9cd430b7` completed successfully and aliases `https://traderefer.au`.
+- Vercel GitHub deployment for fork commit `89123c22` completed successfully and aliases `https://traderefer.au`.
 - `https://traderefer.au/businesses` returns `200`, renders `Find Verified Trades Near You`, and keeps `robots: index, follow`.
 - `https://traderefer.au/remove` returns `200`, renders `Request a business listing removal`, and keeps `robots: noindex, follow`.
 - DeepSyte live focus check confirms the homepage rewards marquee is no longer in the keyboard tab order and representative public templates show 0 invisible focus indicators in sampled tab stops.
+- `https://traderefer.au/logo.png` and `https://traderefer.au/images/hero-construction.webp` return `200` after the Vercel public asset ignore fix.
+- DeepSyte `/businesses` check after the directory prefetch pass: 32 resources, 516 KB transfer, 0 failed network requests, no raw `/logo.png`, no homepage hero prefetch, and no idle `_rsc` prefetch entries in the targeted resource check.
 - Production route-flow sweep from `https://traderefer.au/` found 84 visible internal routes and 0 issues.
 - Production route-flow sweep found 0 `/signup` links, 0 bad `/local/` redirecting popular-search links, and 0 `/api/enrich-business` calls from public directory browsing.
 - GSC sitemap listing confirms `https://traderefer.au/sitemap.xml` was submitted and downloaded on `2026-05-26` with 0 errors and 0 warnings.
 - `pnpm.cmd --dir apps/web exec eslint app/page.tsx "app/(public)/businesses/page.tsx" app/remove/page.tsx components/RuntimeShell.tsx lib/public-routes.ts` passed with one existing `<img>` performance warning on directory thumbnails.
-- `pnpm.cmd --dir apps/web build` completed successfully after the route-flow and focus-order changes.
+- `pnpm.cmd --dir apps/web build` completed successfully after the route-flow, focus-order, public-asset, and directory-prefetch changes.
 - Built local app served at `http://localhost:3020` and was swept from the landing page with rendered Chrome.
 - Route-flow sweep found 84 unique internal routes exposed from desktop/mobile landing-page navigation and content links.
 - Route-flow sweep found zero real failures after retrying two transient category navigations.
