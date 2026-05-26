@@ -50,6 +50,7 @@ import {
     CalendarDays,
 } from "lucide-react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
@@ -79,6 +80,8 @@ const ScrollNavButtons = dynamic(() => import("@/components/ScrollNavButtons").t
 const EnrichTrigger = dynamic(() => import("@/components/EnrichTrigger").then((mod) => mod.EnrichTrigger));
 
 export const revalidate = 3600; // Cache for 1 hour, ISR revalidation
+
+const MAX_PUBLIC_GALLERY_IMAGES = 6;
 
 function toTitleCase(value: string) {
     return value
@@ -368,13 +371,29 @@ function PublicGallery({ images = [], businessName }: { images?: string[]; busin
     const validImages = (images || []).map((image) => String(image || "").trim()).filter(Boolean);
     if (validImages.length === 0) return null;
 
+    const visibleImages = validImages.slice(0, MAX_PUBLIC_GALLERY_IMAGES);
+
     return (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {validImages.map((image, index) => (
-                <div key={`${image}-${index}`} className="overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-100 aspect-[4/3]">
-                    <img src={image} alt={`${businessName} project ${index + 1}`} className="w-full h-full object-cover" loading="lazy" />
-                </div>
-            ))}
+        <div className="space-y-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {visibleImages.map((image, index) => (
+                    <div key={`${image}-${index}`} className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-100 aspect-[4/3]">
+                        <Image
+                            src={image}
+                            alt={`${businessName} project ${index + 1}`}
+                            fill
+                            className="object-cover"
+                            sizes="(min-width: 1024px) 260px, (min-width: 768px) 30vw, 50vw"
+                            quality={72}
+                        />
+                    </div>
+                ))}
+            </div>
+            {validImages.length > visibleImages.length && (
+                <p className="text-sm font-semibold text-zinc-500">
+                    Showing {visibleImages.length} of {validImages.length} project photos.
+                </p>
+            )}
         </div>
     );
 }
@@ -744,13 +763,15 @@ export default async function PublicProfilePage({
                                     {/* Cover photo */}
                                     <div className="h-36 relative overflow-hidden bg-zinc-200">
                                         {business.cover_photo_url ? (
-                                            <img
+                                            <Image
                                                 src={business.cover_photo_url}
                                                 alt={`${business.business_name} cover`}
-                                                className="w-full h-full object-cover"
-                                                loading="eager"
+                                                fill
+                                                className="object-cover"
+                                                sizes="300px"
+                                                quality={72}
+                                                priority
                                                 fetchPriority="high"
-                                                decoding="async"
                                             />
                                         ) : (
                                             <div className="absolute inset-0 bg-gradient-to-br from-orange-100 via-amber-50 to-zinc-100" />
