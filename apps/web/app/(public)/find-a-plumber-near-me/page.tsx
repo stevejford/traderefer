@@ -7,6 +7,7 @@ import {
 import { sql } from "@/lib/db";
 import { BusinessLogo } from "@/components/BusinessLogo";
 import { generateFallbackDescription } from "@/lib/business-utils";
+import { buildOgImageUrl } from "@/lib/og-image";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
@@ -15,6 +16,16 @@ const BASE_URL = "https://traderefer.au";
 
 export async function generateMetadata(): Promise<Metadata> {
     const year = new Date().getFullYear();
+    const ogImageUrl = buildOgImageUrl({
+        template: "near-me",
+        title: "Find a plumber near me",
+        subtitle: "Compare licensed plumbers near you Australia-wide. Real reviews, free quotes and emergency plumbing options.",
+        eyebrow: "Near me guide",
+        badge: `${year} plumbing guide`,
+        stat1: "Licensed plumbers",
+        stat2: "Emergency jobs",
+        stat3: "Free quotes",
+    });
     return {
         title: `Find a Plumber Near Me | Compare Licensed Plumbers | TradeRefer`,
         description:
@@ -25,6 +36,13 @@ export async function generateMetadata(): Promise<Metadata> {
             description: "Compare licensed plumbers near you. Real reviews, free quotes, no signup needed.",
             url: `${BASE_URL}/find-a-plumber-near-me`,
             type: "website",
+            images: [{ url: ogImageUrl, width: 1200, height: 630, alt: "Find a plumber near me on TradeRefer" }],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: "Find a Plumber Near Me | TradeRefer",
+            description: "Compare licensed plumbers near you. Real reviews, free quotes, no signup needed.",
+            images: [ogImageUrl],
         },
     };
 }

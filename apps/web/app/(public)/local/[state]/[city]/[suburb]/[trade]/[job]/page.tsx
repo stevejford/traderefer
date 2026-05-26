@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import { TRADE_COST_GUIDE, TRADE_FAQ_BANK, STATE_LICENSING, JOB_TYPES, TRADE_NOUNS, jobToSlug, normalizeTradeName } from "@/lib/constants";
 import { permanentRedirect } from "next/navigation";
 import { parseSuburbSlug, getCanonicalSuburbSlug, getDisplayPostcode } from "@/lib/postcodes";
+import { buildOgImageUrl } from "@/lib/og-image";
 
 export const dynamic = "force-dynamic";
 
@@ -48,15 +49,36 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const count = businesses.length;
     const postcode = getDisplayPostcode(canonicalSuburb, state);
     const suburbWithPostcode = postcode ? `${suburbName} ${postcode}` : suburbName;
+    const canonicalUrl = `https://traderefer.au/local/${state}/${city}/${canonicalSuburb}/${trade}/${job}`;
+    const ogImageUrl = buildOgImageUrl({
+        template: "job",
+        title: `${jobName} in ${suburbWithPostcode}`,
+        subtitle: `Compare ${count > 0 ? count : "verified"} local specialists in ${suburbName}, ${cityName} ${stateUpper}. ABN-checked, community-referred and quote-ready.`,
+        eyebrow: "Local job guide",
+        badge: `${stateUpper} service page`,
+        stat1: count > 0 ? `${count} specialists` : "Verified specialists",
+        stat2: cost ? `$${cost.low}-${cost.high}${cost.unit}` : tradeName,
+        stat3: "Free quotes",
+    });
 
     return {
         title: `${jobName} in ${suburbWithPostcode} | TradeRefer`,
         description: `Compare ${count > 0 ? count : 'verified'} ${jobName.toLowerCase()} specialists in ${suburbName}, ${cityName} ${stateUpper}.${cost ? ` Typical cost $${cost.low}–$${cost.high}${cost.unit}.` : ''} ABN-checked, community-referred. Get free quotes today.`,
         robots: { index: false, follow: true },
-        alternates: { canonical: `https://traderefer.au/local/${state}/${city}/${canonicalSuburb}/${trade}/${job}` },
+        alternates: { canonical: canonicalUrl },
         openGraph: {
             title: `${jobName} in ${suburbWithPostcode} | TradeRefer`,
             description: `${count > 0 ? count : 'Verified'} local ${jobName.toLowerCase()} specialists in ${suburbWithPostcode}. Compare ratings, pricing and referrals.`,
+            url: canonicalUrl,
+            siteName: "TradeRefer",
+            type: "website",
+            images: [{ url: ogImageUrl, width: 1200, height: 630, alt: `${jobName} in ${suburbWithPostcode}` }],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: `${jobName} in ${suburbWithPostcode} | TradeRefer`,
+            description: `${count > 0 ? count : 'Verified'} local ${jobName.toLowerCase()} specialists in ${suburbWithPostcode}. Compare ratings, pricing and referrals.`,
+            images: [ogImageUrl],
         },
     };
 }

@@ -10,9 +10,21 @@ import {
 } from "lucide-react";
 import { TRADE_CATEGORIES } from "@/lib/constants";
 import { sql } from "@/lib/db";
+import { buildOgImageUrl } from "@/lib/og-image";
 
 const SmartSearch = dynamic(() => import("@/components/SmartSearch").then((m) => m.SmartSearch), {
   loading: () => <div className="h-14 rounded-xl bg-white/10 animate-pulse" />,
+});
+
+const homeOgImage = buildOgImageUrl({
+  template: "home",
+  title: "More customers for tradies",
+  subtitle: "TradeRefer connects verified trade businesses, local job seekers and referrers across Australia.",
+  eyebrow: "Trade referral marketplace",
+  badge: "Australia-wide",
+  stat1: "Verified tradies",
+  stat2: "Referral rewards",
+  stat3: "Free quotes",
 });
 
 export const metadata: Metadata = {
@@ -24,13 +36,13 @@ export const metadata: Metadata = {
     url: "https://traderefer.au",
     siteName: "TradeRefer",
     type: "website",
-    images: [{ url: "https://traderefer.au/og-default.jpg", width: 1200, height: 630, alt: "TradeRefer — More customers for tradies. Earn gift cards for referrals." }],
+    images: [{ url: homeOgImage, width: 1200, height: 630, alt: "TradeRefer - More customers for tradies. Earn gift cards for referrals." }],
   },
   twitter: {
     card: "summary_large_image",
     title: "TradeRefer | More Customers for Tradies. Earn Gift Cards.",
     description: "TradeRefer helps trade businesses win more jobs and rewards referrers with gift cards for trusted introductions.",
-    images: ["https://traderefer.au/og-default.jpg"],
+    images: [homeOgImage],
   },
 };
 

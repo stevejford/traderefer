@@ -6,6 +6,8 @@ Last updated: 2026-05-26
 
 The first SEO rescue pass and the first DeepSyte-driven metadata/accessibility uplift are deployed to production on Vercel and merged to the upstream GitHub repository.
 
+The next rescue pass now adds dynamic, template-specific Open Graph image generation for homepage, profile, local trade, suburb, top-list, near-me, and trade/job guide templates. This replaces the shared `og-default.jpg` fallback in app metadata with `/api/og` URLs carrying page-specific title, location, trade, count, review, and pricing signals.
+
 - Production domain: `https://traderefer.au`
 - Vercel deployment: `dpl_FTMBM6G6GuxTD93CN6trnPKKqnbm`
 - Upstream PR: `https://github.com/maddonsteve2-blip/traderefer/pull/1` (merged)
@@ -90,8 +92,18 @@ Observed state and fixes:
 Residual DeepSyte findings:
 
 - DeepSyte still reports `WCAG 2.4.7` focus indicator failures in its aggregate audit despite computed focus styles showing a visible outline. Treat this as needing a follow-up selector-level audit before closing accessibility.
-- All sampled pages still share `https://traderefer.au/og-default.jpg`; add template-specific OG images next.
+- Template-specific OG images are implemented in the current workspace via `apps/web/app/api/og/route.tsx` and `apps/web/lib/og-image.ts`; verify on production with DeepSyte after deployment.
 - Mobile Lighthouse lab performance remains weak on heavier pages, especially profiles. Latest sampled scores: home 66, local trade 65, top 69, profile 49.
+
+## Current Local Validation
+
+Latest local checks for the dynamic OG image pass:
+
+- `pnpm.cmd --dir apps/web build` completed with `LASTEXITCODE=0`.
+- `pnpm.cmd --dir apps/web exec eslint app/api/og/route.tsx lib/og-image.ts app/page.tsx app/layout.tsx` passed.
+- `curl -I http://localhost:3000/api/og?...` returned `200` with `content-type: image/png`.
+- `git diff --check` passed.
+- Broad targeted lint across old directory templates still reports pre-existing `any`, unused import, and `<img>` warnings/errors unrelated to this OG change.
 
 ## Daily Monitoring
 
@@ -119,7 +131,7 @@ Watch for:
 ## Next Recovery Gates
 
 1. Complete writable GSC OAuth and resubmit `https://traderefer.au/sitemap.xml`.
-2. Add differentiated OG images for profile, local trade, suburb, top, and generic trade templates.
+2. Deploy differentiated OG images for profile, local trade, suburb, top, near-me, and generic trade/job templates, then verify sampled production metadata with DeepSyte.
 3. Investigate profile/mobile performance: large JS payload, LCP, TTI, and resource count.
 4. Follow up on selector-level focus indicator audit.
 5. Monitor GSC at 7, 14, and 28 days before adding any new programmatic page sets.

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { JOB_TYPES, TRADE_COST_GUIDE, TRADE_FAQ_BANK, STATE_LICENSING, jobToSlug } from "@/lib/constants";
 import { sql } from "@/lib/db";
+import { buildOgImageUrl } from "@/lib/og-image";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +36,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const { job } = await params;
     const jobName = findJobNameForSlug(job) || formatSlug(job);
     const tradeName = findTradeForJob(job);
+    const cost = tradeName ? TRADE_COST_GUIDE[tradeName] : undefined;
+    const ogImageUrl = buildOgImageUrl({
+        template: "trade-guide",
+        title: `${jobName} cost guide`,
+        subtitle: `Compare Australian pricing, licensing requirements and verified local specialists for ${jobName.toLowerCase()}.`,
+        eyebrow: "Trade cost guide",
+        badge: "Australia guide",
+        stat1: cost ? `$${cost.low}-${cost.high}${cost.unit}` : "Cost guide",
+        stat2: tradeName || "Trade specialists",
+        stat3: "Verified local help",
+    });
     return {
         title: `${jobName} Cost Guide | TradeRefer`,
         description: `How much does ${jobName.toLowerCase()} cost in Australia? Compare prices by state, understand licensing requirements, and find verified local specialists across Australia.`,
@@ -42,6 +54,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         openGraph: {
             title: `${jobName} Cost Guide | TradeRefer`,
             description: `National pricing guide for ${jobName.toLowerCase()} in Australia. State-by-state costs, licensing requirements, and how to find the right tradie.`,
+            images: [{ url: ogImageUrl, width: 1200, height: 630, alt: `${jobName} cost guide on TradeRefer` }],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: `${jobName} Cost Guide | TradeRefer`,
+            description: `National pricing guide for ${jobName.toLowerCase()} in Australia. State-by-state costs and verified local specialists.`,
+            images: [ogImageUrl],
         },
     };
 }

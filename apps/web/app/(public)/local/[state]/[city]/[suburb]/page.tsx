@@ -6,6 +6,7 @@ import { Metadata } from "next";
 import { permanentRedirect, redirect } from "next/navigation";
 import { SUBURB_CONTEXT } from "@/lib/constants";
 import { parseSuburbSlug, getPostcode, getCanonicalSuburbSlug, getDisplayPostcode } from "@/lib/postcodes";
+import { buildOgImageUrl } from "@/lib/og-image";
 
 interface PageProps {
     params: Promise<{ state: string; city: string; suburb: string }>;
@@ -61,6 +62,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const pcLabel = pc ? ` ${stateUpper} ${pc}` : ` ${stateUpper}`;
     const stats = await getSuburbStats(state, city, canonicalSuburb);
     const canonicalUrl = `https://traderefer.au/local/${state}/${city}/${canonicalSuburb}`;
+    const ogImageUrl = buildOgImageUrl({
+        template: "suburb",
+        title: `Trusted tradies in ${suburbName}${pcLabel}`,
+        subtitle: `Browse ${stats.categories > 0 ? `${stats.categories} trade categories` : "local trades"} in ${suburbName}, ${cityName}. ABN-checked businesses with community referral signals.`,
+        eyebrow: "Suburb directory",
+        badge: `${stateUpper} local hub`,
+        stat1: stats.total > 0 ? `${stats.total} tradies` : "Verified tradies",
+        stat2: stats.categories > 0 ? `${stats.categories} categories` : "Trade categories",
+        stat3: pc ? `Postcode ${pc}` : "Free quotes",
+    });
     return {
         title: `${stats.total > 0 ? stats.total + ' ' : ''}Trusted Tradies in ${suburbName}${pcLabel} | TradeRefer`,
         description: `Compare ${stats.total > 0 ? stats.total : 'verified'} local tradespeople in ${suburbName}, ${cityName}${pcLabel}. Browse ${stats.categories > 0 ? stats.categories + ' trade categories' : 'plumbers, electricians, builders & more'} — ABN-checked with real community referrals. Free quotes.`,
@@ -72,13 +83,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
             url: canonicalUrl,
             siteName: 'TradeRefer',
             type: 'website',
-            images: [{ url: 'https://traderefer.au/og-default.jpg', width: 1200, height: 630, alt: `Trusted tradies in ${suburbName}${pcLabel}` }],
+            images: [{ url: ogImageUrl, width: 1200, height: 630, alt: `Trusted tradies in ${suburbName}${pcLabel}` }],
         },
         twitter: {
             card: 'summary_large_image',
             title: `${stats.total > 0 ? stats.total + ' ' : ''}Trusted Tradies in ${suburbName}${pcLabel} | TradeRefer`,
             description: `Compare ${stats.total > 0 ? stats.total : 'verified'} local tradespeople in ${suburbName}${pcLabel}. ABN-checked, community-ranked.`,
-            images: ['https://traderefer.au/og-default.jpg'],
+            images: [ogImageUrl],
         },
     };
 }

@@ -9,6 +9,7 @@ import {
     Star, ShieldCheck, MapPin, ChevronRight, Users, Award,
     DollarSign, FileText, ArrowRight, Trophy
 } from "lucide-react";
+import { buildOgImageUrl } from "@/lib/og-image";
 
 export const dynamic = "force-dynamic";
 
@@ -100,6 +101,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const topBiz = businesses[0] as any;
     const topBizStr = topBiz ? ` #1: ${topBiz.business_name} (${parseFloat(topBiz.avg_rating).toFixed(1)}★).` : "";
     const canonicalUrl = `https://traderefer.au/top/${trade}/${state}/${city}/${suburb}`;
+    const ogImageUrl = buildOgImageUrl({
+        template: "top",
+        title: `Top ${tradeName} in ${suburbName}`,
+        subtitle: `Ranked by verified Google reviews and local business signals in ${suburbName}, ${cityName} ${stateName}.`,
+        eyebrow: "Ranked suburb list",
+        badge: "Top local picks",
+        stat1: businesses.length > 0 ? `${businesses.length} ranked` : "Ranked list",
+        stat2: totalReviews > 0 ? `${totalReviews} reviews` : "Review signals",
+        stat3: topBiz ? `#1 ${topBiz.business_name}` : "Free quotes",
+    });
 
     return {
         title: `Top ${tradeName} in ${suburbName} | TradeRefer`,
@@ -112,13 +123,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
             url: canonicalUrl,
             siteName: 'TradeRefer',
             type: 'website',
-            images: ['https://traderefer.au/og-default.jpg'],
+            images: [ogImageUrl],
         },
         twitter: {
             card: 'summary_large_image',
             title: `Top ${tradeName} in ${suburbName} | TradeRefer`,
             description: `Ranked by verified Google reviews. Best ${tradeName.toLowerCase()} in ${suburbName}.`,
-            images: ['https://traderefer.au/og-default.jpg'],
+            images: [ogImageUrl],
         },
     };
 }

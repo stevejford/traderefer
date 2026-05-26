@@ -6,6 +6,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ConditionalLayout } from "@/components/ConditionalLayout";
 import { DirectoryFooter } from "@/components/DirectoryFooter";
 import { ClientProviders } from "@/components/ClientProviders";
+import { buildOgImageUrl } from "@/lib/og-image";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -33,6 +34,17 @@ const oswald = Oswald({
   weight: ["400", "700"],
 });
 
+const defaultOgImage = buildOgImageUrl({
+  template: "home",
+  title: "Australia's verified trade referral marketplace",
+  subtitle: "Find ABN-verified tradespeople, compare local options and earn rewards for trusted referrals.",
+  eyebrow: "TradeRefer",
+  badge: "Verified network",
+  stat1: "ABN-checked",
+  stat2: "Local referrals",
+  stat3: "Free quotes",
+});
+
 export const metadata: Metadata = {
   title: "TradeRefer | Australia's Verified Trade Referral Marketplace",
   description: "Find ABN-verified tradespeople near you. Compare reviews, get free quotes, and earn 70% commission by referring. Australia's trusted trade referral marketplace.",
@@ -42,13 +54,13 @@ export const metadata: Metadata = {
     url: "https://traderefer.au",
     siteName: "TradeRefer",
     type: "website",
-    images: [{ url: "https://traderefer.au/og-default.jpg", width: 1200, height: 630, alt: "TradeRefer — Australia's Verified Trade Referral Marketplace" }],
+    images: [{ url: defaultOgImage, width: 1200, height: 630, alt: "TradeRefer - Australia's Verified Trade Referral Marketplace" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "TradeRefer | Australia's Verified Trade Referral Marketplace",
     description: "Find ABN-verified tradespeople near you. Earn 70% commission by referring. Australia's trusted trade referral marketplace.",
-    images: ["https://traderefer.au/og-default.jpg"],
+    images: [defaultOgImage],
   },
   alternates: { canonical: "https://traderefer.au" },
   other: {

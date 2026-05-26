@@ -29,6 +29,7 @@ import {
     jobToSlug,
     normalizeTradeName,
 } from "@/lib/constants";
+import { buildOgImageUrl } from "@/lib/og-image";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
@@ -49,6 +50,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const noun = TRADE_NOUNS[tradeName] || tradeName;
     const cost = TRADE_COST_GUIDE[tradeName];
     const count = await getBusinessCount(tradeName);
+    const ogImageUrl = buildOgImageUrl({
+        template: "near-me",
+        title: `Best ${noun} near me`,
+        subtitle: `Compare verified ${noun.toLowerCase()} across Australia with reviews, pricing context and free quote pathways.`,
+        eyebrow: "Near me guide",
+        badge: "Australia-wide",
+        stat1: count > 0 ? `${count.toLocaleString()}+ listings` : "Verified listings",
+        stat2: cost ? `$${cost.low}-${cost.high}${cost.unit}` : "Transparent pricing",
+        stat3: "Free quotes",
+    });
 
     return {
         title: `Best ${noun} Near Me | TradeRefer`,
@@ -61,13 +72,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
             url: `https://traderefer.au/${slug}`,
             siteName: "TradeRefer",
             type: "website",
-            images: [{ url: "https://traderefer.au/og-default.jpg", width: 1200, height: 630, alt: `${noun} near me on TradeRefer` }],
+            images: [{ url: ogImageUrl, width: 1200, height: 630, alt: `${noun} near me on TradeRefer` }],
         },
         twitter: {
             card: "summary_large_image",
             title: `Best ${noun} Near Me | TradeRefer`,
             description: `Compare verified ${noun.toLowerCase()} near you. Real reviews, transparent pricing, free quotes.`,
-            images: ["https://traderefer.au/og-default.jpg"],
+            images: [ogImageUrl],
         },
     };
 }

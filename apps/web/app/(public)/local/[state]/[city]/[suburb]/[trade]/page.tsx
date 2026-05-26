@@ -8,6 +8,7 @@ import { permanentRedirect } from "next/navigation";
 import { TRADE_COST_GUIDE, TRADE_FAQ_BANK, STATE_LICENSING, STATE_AUTHORITY_LINKS, SUBURB_CONTEXT, JOB_TYPES, TRADE_NOUNS, jobToSlug, generateLocalizedIntro, normalizeTradeName } from "@/lib/constants";
 import { parseSuburbSlug, getCanonicalSuburbSlug, getDisplayPostcode, isPostcodeValidForState } from "@/lib/postcodes";
 import { generateFallbackDescription } from "@/lib/business-utils";
+import { buildOgImageUrl } from "@/lib/og-image";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600; // Cache for 1 hour, ISR revalidation
@@ -79,6 +80,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const titlePrefix = count > 0 ? `${count} ` : "";
     const costSnippet = cost ? ` Avg cost $${cost.low}-${cost.high}${cost.unit}.` : "";
     const reviewSnippet = totalReviews > 0 ? ` ${totalReviews} reviews.` : "";
+    const ogImageUrl = buildOgImageUrl({
+        template: "local-trade",
+        title: `${titlePrefix}${tradeNamePlural} in ${suburbWithPostcode}`,
+        subtitle: `Compare ${count > 0 ? count : "verified"} ${tradeNamePlural.toLowerCase()} in ${suburbWithPostcode}${cityDisplay} ${stateUpper}. ABN-checked, locally relevant and quote-ready.`,
+        eyebrow: "Local trade directory",
+        badge: `${stateUpper} local guide`,
+        stat1: count > 0 ? `${count} businesses` : "Verified matches",
+        stat2: totalReviews > 0 ? `${totalReviews} reviews` : "ABN-checked",
+        stat3: cost ? `$${cost.low}-${cost.high}${cost.unit}` : "Free quotes",
+    });
 
     return {
         title: `${titlePrefix}${tradeNamePlural} in ${suburbWithPostcode}`,
@@ -91,13 +102,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
             url: canonicalUrl,
             siteName: 'TradeRefer',
             type: 'website',
-            images: [{ url: 'https://traderefer.au/og-default.jpg', width: 1200, height: 630, alt: `${tradeName} in ${suburbName}` }],
+            images: [{ url: ogImageUrl, width: 1200, height: 630, alt: `${tradeName} in ${suburbName}` }],
         },
         twitter: {
             card: 'summary_large_image',
             title: `${tradeName} in ${suburbWithPostcode} | TradeRefer`,
             description: `${count > 0 ? count : 'Verified'} local ${tradeName.toLowerCase()} in ${suburbWithPostcode}. Compare ratings, pricing and referrals.`,
-            images: ['https://traderefer.au/og-default.jpg'],
+            images: [ogImageUrl],
         },
     };
 }

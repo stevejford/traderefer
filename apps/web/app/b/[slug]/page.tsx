@@ -60,6 +60,7 @@ import { JOB_TYPES, TRADE_FAQ_BANK } from "@/lib/constants";
 import { getPostcode } from "@/lib/postcodes";
 import { toOpeningHoursSchema } from "@/lib/business-hours";
 import { sql } from "@/lib/db";
+import { buildOgImageUrl } from "@/lib/og-image";
 
 const LeadForm = dynamic(() => import("@/components/LeadForm").then((mod) => mod.LeadForm), {
     loading: () => <div className="min-h-[480px] rounded-2xl bg-zinc-50 border border-zinc-100 animate-pulse" />,
@@ -389,8 +390,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const hasRating = !isNaN(rating) && rating > 0 && reviewCount > 0;
     const { title, description } = buildSeoContent(business, canonicalSlug, hasRating, rating, reviewCount);
     const url = `https://traderefer.au/b/${canonicalSlug}`;
-    const imageUrl = business.logo_url || business.cover_photo_url || (Array.isArray(business.photo_urls) ? business.photo_urls[0] : null) || null;
-    const ogImageUrl = imageUrl || 'https://traderefer.au/og-default.jpg';
+    const location = [business.suburb, business.state].filter(Boolean).join(", ");
+    const ogImageUrl = buildOgImageUrl({
+        template: "profile",
+        title: business.business_name || "TradeRefer business profile",
+        subtitle: `${business.trade_category || "Local trade"}${location ? ` in ${location}` : ""}. Compare reviews, services and referral-ready contact details.`,
+        eyebrow: "Business profile",
+        badge: hasRating ? `${rating.toFixed(1)} stars` : "Verified profile",
+        stat1: hasRating ? `${reviewCount} reviews` : "ABN-checked",
+        stat2: business.trade_category || "Local trade",
+        stat3: location || "Australia",
+    });
 
     return {
         title,

@@ -9,6 +9,7 @@ import {
     Star, ShieldCheck, MapPin, ChevronRight, Users, Award,
     DollarSign, FileText, CheckCircle2, ArrowRight, Trophy
 } from "lucide-react";
+import { buildOgImageUrl } from "@/lib/og-image";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600; // Cache for 1 hour, ISR revalidation
@@ -96,6 +97,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const totalReviews = businesses.reduce((acc: number, biz: any) => acc + (parseInt(biz.total_reviews) || 0), 0);
     const topBizStr = topBiz ? ` #1: ${topBiz.business_name} (${parseFloat(topBiz.avg_rating).toFixed(1)}★).` : "";
     const canonicalUrl = `https://traderefer.au/top/${trade}/${state}/${city}`;
+    const ogImageUrl = buildOgImageUrl({
+        template: "top",
+        title: `Top ${tradeNoun} in ${cityName}`,
+        subtitle: `Ranked by real Google reviews and local business signals in ${cityName}, ${stateName}.`,
+        eyebrow: "Ranked trade list",
+        badge: "Top local picks",
+        stat1: count > 0 ? `${count} ranked` : "Ranked list",
+        stat2: totalReviews > 0 ? `${totalReviews} reviews` : "Review signals",
+        stat3: topBiz ? `#1 ${topBiz.business_name}` : "Free quotes",
+    });
 
     return {
         title: `Top ${tradeNoun} in ${cityName} | TradeRefer`,
@@ -108,13 +119,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
             url: canonicalUrl,
             siteName: 'TradeRefer',
             type: 'website',
-            images: ['https://traderefer.au/og-default.jpg'],
+            images: [ogImageUrl],
         },
         twitter: {
             card: 'summary_large_image',
             title: `Top ${tradeNoun} in ${cityName} | TradeRefer`,
             description: `Ranked by real Google reviews. Find the best ${tradeNoun.toLowerCase()} in ${cityName}, ${stateName}.`,
-            images: ['https://traderefer.au/og-default.jpg'],
+            images: [ogImageUrl],
         },
     };
 }
