@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useRef } from "react";
 
 /**
@@ -284,6 +285,7 @@ export function BusinessLogo({
     // Only use proxy URL when we need CORS access for canvas analysis
     const directUrl = logoUrl?.replace(/^http:\/\//i, "https://") || proxyUrl;
     const displaySrc = stats?.croppedSrc ?? (needsAnalysis ? proxyUrl : directUrl);
+    const useOptimizedVisibleLogo = !needsAnalysis && !displaySrc.startsWith("data:");
 
     return (
         <div
@@ -310,20 +312,41 @@ export function BusinessLogo({
                 />
             )}
             {/* Visible logo */}
-            <img
-                src={displaySrc}
-                alt={name}
-                loading={imageLoading}
-                fetchPriority={fetchPriority}
-                style={{
-                    maxWidth: "100%",
-                    maxHeight: "100%",
-                    objectFit: "contain",
-                    display: "block",
-                    transition: "opacity 0.2s ease",
-                }}
-                onError={() => setLogoState({ logoUrl, stats: null, error: true })}
-            />
+            {useOptimizedVisibleLogo ? (
+                <Image
+                    src={displaySrc}
+                    alt={name}
+                    width={config.w || 240}
+                    height={config.h || 136}
+                    loading={imageLoading}
+                    fetchPriority={fetchPriority}
+                    quality={72}
+                    sizes={`${config.w || 240}px`}
+                    style={{
+                        maxWidth: "100%",
+                        maxHeight: "100%",
+                        objectFit: "contain",
+                        display: "block",
+                        transition: "opacity 0.2s ease",
+                    }}
+                    onError={() => setLogoState({ logoUrl, stats: null, error: true })}
+                />
+            ) : (
+                <img
+                    src={displaySrc}
+                    alt={name}
+                    loading={imageLoading}
+                    fetchPriority={fetchPriority}
+                    style={{
+                        maxWidth: "100%",
+                        maxHeight: "100%",
+                        objectFit: "contain",
+                        display: "block",
+                        transition: "opacity 0.2s ease",
+                    }}
+                    onError={() => setLogoState({ logoUrl, stats: null, error: true })}
+                />
+            )}
         </div>
     );
 }
