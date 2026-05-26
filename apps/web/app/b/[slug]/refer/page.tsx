@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { ArrowRight, ShieldCheck, Star } from "lucide-react";
 import { BusinessLogo } from "@/components/BusinessLogo";
+import { buildOgImageUrl } from "@/lib/og-image";
 
 const BASE_URL = "https://traderefer.au";
 
@@ -27,10 +28,21 @@ export async function generateMetadata({
     const business = await getBusiness(slug);
     const canonicalSlug = String(business?.slug || slug).trim() || slug;
     const businessName = String(business?.business_name || "TradeRefer business").trim();
-    const shortName = businessName.length > 42 ? `${businessName.slice(0, 39).trim()}...` : businessName;
-    const title = `Refer ${shortName} | TradeRefer`;
+    const shortName = businessName.length > 34 ? `${businessName.slice(0, 31).trim()}...` : businessName;
+    const title = `Refer ${shortName}`;
     const description = `Apply to refer ${shortName} on TradeRefer.`;
     const profileUrl = `${BASE_URL}/b/${canonicalSlug}`;
+    const location = [business?.suburb, business?.state].filter(Boolean).join(", ");
+    const ogImageUrl = buildOgImageUrl({
+        template: "profile",
+        title: businessName || "TradeRefer business profile",
+        subtitle: `${business?.trade_category || "Local trade"}${location ? ` in ${location}` : ""}. Apply to refer this business on TradeRefer.`,
+        eyebrow: "Referral program",
+        badge: "Noindex application page",
+        stat1: business?.trade_category || "Local trade",
+        stat2: location || "Australia",
+        stat3: "TradeRefer",
+    });
 
     return {
         title,
@@ -42,11 +54,13 @@ export async function generateMetadata({
             url: profileUrl,
             type: "website",
             siteName: "TradeRefer",
+            images: [{ url: ogImageUrl, width: 1200, height: 630, alt: `${businessName} referral program` }],
         },
         twitter: {
             card: "summary_large_image",
             title,
             description,
+            images: [ogImageUrl],
         },
         robots: { index: false, follow: true },
     };
