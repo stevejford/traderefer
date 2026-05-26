@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Outfit, Montserrat, Oswald } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
-import { ConditionalLayout } from "@/components/ConditionalLayout";
 import { DirectoryFooter } from "@/components/DirectoryFooter";
-import { ClientProviders } from "@/components/ClientProviders";
+import { RuntimeShell } from "@/components/RuntimeShell";
 import { buildOgImageUrl } from "@/lib/og-image";
 
 const inter = Inter({
@@ -97,38 +94,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en-AU" suppressHydrationWarning>
-        <head>
-          <Script
-            src="https://www.googletagmanager.com/gtag/js?id=G-YQ1SSL3MQF"
-            strategy="lazyOnload"
-          />
-          <Script id="gtag-init" strategy="lazyOnload">
-            {`
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-YQ1SSL3MQF');
-            `}
-          </Script>
-        </head>
-        <body
-          className={`${inter.variable} ${outfit.variable} ${montserrat.variable} ${oswald.variable} font-sans antialiased`}
-        >
-          <a href="#main-content" className="skip-link">
-            Skip to main content
-          </a>
-          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
-          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
-          <ClientProviders />
-          <ConditionalLayout footer={<DirectoryFooter />}>
-            <div id="main-content" tabIndex={-1}>
-              {children}
-            </div>
-          </ConditionalLayout>
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en-AU" suppressHydrationWarning>
+      <body
+        className={`${inter.variable} ${outfit.variable} ${montserrat.variable} ${oswald.variable} font-sans antialiased`}
+      >
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
+        <RuntimeShell footer={<DirectoryFooter />}>
+          {children}
+        </RuntimeShell>
+      </body>
+    </html>
   );
 }

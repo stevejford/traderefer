@@ -1,7 +1,6 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { Metadata } from "next";
-import { SignedInOut } from "@/components/SignedInOut";
 import {
   MapPin, ArrowRight,
   Megaphone, CheckCircle2, XCircle, ShieldCheck,
@@ -159,26 +158,13 @@ export default async function HomePage() {
               <p className="text-gray-600 mb-8 text-center text-xl leading-relaxed flex-grow">
                 Get rewarded for trusted introductions. Earn gift cards for every trade job you refer — no selling, just connecting.
               </p>
-              <SignedInOut
-                signedOut={
-                  <Link
-                    href="/register?type=referrer"
-                    prefetch={false}
-                    className="w-full bg-[#FF6600] hover:bg-[#E65C00] text-white rounded-xl shadow-lg transition-all active:scale-95 font-cta text-2xl font-bold uppercase tracking-wider flex items-center justify-center gap-2"
-                  >
-                    Get Paid to Refer <ArrowRight className="w-6 h-6" />
-                  </Link>
-                }
-                signedIn={
-                  <Link
-                    href="/dashboard/referrer"
-                    prefetch={false}
-                    className="w-full bg-[#FF6600] hover:bg-[#E65C00] text-white rounded-xl shadow-lg transition-all active:scale-95 font-cta text-2xl font-bold uppercase tracking-wider flex items-center justify-center gap-2"
-                  >
-                    My Dashboard <ArrowRight className="w-6 h-6" />
-                  </Link>
-                }
-              />
+              <Link
+                href="/register?type=referrer"
+                prefetch={false}
+                className="w-full bg-[#FF6600] hover:bg-[#E65C00] text-white rounded-xl shadow-lg transition-all active:scale-95 font-cta text-2xl font-bold uppercase tracking-wider flex items-center justify-center gap-2"
+              >
+                Get Paid to Refer <ArrowRight className="w-6 h-6" />
+              </Link>
             </div>
 
             {/* Trades card */}
@@ -193,28 +179,14 @@ export default async function HomePage() {
               <p className="text-gray-300 mb-8 text-center text-xl leading-relaxed flex-grow z-10">
                 Get more jobs from trusted referrals. Zero upfront cost — only pay a 20% fee when you win the job.
               </p>
-              <SignedInOut
-                signedOut={
-                  <Link
-                    href="/register?type=business"
-                    prefetch={false}
-                    className="w-full bg-[#FF6600] hover:bg-[#E65C00] text-white rounded-xl shadow-lg transition-all active:scale-95 font-cta text-[22px] font-bold uppercase tracking-wider z-10 flex items-center justify-center gap-2"
-                    style={{ minHeight: "64px" }}
-                  >
-                    Get More Jobs <TrendingUp className="w-6 h-6" />
-                  </Link>
-                }
-                signedIn={
-                  <Link
-                    href="/dashboard/business"
-                    prefetch={false}
-                    className="w-full bg-[#FF6600] hover:bg-[#E65C00] text-white rounded-xl shadow-lg transition-all active:scale-95 font-cta text-[22px] font-bold uppercase tracking-wider z-10 flex items-center justify-center gap-2"
-                    style={{ minHeight: "64px" }}
-                  >
-                    View My Leads <TrendingUp className="w-6 h-6" />
-                  </Link>
-                }
-              />
+              <Link
+                href="/register?type=business"
+                prefetch={false}
+                className="w-full bg-[#FF6600] hover:bg-[#E65C00] text-white rounded-xl shadow-lg transition-all active:scale-95 font-cta text-[22px] font-bold uppercase tracking-wider z-10 flex items-center justify-center gap-2"
+                style={{ minHeight: "64px" }}
+              >
+                Get More Jobs <TrendingUp className="w-6 h-6" />
+              </Link>
             </div>
           </div>
         </div>

@@ -6,10 +6,10 @@ Last updated: 2026-05-26
 
 The first SEO rescue pass and the first DeepSyte-driven metadata/accessibility uplift are deployed to production on Vercel and merged to the upstream GitHub repository.
 
-The next rescue pass added dynamic, template-specific Open Graph image generation for homepage, profile, local trade, suburb, top-list, near-me, and trade/job guide templates. The current live pass also reduces public-page mobile weight by removing the embedded Google Maps iframe from profile pages, lazy-loading address autocomplete, disabling eager route prefetches on key public directory templates, and replacing the oversized remote local-page hero image with the existing local WebP asset.
+The next rescue pass added dynamic, template-specific Open Graph image generation for homepage, profile, local trade, suburb, top-list, near-me, and trade/job guide templates. The current live pass also reduces public-page mobile weight by removing the embedded Google Maps iframe from profile pages, lazy-loading address autocomplete, disabling eager route prefetches on key public directory templates, replacing the oversized remote local-page hero image with the existing local WebP asset, and deferring Clerk/PostHog/Google Analytics away from anonymous SEO routes.
 
 - Production domain: `https://traderefer.au`
-- Vercel deployment: `dpl_FPfYC3TtP64b2eqC2snRWpgq6iMf`
+- Vercel deployment: `dpl_CPafjEzfG38QuaGGvB75GyU8JtGD`
 - Upstream PR: `https://github.com/maddonsteve2-blip/traderefer/pull/1` (merged)
 - Active upstream PR for dynamic OG images: `https://github.com/maddonsteve2-blip/traderefer/pull/2`
 - Fork containing rescue commits: `https://github.com/stevejford/traderefer`
@@ -24,7 +24,7 @@ Local commits:
 - `c4a77e6f Strengthen visible focus styles`
 - `bdde8997 Force visible focus outline`
 
-The upstream repository is now at commit `ddd6ef6e`. The fork branch has the current merged/deploy commits through `f6363997`; the performance pass is deployed live and should be pushed/merged upstream next.
+The upstream repository is now at commit `ddd6ef6e`. The fork branch has the current merged/deploy commits through `f6363997`; the performance and anonymous-route JS deferral passes are deployed live and should be pushed/merged upstream next.
 
 ## Live Sitemap Counts
 
@@ -58,7 +58,7 @@ The monitor currently checks these URLs:
 
 Latest GSC cache seen during rescue monitor:
 
-- Pulled at: `2026-05-25T20:09:28.711608+00:00`
+- Pulled at: `2026-05-25T20:58:54.996111+00:00`
 - Last 28 days: 11 clicks, 3,458 impressions, 0.32% CTR, average position 15.3
 
 The existing `gsc_token.json` has readonly scope only. Sitemap listing works, but submitting the sitemap fails with `403 insufficient authentication scopes`.
@@ -102,18 +102,25 @@ Residual DeepSyte findings:
   - Local trade after final pass: 40 resources, 4 fetches, ~1,009 KB transfer; the 607 KB remote Unsplash hero was replaced by `/images/hero-construction.webp`.
   - Top-list after: 40 resources, 4 fetches, ~105 KB page-size summary, with no failed network requests in the sampled run.
 - DeepSyte run evidence for this pass: `https://www.deepsyte.com/dashboard/runs/4YOLPaw0BOGwYgEAhcStE`, `https://www.deepsyte.com/dashboard/runs/808UDTo6puiJVrvMnGuqA`, and `https://www.deepsyte.com/dashboard/runs/FSVjq0ITmUqlxd5Veor8h`.
-- Remaining mobile weight is mostly global anonymous-route JavaScript: Clerk, PostHog, Google Analytics, shared Next chunks, and large favicon/icon transfer.
+- Anonymous-route JS deferral pass is live on production. DeepSyte evidence:
+  - Profile `/b/derek-son-painting-group`: 24 resources, 1 fetch, 527 KB transfer, LCP 1024ms, no failed requests, and no Clerk/GTM/GA/PostHog/ingest resources.
+  - Local trade `/local/nsw/sydney/caringbah-2229/air-conditioning-heating`: 20 resources, 0 fetches, 599 KB transfer, LCP 672ms, no failed requests, and no Clerk/GTM/GA/PostHog/ingest resources.
+  - Top-list `/top/air-conditioning-heating/nsw/parramatta`: 20 resources, 0 fetches, 587 KB transfer, LCP 704ms, no failed requests, and no Clerk/GTM/GA/PostHog/ingest resources.
+- DeepSyte run evidence for anonymous-route JS deferral: `https://www.deepsyte.com/dashboard/runs/Mw6BYZ3Hfrkx_a0st3R2V`, `https://www.deepsyte.com/dashboard/runs/gv9xOuO8fRBrdNo8Ia5Od`, and `https://www.deepsyte.com/dashboard/runs/MJ9K2RgecrZ-Z3q4lFLkH`.
+- Remaining mobile weight is mostly first-party Next.js chunks, font files, large icon/favicon transfer, and template images/logos.
 
 ## Current Local Validation
 
 Latest local/live checks:
 
 - `pnpm.cmd --dir apps/web build` completed with `LASTEXITCODE=0`.
+- `pnpm.cmd --dir apps/web exec eslint app/layout.tsx app/page.tsx components/RuntimeShell.tsx components/AuthenticatedRuntimeShell.tsx components/GoogleAnalytics.tsx components/ClientProviders.tsx components/PostHogPageView.tsx components/LeadForm.tsx instrumentation-client.ts lib/public-routes.ts` passed.
 - `pnpm.cmd --dir apps/web exec eslint components/AddressAutocomplete.tsx` passed.
 - `pnpm.cmd --dir apps/web exec eslint app/api/og/route.tsx lib/og-image.ts app/page.tsx app/layout.tsx` passed.
 - `curl -I http://localhost:3000/api/og?...` returned `200` with `content-type: image/png`.
 - `curl -I https://traderefer.au/api/og?...` returned `200` with `content-type: image/png` after deployment.
 - Live HTML checks confirm profile pages no longer contain `maps.google.com/maps?...output=embed`, profile pages include `Open location in Google Maps`, and local trade pages use `/images/hero-construction.webp` instead of the remote Unsplash hero.
+- Live HTML checks confirm home, profile, local, and top SEO pages do not include Clerk, Google Tag Manager, or PostHog markers; `/login` still includes Clerk as expected.
 - `git diff --check` passed.
 - `node scripts/seo_rescue_monitor.mjs` returned `Status: OK` after deploy with sitemap counts unchanged and watched URL indexation/redirect rules stable.
 - Broad targeted lint across old directory templates still reports pre-existing `any`, unused import, React set-state-in-effect, and `<img>` warnings/errors unrelated to this performance pass.
@@ -144,7 +151,7 @@ Watch for:
 ## Next Recovery Gates
 
 1. Complete writable GSC OAuth and resubmit `https://traderefer.au/sitemap.xml`.
-2. Push/merge the live performance pass upstream so the deployed production state is reflected in GitHub.
-3. Remove or defer Clerk/PostHog/GA from anonymous SEO routes where possible; this is now the largest remaining mobile-performance lever.
-4. Follow up on selector-level focus indicator audit.
+2. Push/merge the live performance and JS deferral passes upstream so the deployed production state is reflected in GitHub.
+3. Follow up on selector-level focus indicator audit.
+4. Reduce remaining first-party JS/font/icon weight where it materially affects crawl/render cost.
 5. Monitor GSC at 7, 14, and 28 days before adding any new programmatic page sets.
