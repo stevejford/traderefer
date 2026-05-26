@@ -6,14 +6,14 @@ Last updated: 2026-05-26
 
 The first SEO rescue pass and the first DeepSyte-driven metadata/accessibility uplift are deployed to production on Vercel and merged to the upstream GitHub repository.
 
-The next rescue pass added dynamic, template-specific Open Graph image generation for homepage, profile, local trade, suburb, top-list, near-me, and trade/job guide templates. The current live pass also reduces public-page mobile weight by removing the embedded Google Maps iframe from profile pages, lazy-loading address autocomplete, disabling eager route prefetches on key public directory templates, replacing the oversized remote local-page hero image with the existing local WebP asset, and deferring Clerk/PostHog/Google Analytics away from anonymous SEO routes.
+The next rescue pass added dynamic, template-specific Open Graph image generation for homepage, profile, local trade, suburb, top-list, near-me, and trade/job guide templates. The current live pass also reduces public-page mobile weight by removing the embedded Google Maps iframe from profile pages, lazy-loading address autocomplete, disabling eager route prefetches on key public directory templates, replacing the oversized remote local-page hero image with the existing local WebP asset, deferring Clerk/PostHog/Google Analytics away from anonymous SEO routes, and optimizing public profile photo payloads through Next image delivery.
 
 The latest route-flow rescue pass is deployed and verified on production. It fixes public navigation from the landing page, restores the public business directory render path, adds a real noindex listing-removal support page, prevents homepage popular-search links from emitting bad city/postcode combinations, and adds repo-side Vercel monorepo build config for the GitHub-connected deployment.
 
 The selector-level focus follow-up is also deployed. The homepage rewards marquee no longer injects duplicated off-screen carousel cards into the keyboard tab order; the visible `/rewards` path is now the normal "See all 335 brands" CTA.
 
 - Production domain: `https://traderefer.au`
-- Vercel deployment: `https://traderefer-2b4m3edd4-stevejfords-projects.vercel.app` (`dpl_au8T7qf3svw4apMy87B4Gn8S5WYB`)
+- Vercel deployment: `https://traderefer-82029brch-stevejfords-projects.vercel.app` (`dpl_4wSM94anNDU2qbtxh21wU6wbF7Vo`)
 - Upstream PR: `https://github.com/maddonsteve2-blip/traderefer/pull/1` (merged)
 - Active upstream PR for dynamic OG images: `https://github.com/maddonsteve2-blip/traderefer/pull/2`
 - Fork containing rescue commits: `https://github.com/stevejford/traderefer`
@@ -32,8 +32,10 @@ Local commits:
 - `79f34d7a Use lightweight business logo placeholders`
 - `9e6ec85e Disable footer prefetch on public SEO pages`
 - `89123c22 Disable directory page link prefetch`
+- `4bc1ed35 Document public asset performance pass`
+- `d0b3de4a Optimize public profile photos`
 
-The upstream repository is now at commit `ddd6ef6e`. The fork branch has the deployed rescue commits through `89123c22`; PR #2 is clean and should be merged upstream next. A merge attempt from `stevejford` failed with `does not have the correct permissions to execute MergePullRequest`, so upstream merge still needs a repo maintainer.
+The upstream repository is still behind the fork rescue branch. The fork branch has deployed rescue commits through `d0b3de4a`; PR #2 is open, clean, and mergeable, but a merge attempt from `stevejford` failed with `does not have the correct permissions to execute MergePullRequest`, so upstream merge still needs a repo maintainer.
 
 ## Live Sitemap Counts
 
@@ -139,6 +141,13 @@ Observed state and fixes:
   - After the fallback-logo patch, `/businesses` no longer includes raw `/logo.png`; only optimized 64px logo variants remain at ~2 KB each.
   - After disabling footer and directory-card prefetches, `/businesses` dropped from 49 captured resources / ~1,792 KB network to 32 resources / 516 KB in DeepSyte perf, with 0 failed requests and no `_rsc`, homepage hero, or raw-logo resource entries in the targeted check.
   - Evidence: `https://www.deepsyte.com/dashboard/runs/3kKRBK1N-PRBwD0SeA_HW`, `https://www.deepsyte.com/dashboard/runs/24KW2na69XcDHoVxvpC5C`, `https://www.deepsyte.com/dashboard/runs/17IK_-TtjSfpvT4V5Bctj`, `https://www.deepsyte.com/dashboard/runs/hBhTeYvOe_BWRMJlu56bO`, and `https://www.deepsyte.com/dashboard/runs/PAYcm8-MQl-llPAK3yLwk`.
+- Public profile photo performance pass is live on production. DeepSyte evidence:
+  - `/b/derek-son-painting-group` now renders gallery photos through Next image optimization instead of raw remote `<img>` delivery.
+  - Public profile gallery is capped to the first 6 project photos to preserve visible proof without forcing every crawler/visitor to fetch the full media set.
+  - DeepSyte profile run after deployment: 29 resources, 652 KB transfer, 0 failed network requests, 0 console errors, FCP/LCP 236 ms in the browser-session perf read.
+  - Image waterfall after deployment: 9 image requests, 185 KB total; gallery/cover requests use `/_next/image?...w=384&q=75` for remote Vercel Blob assets.
+  - Rendered SEO audit still passes the profile basics: 60-character title, 152-character description, canonical `https://traderefer.au/b/derek-son-painting-group`, robots allowed, `en-AU`, sitemap reference in robots.txt, 10/10 image alt coverage, and LocalBusiness-type schema present as `HousePainter`.
+  - Evidence: `https://www.deepsyte.com/dashboard/runs/3SflkKytwACbXvAAm2ANn`.
 - Remaining public-page weight is mostly first-party Next.js chunks, font files, favicon/icon transfer, and remote business media served from the Railway API.
 - Route-flow pass DeepSyte state:
   - DeepSyte MCP browser navigation is working again; session evidence from the resumed audit: `https://www.deepsyte.com/dashboard/runs/MoGzlDxfwJcuYRAi_kMsO`.
@@ -153,12 +162,13 @@ Observed state and fixes:
 
 Latest local/live checks:
 
-- Vercel GitHub deployment for fork commit `89123c22` completed successfully and aliases `https://traderefer.au`.
+- Vercel GitHub deployment for fork commit `d0b3de4a` completed successfully and aliases `https://traderefer.au`.
 - `https://traderefer.au/businesses` returns `200`, renders `Find Verified Trades Near You`, and keeps `robots: index, follow`.
 - `https://traderefer.au/remove` returns `200`, renders `Request a business listing removal`, and keeps `robots: noindex, follow`.
 - DeepSyte live focus check confirms the homepage rewards marquee is no longer in the keyboard tab order and representative public templates show 0 invisible focus indicators in sampled tab stops.
 - `https://traderefer.au/logo.png` and `https://traderefer.au/images/hero-construction.webp` return `200` after the Vercel public asset ignore fix.
 - DeepSyte `/businesses` check after the directory prefetch pass: 32 resources, 516 KB transfer, 0 failed network requests, no raw `/logo.png`, no homepage hero prefetch, and no idle `_rsc` prefetch entries in the targeted resource check.
+- DeepSyte `/b/derek-son-painting-group` check after the profile photo pass: 29 resources, 652 KB transfer, 0 failed network requests, 0 console errors, profile SEO metadata/canonical/schema still present, and image waterfall reduced to optimized Next image requests for cover/gallery media.
 - Production route-flow sweep from `https://traderefer.au/` found 84 visible internal routes and 0 issues.
 - Production route-flow sweep found 0 `/signup` links, 0 bad `/local/` redirecting popular-search links, and 0 `/api/enrich-business` calls from public directory browsing.
 - GSC sitemap listing confirms `https://traderefer.au/sitemap.xml` was submitted and downloaded on `2026-05-26` with 0 errors and 0 warnings.
@@ -183,6 +193,7 @@ Latest local/live checks:
 - `git diff --check` passed.
 - `node scripts/seo_rescue_monitor.mjs` returned `Status: OK` after deploy with sitemap counts unchanged and watched URL indexation/redirect rules stable.
 - Broad targeted lint across old directory templates still reports pre-existing `any`, unused import, React set-state-in-effect, and `<img>` warnings/errors unrelated to this performance pass.
+- `pnpm.cmd --dir apps/web exec eslint 'app/b/[slug]/page.tsx'` still reports pre-existing `any`/unused-import errors in that legacy profile file; the production `pnpm.cmd --dir apps/web build` passed after the profile image patch.
 
 ## Daily Monitoring
 
