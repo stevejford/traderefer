@@ -224,7 +224,7 @@ function buildSeoContent(business: any, slug: string, hasRating: boolean, rating
         `${cleanName}: ${titleTrade.toLowerCase()} in ${localArea}.`,
         hasRating ? `${rating.toFixed(1)}★ from ${reviewCount} ${reviewLabel.toLowerCase()}.` : "",
         yearsExperience > 0 ? `${yearsExperience} years local experience.` : "",
-        business.is_verified ? "ABN verified & trusted." : "Local trade service.",
+        business.is_verified ? "ABN checked profile." : "Local trade service.",
         `Get free quotes from ${cleanName} on TradeRefer today.`
     ].filter(Boolean).join(" ");
     const heading = `${cleanName} — ${titleTrade} in ${suburb}`;
@@ -415,7 +415,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         title: business.business_name || "TradeRefer business profile",
         subtitle: `${business.trade_category || "Local trade"}${location ? ` in ${location}` : ""}. Compare reviews, services and referral-ready contact details.`,
         eyebrow: "Business profile",
-        badge: hasRating ? `${rating.toFixed(1)} stars` : "Verified profile",
+        badge: hasRating ? `${rating.toFixed(1)} stars` : "Business profile",
         stat1: hasRating ? `${reviewCount} reviews` : "ABN-checked",
         stat2: business.trade_category || "Local trade",
         stat3: location || "Australia",
@@ -728,7 +728,7 @@ export default async function PublicProfilePage({
                             )}
                             {business.is_verified && (
                                 <span className="flex items-center gap-1.5 px-3 py-1 bg-orange-500 text-white rounded-full text-sm font-semibold">
-                                    <ShieldCheck className="w-3 h-3" /> Verified
+                                    <ShieldCheck className="w-3 h-3" /> ABN checked
                                 </span>
                             )}
                             {hasValidRating && (
@@ -814,7 +814,7 @@ export default async function PublicProfilePage({
                                         </span>
                                         {business.is_verified && (
                                             <span className="flex items-center gap-1.5 px-3 py-1.5 bg-[#FF6600] text-white rounded-full font-black uppercase tracking-widest" style={{ fontSize: '16px' }}>
-                                                <ShieldCheck className="w-3.5 h-3.5" /> Verified
+                                                <ShieldCheck className="w-3.5 h-3.5" /> ABN checked
                                             </span>
                                         )}
                                     </div>
@@ -1027,7 +1027,7 @@ export default async function PublicProfilePage({
                                         <div className="w-1 h-1 bg-orange-300 rounded-full" />
                                         <div className="flex items-center gap-2">
                                             <CheckCircle2 className="w-5 h-5 text-orange-600" />
-                                            <span className="font-semibold text-orange-800 text-sm">ABN verified</span>
+                                            <span className="font-semibold text-orange-800 text-sm">ABN checked</span>
                                         </div>
                                     </>
                                 )}

@@ -33,30 +33,30 @@ const oswald = Oswald({
 
 const defaultOgImage = buildOgImageUrl({
   template: "home",
-  title: "Australia's verified trade referral marketplace",
-  subtitle: "Find ABN-verified tradespeople, compare local options and earn rewards for trusted referrals.",
+  title: "Australia's trade referral marketplace",
+  subtitle: "Find ABN-checked trade profiles, compare local options and receive rewards for eligible referrals.",
   eyebrow: "TradeRefer",
-  badge: "Verified network",
+  badge: "Trade directory",
   stat1: "ABN-checked",
   stat2: "Local referrals",
   stat3: "Free quotes",
 });
 
 export const metadata: Metadata = {
-  title: "TradeRefer | Australia's Verified Trade Referral Marketplace",
-  description: "Find ABN-verified tradespeople near you. Compare reviews, get free quotes, and earn 70% commission by referring. Australia's trusted trade referral marketplace.",
+  title: "TradeRefer | Australia's Trade Referral Marketplace",
+  description: "Find ABN-checked trade profiles near you, compare reviews, request free quotes, and receive rewards for eligible referrals.",
   openGraph: {
-    title: "TradeRefer | Australia's Verified Trade Referral Marketplace",
-    description: "Find ABN-verified tradespeople near you. Compare reviews, get free quotes, and earn by referring. Australia's trusted trade referral marketplace.",
+    title: "TradeRefer | Australia's Trade Referral Marketplace",
+    description: "Find ABN-checked trade profiles near you, compare reviews, request free quotes, and receive rewards for eligible referrals.",
     url: "https://traderefer.au",
     siteName: "TradeRefer",
     type: "website",
-    images: [{ url: defaultOgImage, width: 1200, height: 630, alt: "TradeRefer - Australia's Verified Trade Referral Marketplace" }],
+    images: [{ url: defaultOgImage, width: 1200, height: 630, alt: "TradeRefer - Australia's trade referral marketplace" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "TradeRefer | Australia's Verified Trade Referral Marketplace",
-    description: "Find ABN-verified tradespeople near you. Earn 70% commission by referring. Australia's trusted trade referral marketplace.",
+    title: "TradeRefer | Australia's Trade Referral Marketplace",
+    description: "Find ABN-checked trade profiles near you, compare reviews, request free quotes, and receive rewards for eligible referrals.",
     images: [defaultOgImage],
   },
   alternates: { canonical: "https://traderefer.au" },
@@ -72,7 +72,7 @@ const organizationJsonLd = {
   "name": "TradeRefer",
   "url": "https://traderefer.au",
   "logo": "https://traderefer.au/logo.png",
-  "description": "Australia's verified trade referral marketplace. Find ABN-verified tradespeople, refer businesses, and earn commission.",
+  "description": "Australia's trade referral marketplace. Find ABN-checked trade profiles, compare local options, and receive rewards for eligible referrals.",
   "sameAs": ["https://www.facebook.com/traderefer", "https://www.instagram.com/traderefer"]
 };
 

@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
     title: "Local Trade Directory | Find Trusted Tradies in Australia | TradeRefer",
-    description: "Browse verified local tradies across all Australian states and cities. Find electricians, plumbers, painters & more in your suburb. ABN-verified, community-ranked. Free quotes.",
+    description: "Browse local tradies across all Australian states and cities. Find electricians, plumbers, painters & more in your suburb. ABN-checked, community-informed. Free quotes.",
     alternates: { canonical: "https://traderefer.au/local" },
 };
 
@@ -71,7 +71,7 @@ export default async function LocalDirectoryPage({
                         Local Service Directory
                     </h1>
                     <p className="text-xl md:text-2xl text-zinc-600 mb-6 leading-relaxed font-medium max-w-3xl">
-                        Find verified, community-recommended trades across Australia. {totalBusinesses.toLocaleString()} ABN-verified businesses across {states.length} states.
+                        Find local trade profiles across Australia. {totalBusinesses.toLocaleString()} profiles across {states.length} states with ABN and public review signals where available.
                     </p>
                     <div className="flex flex-wrap gap-4 mb-8">
                         <Link href="/quotes?source=%2Flocal" className="inline-flex items-center justify-center gap-2 bg-[#FF6600] hover:bg-[#E65C00] text-white font-black px-8 rounded-xl transition-colors" style={{ minHeight: '64px', fontSize: '18px' }}>
@@ -95,7 +95,7 @@ export default async function LocalDirectoryPage({
                         <div className="max-w-3xl mb-8">
                             <h2 className="text-3xl md:text-4xl font-black text-zinc-900 mb-3 font-display tracking-tight">Get 3 Free Quotes</h2>
                             <p className="text-lg md:text-xl text-zinc-600 leading-relaxed font-medium">
-                                Describe your job and location once, and we&apos;ll match your request with up to 3 verified local businesses.
+                                Describe your job and location once, and we&apos;ll match your request with up to 3 local trade profiles.
                             </p>
                         </div>
                         <PublicMultiQuoteForm initialSourcePage="/local" />

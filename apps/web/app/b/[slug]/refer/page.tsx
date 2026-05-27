@@ -97,7 +97,7 @@ export default async function ReferPublicPage({
 
                 <div className="flex items-center justify-center gap-2 mb-2">
                     <ShieldCheck className="w-5 h-5 text-blue-500" />
-                    <span className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-500">Verified Business</span>
+                    <span className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-500">Business Profile</span>
                 </div>
 
                 <h1 className="text-3xl md:text-4xl font-black text-zinc-900 mb-2 leading-tight">{business.business_name}</h1>
@@ -114,14 +114,14 @@ export default async function ReferPublicPage({
                             <span className="text-5xl md:text-6xl font-black text-zinc-900">{fee}</span>
                             <span className="text-base md:text-lg font-bold text-zinc-400">aud</span>
                         </div>
-                        <p className="text-sm md:text-base text-zinc-600 font-bold mt-2">Earn every time you refer a verified lead</p>
+                        <p className="text-sm md:text-base text-zinc-600 font-bold mt-2">Receive rewards when eligible referrals are accepted</p>
                     </div>
                 )}
 
                 <div className="space-y-4 mb-10 text-left">
                     {[
                         "Free to join — no subscriptions",
-                        "Earn rewards for every lead",
+                        "Rewards for accepted eligible leads",
                         "Instant Prezzee gift card payouts",
                     ].map(item => (
                         <div key={item} className="flex items-center gap-3">

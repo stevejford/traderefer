@@ -68,18 +68,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         subtitle: `Browse ${stats.categories > 0 ? `${stats.categories} trade categories` : "local trades"} in ${suburbName}, ${cityName}. ABN-checked businesses with community referral signals.`,
         eyebrow: "Suburb directory",
         badge: `${stateUpper} local hub`,
-        stat1: stats.total > 0 ? `${stats.total} tradies` : "Verified tradies",
+        stat1: stats.total > 0 ? `${stats.total} tradies` : "Available tradies",
         stat2: stats.categories > 0 ? `${stats.categories} categories` : "Trade categories",
         stat3: pc ? `Postcode ${pc}` : "Free quotes",
     });
     return {
         title: `${stats.total > 0 ? stats.total + ' ' : ''}Trusted Tradies in ${suburbName}${pcLabel} | TradeRefer`,
-        description: `Compare ${stats.total > 0 ? stats.total : 'verified'} local tradespeople in ${suburbName}, ${cityName}${pcLabel}. Browse ${stats.categories > 0 ? stats.categories + ' trade categories' : 'plumbers, electricians, builders & more'} — ABN-checked with real community referrals. Free quotes.`,
+        description: `Compare ${stats.total > 0 ? stats.total : 'available'} local tradespeople in ${suburbName}, ${cityName}${pcLabel}. Browse ${stats.categories > 0 ? stats.categories + ' trade categories' : 'plumbers, electricians, builders & more'} — ABN and public review signals where available. Free quotes.`,
         robots: { index: stats.total >= 2 || stats.categories >= 2, follow: true },
         alternates: { canonical: canonicalUrl },
         openGraph: {
             title: `${stats.total > 0 ? stats.total + ' ' : ''}Trusted Tradies in ${suburbName}${pcLabel} | TradeRefer`,
-            description: `Compare ${stats.total > 0 ? stats.total : 'verified'} local tradespeople in ${suburbName}${pcLabel}. ABN-checked, community-ranked.`,
+            description: `Compare ${stats.total > 0 ? stats.total : 'available'} local tradespeople in ${suburbName}${pcLabel}. ABN-checked, community-informed.`,
             url: canonicalUrl,
             siteName: 'TradeRefer',
             type: 'website',
@@ -88,7 +88,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         twitter: {
             card: 'summary_large_image',
             title: `${stats.total > 0 ? stats.total + ' ' : ''}Trusted Tradies in ${suburbName}${pcLabel} | TradeRefer`,
-            description: `Compare ${stats.total > 0 ? stats.total : 'verified'} local tradespeople in ${suburbName}${pcLabel}. ABN-checked, community-ranked.`,
+            description: `Compare ${stats.total > 0 ? stats.total : 'available'} local tradespeople in ${suburbName}${pcLabel}. ABN-checked, community-informed.`,
             images: [ogImageUrl],
         },
     };
@@ -228,8 +228,8 @@ export default async function SuburbDirectoryPage({ params, searchParams }: Page
                     <div className="bg-white border-l-4 border-[#FF6600] rounded-xl px-6 py-4 max-w-3xl mb-8">
                         <p className="text-[#1A1A1A]" style={{ fontSize: '18px', lineHeight: 1.7 }}>
                             {suburbStats.total > 0
-                                ? `${suburbName} has ${suburbStats.total} verified trade businesses across ${suburbStats.categories} categories. TradeRefer eliminates the $21 lead-risk for ${suburbName} pros — pay only when you win the work.`
-                                : `Find trusted local trade professionals in ${suburbName}, ${cityName}. All businesses are ABN-verified. TradeRefer eliminates upfront lead risk — pay only when you win.`
+                                ? `${suburbName} has ${suburbStats.total} trade businesses across ${suburbStats.categories} categories. TradeRefer helps locals compare profiles, service areas and quote options.`
+                                : `Find trusted local trade professionals in ${suburbName}, ${cityName}. Compare ABN-checked profiles, service areas and quote options.`
                             }
                         </p>
                     </div>
@@ -239,8 +239,8 @@ export default async function SuburbDirectoryPage({ params, searchParams }: Page
                         </h1>
                         <p className="text-gray-600 max-w-2xl" style={{ fontSize: '20px', lineHeight: 1.7 }}>
                             {suburbStats.total > 0
-                                ? `${suburbStats.total.toLocaleString()} verified tradies across ${suburbStats.categories} trade categories in ${suburbName}, ${cityName}.`
-                                : `Find verified local trades in ${suburbName}, ${cityName}. Browse by trade category to compare experts near you.`
+                                ? `${suburbStats.total.toLocaleString()} trade profiles across ${suburbStats.categories} trade categories in ${suburbName}, ${cityName}.`
+                                : `Find local trades in ${suburbName}, ${cityName}. Browse by trade category to compare experts near you.`
                             }
                         </p>
                         <div className="flex flex-wrap gap-4 mb-6">
@@ -255,7 +255,7 @@ export default async function SuburbDirectoryPage({ params, searchParams }: Page
                         <div className="flex flex-wrap gap-4 text-[#1A1A1A] font-bold" style={{ fontSize: '16px' }}>
                             <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-[#FF6600]" />ABN-checked businesses</span>
                             <span className="flex items-center gap-2"><MapPin className="w-4 h-4 text-[#FF6600]" />{cityName}, {stateUpper}</span>
-                            <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-[#FF6600]" />Pay only when you win the job</span>
+                            <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-[#FF6600]" />Compare before you contact</span>
                         </div>
                     </div>
                 </div>
@@ -270,7 +270,7 @@ export default async function SuburbDirectoryPage({ params, searchParams }: Page
                             <div className="max-w-3xl mb-8">
                                 <h2 className="font-black text-[#1A1A1A] mb-3 font-display" style={{ fontSize: '32px' }}>Get 3 Free Quotes in {suburbName}</h2>
                                 <p className="text-gray-500" style={{ fontSize: '20px', lineHeight: 1.7 }}>
-                                    Submit your job once and we&apos;ll match you with up to 3 verified local businesses in {suburbName}, {cityName}.
+                                    Submit your job once and we&apos;ll match you with up to 3 local trade profiles in {suburbName}, {cityName}.
                                 </p>
                             </div>
                             <PublicMultiQuoteForm initialState={stateUpper} initialCity={cityName} initialSuburb={suburbName} initialSourcePage={`/local/${state}/${city}/${canonicalSuburb}`} />
@@ -279,7 +279,7 @@ export default async function SuburbDirectoryPage({ params, searchParams }: Page
                         {/* Trade category grid — oversized 120px icons */}
                         <section>
                             <h2 className="font-black text-[#1A1A1A] mb-2 font-display" style={{ fontSize: '32px' }}>Select a Trade Category</h2>
-                            <p className="text-gray-500 mb-8" style={{ fontSize: '20px', lineHeight: 1.7 }}>Find verified local specialists in {suburbName} for your project.</p>
+                            <p className="text-gray-500 mb-8" style={{ fontSize: '20px', lineHeight: 1.7 }}>Find local specialists in {suburbName} for your project.</p>
                             {displayTrades.length > 0 ? (
                                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
                                     {displayTrades.map(({ trade, count }) => {
@@ -296,7 +296,7 @@ export default async function SuburbDirectoryPage({ params, searchParams }: Page
                                                         <p className="font-black text-[#1A1A1A] group-hover:text-[#FF6600] transition-colors leading-tight mb-1" style={{ fontSize: '22px' }}>
                                                             {trade}
                                                         </p>
-                                                        <p className="font-bold text-[#FF6600]" style={{ fontSize: '16px' }}>{count} verified</p>
+                                                        <p className="font-bold text-[#FF6600]" style={{ fontSize: '16px' }}>{count} profiles</p>
                                                     </div>
                                                 </div>
                                             </Link>
@@ -329,7 +329,7 @@ export default async function SuburbDirectoryPage({ params, searchParams }: Page
                             <div>
                                 <h2 className="font-black text-[#1A1A1A] mb-2 font-display" style={{ fontSize: '24px' }}>How TradeRefer Verifies {suburbName} Businesses</h2>
                                 <p className="text-gray-600" style={{ fontSize: '20px', lineHeight: 1.7 }}>
-                                    Every business listed in {suburbName} is checked against the Australian Business Register for an active ABN, has their state trade licence confirmed, and is ranked by real peer referrals from {cityName} residents — never paid ads.
+                                    TradeRefer uses public business data such as ABN, location, category, review and referral signals where available, helping {cityName} residents build a more informed shortlist.
                                 </p>
                             </div>
                         </section>

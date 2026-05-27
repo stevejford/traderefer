@@ -34,7 +34,7 @@ const FAQS = [
     },
     {
         q: "How do I find a reliable bathroom renovator in Perth?",
-        a: "The best bathroom renovators in Perth are licenced builders or registered tradespeople with strong local reviews. TradeRefer profiles include licence details, insurance status, and verified customer feedback, making it straightforward to compare and shortlist quality renovators before committing.",
+        a: "The best bathroom renovators in Perth are licenced builders or registered tradespeople with strong local reviews. TradeRefer profiles include licence details, insurance status, and public customer feedback, making it straightforward to compare and shortlist quality renovators before committing.",
     },
     {
         q: "How long do bathroom renovations take in Perth?",
@@ -267,7 +267,7 @@ export default async function BathroomRenovationsPerthPage() {
                     <section className="py-14 bg-[#FCFCFC] border-b border-gray-100">
                         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                             <h2 className="text-2xl font-extrabold mb-2 text-[#1A1A1A] font-display">Bathroom Renovators in Perth</h2>
-                            <p className="text-gray-500 mb-8">Verified contractors serving greater Perth and surrounds</p>
+                            <p className="text-gray-500 mb-8">Checked contractors serving greater Perth and surrounds</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {businesses.map((biz) => {
                                     const rating = biz.avg_rating ? parseFloat(String(biz.avg_rating)) : null;

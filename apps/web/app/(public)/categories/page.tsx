@@ -8,12 +8,12 @@ import { ChevronRight, Wrench, Users, ArrowRight, Search } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-    title: "50+ Trade Categories | Find Verified Tradies in Australia | TradeRefer",
-    description: "Browse 50+ trade categories on TradeRefer. Find verified electricians, plumbers, painters, builders & more across Australia. ABN-verified, community-ranked. Free quotes.",
+    title: "Trade Categories Australia | Browse Local Trade Services | TradeRefer",
+    description: "Browse 50+ trade categories on TradeRefer. Find electricians, plumbers, painters, builders & more across Australia. ABN-checked, community-informed. Free quotes.",
     alternates: { canonical: "https://traderefer.au/categories" },
     openGraph: {
         title: "All Trade Categories | TradeRefer Australia",
-        description: "50+ trade categories. Find verified local tradies across all Australian states and cities.",
+        description: "50+ trade categories. Find local trade profiles across all Australian states and cities.",
     },
 };
 
@@ -83,7 +83,7 @@ export default async function CategoriesPage() {
                         All Trade <span className="text-[#FF6600]">Categories</span>
                     </h1>
                     <p className="text-zinc-400 max-w-2xl mb-8" style={{ fontSize: '20px', lineHeight: 1.7 }}>
-                        Browse {totalTrades} trade categories across Australia. Find verified, ABN-checked local tradies with real community ratings.
+                        Browse {totalTrades} trade categories across Australia. Find local trade profiles with ABN and public review signals where available.
                     </p>
                     <div className="flex flex-wrap gap-4 mb-8">
                         <Link href="/quotes?source=%2Fcategories" className="bg-[#FF6600] hover:bg-[#E65C00] text-white font-black px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2" style={{ minHeight: '64px', fontSize: '18px' }}>
@@ -95,7 +95,7 @@ export default async function CategoriesPage() {
                         </Link>
                     </div>
                     <div className="flex flex-wrap gap-6 text-white font-bold" style={{ fontSize: '16px' }}>
-                        <span className="flex items-center gap-2"><Users className="w-4 h-4 text-[#FF6600]" />{totalBusinesses.toLocaleString()} verified businesses</span>
+                        <span className="flex items-center gap-2"><Users className="w-4 h-4 text-[#FF6600]" />{totalBusinesses.toLocaleString()} trade profiles</span>
                         <span className="flex items-center gap-2"><Wrench className="w-4 h-4 text-[#FF6600]" />{totalTrades} trade categories</span>
                         <span className="flex items-center gap-2"><Search className="w-4 h-4 text-[#FF6600]" />Free quotes, no obligation</span>
                     </div>
@@ -110,7 +110,7 @@ export default async function CategoriesPage() {
                     {tradeStats.length > 0 && (
                         <section className="mb-16">
                             <h2 className="font-black text-[#1A1A1A] mb-2 font-display" style={{ fontSize: '40px' }}>Browse by Trade</h2>
-                            <p className="text-zinc-500 mb-8" style={{ fontSize: '20px', lineHeight: 1.7 }}>Click any trade to find verified local specialists in your area.</p>
+                            <p className="text-zinc-500 mb-8" style={{ fontSize: '20px', lineHeight: 1.7 }}>Click any trade to find local specialists in your area.</p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                 {tradeStats.map(({ trade, count, suburbs }) => {
                                     const slug = tradeToSlug(trade);
@@ -168,7 +168,7 @@ export default async function CategoriesPage() {
                     {/* Quick Links to Top 10 pages */}
                     <section className="bg-white rounded-3xl border border-zinc-200 p-8 md:p-10 mb-16">
                         <h2 className="font-black text-[#1A1A1A] mb-2 font-display" style={{ fontSize: '32px' }}>Top Rated Tradies by City</h2>
-                        <p className="text-zinc-500 mb-6" style={{ fontSize: '20px', lineHeight: 1.7 }}>Find the highest-rated tradies in Australia&apos;s major cities, ranked by verified customer reviews.</p>
+                        <p className="text-zinc-500 mb-6" style={{ fontSize: '20px', lineHeight: 1.7 }}>Find the highest-rated tradies in Australia&apos;s major cities, ranked by public customer reviews.</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                             {[
                                 { label: "Top Electricians Melbourne", href: "/top/electrician/vic/melbourne" },
@@ -196,7 +196,7 @@ export default async function CategoriesPage() {
                         <div className="max-w-3xl mb-8">
                             <h2 className="font-black text-[#1A1A1A] mb-3 font-display" style={{ fontSize: '32px' }}>Get 3 Free Quotes</h2>
                             <p className="text-zinc-500" style={{ fontSize: '20px', lineHeight: 1.7 }}>
-                                Tell us what trade you need and where the job is located. We&apos;ll match your request with up to 3 verified local businesses.
+                                Tell us what trade you need and where the job is located. We&apos;ll match your request with up to 3 local trade profiles.
                             </p>
                         </div>
                         <PublicMultiQuoteForm initialSourcePage="/categories" />
@@ -205,7 +205,7 @@ export default async function CategoriesPage() {
                     {/* Browse by Location CTA */}
                     <section className="bg-[#1A1A1A] rounded-3xl p-8 md:p-10 text-white text-center">
                         <h2 className="font-black mb-4 text-white" style={{ fontSize: '32px' }}>Need quotes instead of browsing?</h2>
-                        <p className="text-zinc-400 mb-8 max-w-lg mx-auto" style={{ fontSize: '20px', lineHeight: 1.7 }}>Request up to 3 free quotes from verified local businesses, or keep browsing by suburb, city, or state.</p>
+                        <p className="text-zinc-400 mb-8 max-w-lg mx-auto" style={{ fontSize: '20px', lineHeight: 1.7 }}>Request up to 3 free quotes from local trade profiles, or keep browsing by suburb, city, or state.</p>
                         <div className="flex flex-wrap gap-4 justify-center">
                             <Link href="/quotes?source=%2Fcategories" className="bg-[#FF6600] hover:bg-[#E65C00] text-white font-black px-8 rounded-xl transition-colors inline-flex items-center justify-center gap-2" style={{ minHeight: '64px', fontSize: '18px' }}>
                                 Get 3 Free Quotes

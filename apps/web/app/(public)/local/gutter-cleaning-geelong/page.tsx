@@ -212,7 +212,7 @@ export default async function GutterCleaningGeelongPage() {
                             {count > 0 && (
                                 <div className="flex items-center gap-2 text-gray-300">
                                     <ShieldCheck className="w-5 h-5 text-[#FF6600]" />
-                                    <span className="font-semibold">{count}+ verified gutter cleaners in Geelong</span>
+                                    <span className="font-semibold">{count}+ gutter cleaners in Geelong</span>
                                 </div>
                             )}
                             <div className="flex items-center gap-2 text-gray-300">
@@ -265,7 +265,7 @@ export default async function GutterCleaningGeelongPage() {
                             <h2 className="text-2xl font-extrabold mb-2 text-[#1A1A1A] font-display">
                                 Top Gutter Cleaners in Geelong
                             </h2>
-                            <p className="text-gray-500 mb-8">Verified businesses serving Greater Geelong and surrounds</p>
+                            <p className="text-gray-500 mb-8">Trade profiles serving Greater Geelong and surrounds</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {businesses.map((biz) => {
                                     const rating = biz.avg_rating ? parseFloat(String(biz.avg_rating)) : null;
@@ -333,7 +333,7 @@ export default async function GutterCleaningGeelongPage() {
                             <div className="text-center">
                                 <div className="w-12 h-12 rounded-full bg-orange-100 text-[#FF6600] font-extrabold text-xl flex items-center justify-center mx-auto mb-4">1</div>
                                 <h3 className="font-bold text-lg mb-2">Post your gutter cleaning job</h3>
-                                <p className="text-gray-500 text-sm leading-relaxed">Describe your property, the number of storeys, and any access issues. Takes less than two minutes and it&apos;s completely free.</p>
+                                <p className="text-gray-500 text-sm leading-relaxed">Describe your property, the number of storeys, and any access issues. It&apos;s free to request quotes.</p>
                             </div>
                             <div className="text-center">
                                 <div className="w-12 h-12 rounded-full bg-orange-100 text-[#FF6600] font-extrabold text-xl flex items-center justify-center mx-auto mb-4">2</div>
@@ -343,7 +343,7 @@ export default async function GutterCleaningGeelongPage() {
                             <div className="text-center">
                                 <div className="w-12 h-12 rounded-full bg-orange-100 text-[#FF6600] font-extrabold text-xl flex items-center justify-center mx-auto mb-4">3</div>
                                 <h3 className="font-bold text-lg mb-2">Choose your tradie and get it done</h3>
-                                <p className="text-gray-500 text-sm leading-relaxed">Compare quotes and reviews, confirm your preferred tradie, and get your gutters cleaned — no surprises, no hidden fees.</p>
+                                <p className="text-gray-500 text-sm leading-relaxed">Compare quotes and reviews, confirm your preferred tradie, and check the scope before the work starts.</p>
                             </div>
                         </div>
                     </div>

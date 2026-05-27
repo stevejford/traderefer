@@ -7,11 +7,11 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
     title: "Find Tradies by Location | All Australian States & Cities | TradeRefer",
-    description: "Browse verified tradies by location across all Australian states and cities. Find electricians, plumbers, painters & more in your suburb. ABN-verified, community-ranked. Free quotes.",
+    description: "Browse Australian trade profiles by location. Find electricians, plumbers, painters and more by state, city, and suburb with ABN and public review signals where available.",
     alternates: { canonical: "https://traderefer.au/locations" },
     openGraph: {
         title: "Find Local Tradies by Location | TradeRefer Australia",
-        description: "All 8 Australian states, 89 cities, 997 suburbs. Find verified local tradies near you.",
+        description: "All 8 Australian states, 89 cities, 997 suburbs. Find local trade profiles near you.",
     },
 };
 
@@ -112,10 +112,10 @@ export default async function LocationsPage() {
                         Find Local Tradies <span className="text-[#FF6600]">by Location</span>
                     </h1>
                     <p className="text-zinc-400 max-w-2xl mb-8" style={{ fontSize: '20px', lineHeight: 1.7 }}>
-                        Browse verified tradies across all Australian states and cities. Every business is ABN-verified and ranked by real community referrals.
+                        Browse Australian trade profiles by state and city. TradeRefer uses ABN, location, category, public review, and referral signals where available.
                     </p>
                     <div className="flex flex-wrap gap-6 text-white font-bold" style={{ fontSize: '16px' }}>
-                        <span className="flex items-center gap-2"><Users className="w-4 h-4 text-[#FF6600]" />{totalBusinesses.toLocaleString()} verified businesses</span>
+                        <span className="flex items-center gap-2"><Users className="w-4 h-4 text-[#FF6600]" />{totalBusinesses.toLocaleString()} trade profiles</span>
                         <span className="flex items-center gap-2"><Building2 className="w-4 h-4 text-[#FF6600]" />{totalCities} cities</span>
                         <span className="flex items-center gap-2"><MapPin className="w-4 h-4 text-[#FF6600]" />{totalSuburbs} suburbs</span>
                     </div>

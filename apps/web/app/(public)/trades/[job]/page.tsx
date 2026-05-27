@@ -40,16 +40,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const ogImageUrl = buildOgImageUrl({
         template: "trade-guide",
         title: `${jobName} cost guide`,
-        subtitle: `Compare Australian pricing, licensing requirements and verified local specialists for ${jobName.toLowerCase()}.`,
+        subtitle: `Compare Australian pricing, licensing requirements and local specialists for ${jobName.toLowerCase()}.`,
         eyebrow: "Trade cost guide",
         badge: "Australia guide",
         stat1: cost ? `$${cost.low}-${cost.high}${cost.unit}` : "Cost guide",
         stat2: tradeName || "Trade specialists",
-        stat3: "Verified local help",
+        stat3: "Local help",
     });
     return {
         title: `${jobName} Cost Guide | TradeRefer`,
-        description: `How much does ${jobName.toLowerCase()} cost in Australia? Compare prices by state, understand licensing requirements, and find verified local specialists across Australia.`,
+        description: `How much does ${jobName.toLowerCase()} cost in Australia? Compare prices by state, understand licensing requirements, and find local specialists across Australia.`,
         alternates: { canonical: `https://traderefer.au/trades/${job}` },
         openGraph: {
             title: `${jobName} Cost Guide | TradeRefer`,
@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         twitter: {
             card: "summary_large_image",
             title: `${jobName} Cost Guide | TradeRefer`,
-            description: `National pricing guide for ${jobName.toLowerCase()} in Australia. State-by-state costs and verified local specialists.`,
+            description: `National pricing guide for ${jobName.toLowerCase()} in Australia. State-by-state costs and local specialists.`,
             images: [ogImageUrl],
         },
     };
@@ -211,13 +211,13 @@ export default async function TradeHubPage({ params }: PageProps) {
                         <p className="text-zinc-400 mb-6" style={{ fontSize: '20px', lineHeight: 1.7 }}>
                             {jobName} costs vary significantly across Australia depending on your state, the complexity of the work, and local market conditions.
                             {cost && ` Typical ${tradeName!.toLowerCase()} rates range from $${cost.low}–$${cost.high}${cost.unit} nationally.`}
-                            {" "}Use this guide to understand what to expect, how to compare quotes, and find verified local specialists near you.
+                            {" "}Use this guide to understand what to expect, how to compare quotes, and find local specialists near you.
                         </p>
                         {totalBusinesses > 0 && (
                             <div className="flex flex-wrap gap-6 text-white font-bold" style={{ fontSize: '16px' }}>
                                 <span className="flex items-center gap-1.5">
                                     <Users className="w-4 h-4 text-[#FF6600]" />
-                                    {totalBusinesses.toLocaleString()} verified {tradeName!.toLowerCase()} across Australia
+                                    {totalBusinesses.toLocaleString()} {tradeName!.toLowerCase()} across Australia
                                 </span>
                                 <span className="flex items-center gap-1.5">
                                     <MapPin className="w-4 h-4 text-[#FF6600]" />
@@ -286,7 +286,7 @@ export default async function TradeHubPage({ params }: PageProps) {
                                 <MapPin className="w-6 h-6 text-[#FF6600]" />
                                 Find {jobName} Specialists Near You
                             </h2>
-                            <p className="text-zinc-500 mb-6" style={{ fontSize: '16px' }}>Browse verified {tradeName!.toLowerCase()} by city across Australia:</p>
+                            <p className="text-zinc-500 mb-6" style={{ fontSize: '16px' }}>Browse {tradeName!.toLowerCase()} profiles by city across Australia:</p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 {topCities.map(({ city, state, count }) => {
                                     const stateSlug = STATE_SLUGS[state?.toUpperCase()] || state?.toLowerCase();
@@ -374,7 +374,7 @@ export default async function TradeHubPage({ params }: PageProps) {
                     <section className="bg-[#1A1A1A] rounded-3xl p-8 md:p-12 text-center text-white">
                         <h2 className="font-black mb-4 text-white" style={{ fontSize: '40px' }}>Find a {tradeName} Near You</h2>
                         <p className="text-zinc-400 mb-8 max-w-xl mx-auto" style={{ fontSize: '20px', lineHeight: 1.7 }}>
-                            TradeRefer lists verified, ABN-checked {tradeName!.toLowerCase()} across Australia, ranked by real community referrals — not paid placement.
+                            TradeRefer lists {tradeName!.toLowerCase()} across Australia with ABN, profile, public review, and referral signals where available.
                         </p>
                         <Link
                             href="/local"

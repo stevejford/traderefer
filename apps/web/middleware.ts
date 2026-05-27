@@ -10,6 +10,7 @@ const isPublicRoute = createRouteMatcher([
     "/register(.*)",
     "/signup(.*)",
     "/join(.*)",
+    "/claim(.*)",
     "/b/(.*)",
     "/businesses(.*)",
     "/contact(.*)",
@@ -103,7 +104,6 @@ export const config = {
         '/settings(.*)',
         '/admin(.*)',
         '/onboarding(.*)',
-        '/claim(.*)',
         '/api/backend(.*)',
         '/api/stripe(.*)',
         // Exclude: /, /b/*, /local/*, /top/*, /businesses*, /categories*, etc.

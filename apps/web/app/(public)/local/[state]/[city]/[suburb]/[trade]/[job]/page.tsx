@@ -53,22 +53,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const ogImageUrl = buildOgImageUrl({
         template: "job",
         title: `${jobName} in ${suburbWithPostcode}`,
-        subtitle: `Compare ${count > 0 ? count : "verified"} local specialists in ${suburbName}, ${cityName} ${stateUpper}. ABN-checked, community-referred and quote-ready.`,
+        subtitle: `Compare ${count > 0 ? count : "available"} local specialists in ${suburbName}, ${cityName} ${stateUpper}. ABN and referral signals where available, with quote-ready paths.`,
         eyebrow: "Local job guide",
         badge: `${stateUpper} service page`,
-        stat1: count > 0 ? `${count} specialists` : "Verified specialists",
+        stat1: count > 0 ? `${count} specialists` : "Available specialists",
         stat2: cost ? `$${cost.low}-${cost.high}${cost.unit}` : tradeName,
         stat3: "Free quotes",
     });
 
     return {
         title: `${jobName} in ${suburbWithPostcode} | TradeRefer`,
-        description: `Compare ${count > 0 ? count : 'verified'} ${jobName.toLowerCase()} specialists in ${suburbName}, ${cityName} ${stateUpper}.${cost ? ` Typical cost $${cost.low}–$${cost.high}${cost.unit}.` : ''} ABN-checked, community-referred. Get free quotes today.`,
+        description: `Compare ${count > 0 ? count : 'available'} ${jobName.toLowerCase()} specialists in ${suburbName}, ${cityName} ${stateUpper}.${cost ? ` Typical cost $${cost.low}–$${cost.high}${cost.unit}.` : ''} ABN and referral signals where available. Get free quotes today.`,
         robots: { index: false, follow: true },
         alternates: { canonical: canonicalUrl },
         openGraph: {
             title: `${jobName} in ${suburbWithPostcode} | TradeRefer`,
-            description: `${count > 0 ? count : 'Verified'} local ${jobName.toLowerCase()} specialists in ${suburbWithPostcode}. Compare ratings, pricing and referrals.`,
+            description: `${count > 0 ? count : 'Available'} local ${jobName.toLowerCase()} specialists in ${suburbWithPostcode}. Compare ratings, pricing and referrals.`,
             url: canonicalUrl,
             siteName: "TradeRefer",
             type: "website",
@@ -77,7 +77,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         twitter: {
             card: "summary_large_image",
             title: `${jobName} in ${suburbWithPostcode} | TradeRefer`,
-            description: `${count > 0 ? count : 'Verified'} local ${jobName.toLowerCase()} specialists in ${suburbWithPostcode}. Compare ratings, pricing and referrals.`,
+            description: `${count > 0 ? count : 'Available'} local ${jobName.toLowerCase()} specialists in ${suburbWithPostcode}. Compare ratings, pricing and referrals.`,
             images: [ogImageUrl],
         },
     };
@@ -254,7 +254,7 @@ export default async function JobTypePage({ params }: PageProps) {
                             <span className="text-orange-500">{jobName}</span> in {suburbName}, {cityName}
                         </h1>
                         <p className="text-xl text-zinc-400 mb-6 leading-relaxed">
-                            Find verified {jobName.toLowerCase()} specialists in {suburbName}. All businesses listed on TradeRefer are ABN-verified and ranked by real community referrals from your neighbours — not paid placement.
+                            Compare {jobName.toLowerCase()} specialists in {suburbName} using ABN, profile, public review, and referral signals where available.
                             {cost && ` Typical ${tradeName.toLowerCase()} rates in ${stateName} range from $${cost.low}–$${cost.high}${cost.unit}.`}
                         </p>
                         {cost && (
@@ -286,7 +286,7 @@ export default async function JobTypePage({ params }: PageProps) {
                     <section id="businesses">
                         <h2 className="text-2xl font-black text-zinc-900 mb-6">
                             {businesses.length > 0
-                                ? `${businesses.length} Verified ${jobName} Specialists in ${suburbName}`
+                                ? `${businesses.length} Checked ${jobName} Specialists in ${suburbName}`
                                 : `${jobName} Specialists Serving ${suburbName}`}
                         </h2>
 
@@ -331,7 +331,7 @@ export default async function JobTypePage({ params }: PageProps) {
                                                             )}
                                                             <span className="flex items-center gap-1">
                                                                 <ShieldCheck className="w-3 h-3 text-green-400" />
-                                                                ABN Verified
+                                                                ABN checked
                                                             </span>
                                                         </div>
                                                     </div>
@@ -346,7 +346,7 @@ export default async function JobTypePage({ params }: PageProps) {
                             <div className="bg-zinc-50 rounded-3xl border border-dashed border-zinc-200 p-12 text-center">
                                 <Wrench className="w-10 h-10 text-zinc-300 mx-auto mb-4" />
                                 <h3 className="text-lg font-black text-zinc-600 mb-2">No listings yet in {suburbName}</h3>
-                                <p className="text-zinc-500 text-sm mb-3 max-w-xl mx-auto">No specialists listed in {suburbName} yet — get quotes from verified {tradeName.toLowerCase()} across {cityName} instead.</p>
+                                <p className="text-zinc-500 text-sm mb-3 max-w-xl mx-auto">No specialists listed in {suburbName} yet — get quotes from {tradeName.toLowerCase()} across {cityName} instead.</p>
                                 <p className="text-zinc-400 text-sm mb-6">Join 1,200+ homeowners who&apos;ve found their tradie on TradeRefer.</p>
                                 <div className="flex flex-col sm:flex-row justify-center gap-3">
                                     <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold border-none">
@@ -387,7 +387,7 @@ export default async function JobTypePage({ params }: PageProps) {
                                     <p className="text-sm text-zinc-500">Always get multiple</p>
                                 </div>
                             </div>
-                            <p className="text-xs text-zinc-400">Price estimates only. Not a guarantee of cost. Verify with your chosen tradie before work begins.</p>
+                            <p className="text-xs text-zinc-400">Price estimates only. Confirm scope, timing, and final cost with your chosen tradie before work begins.</p>
                         </section>
                     )}
 

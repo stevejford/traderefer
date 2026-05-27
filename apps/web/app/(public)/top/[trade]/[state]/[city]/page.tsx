@@ -110,7 +110,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
     return {
         title: `Top ${tradeNoun} in ${cityName} | TradeRefer`,
-        description: `The ${count > 0 ? count : ''} highest-rated ${tradeNoun.toLowerCase()} in ${cityName}, ${stateName} ranked by ${totalReviews > 0 ? totalReviews.toLocaleString() + ' ' : ''}Google reviews.${topBizStr} Free quotes from verified local tradies.`,
+        description: `The ${count > 0 ? count : ''} highest-rated ${tradeNoun.toLowerCase()} in ${cityName}, ${stateName} ranked by ${totalReviews > 0 ? totalReviews.toLocaleString() + ' ' : ''}Google reviews.${topBizStr} Free quotes from local trade profiles.`,
         robots: { index: count >= 3, follow: true },
         alternates: { canonical: canonicalUrl },
         openGraph: {
@@ -173,7 +173,7 @@ export default async function Top10CityPage({ params }: PageProps) {
         "@context": "https://schema.org",
         "@type": "ItemList",
         "name": `Top 10 ${tradeName} in ${cityName}, ${stateName} (${year})`,
-        "description": `The highest-rated ${tradeName.toLowerCase()} in ${cityName} ranked by verified Google reviews.`,
+        "description": `The highest-rated ${tradeName.toLowerCase()} in ${cityName} ranked by public Google reviews.`,
         "numberOfItems": businesses.length,
         "itemListElement": businesses.map((biz: any, i: number) => ({
             "@type": "ListItem",
@@ -249,7 +249,7 @@ export default async function Top10CityPage({ params }: PageProps) {
                             Top {businesses.length} <span className="text-[#FF6600]">{TRADE_NOUNS[tradeName] || tradeName}</span> in {cityName}, {stateName}
                         </h1>
                         <p className="text-zinc-400 mb-4 max-w-2xl" style={{ fontSize: '20px', lineHeight: 1.7 }}>
-                            There are currently <strong className="text-white">{businesses.length} highly-rated {tradeName.toLowerCase()} businesses</strong> in {cityName}, {stateName} listed on TradeRefer, with an average Google rating of <strong className="text-white">{avgRating}★</strong> across <strong className="text-white">{totalReviews.toLocaleString()} verified reviews</strong>. The {businesses.length} listed below are ranked from highest to lowest rating, all ABN-verified and community-recommended.
+                            There are currently <strong className="text-white">{businesses.length} highly-rated {tradeName.toLowerCase()} businesses</strong> in {cityName}, {stateName} listed on TradeRefer, with an average Google rating of <strong className="text-white">{avgRating}★</strong> across <strong className="text-white">{totalReviews.toLocaleString()} public reviews</strong>. The {businesses.length} listed below are ranked from highest to lowest rating, all ABN-checked and community-recommended.
                         </p>
                         {cost && (
                             <div className="inline-flex items-center gap-2 bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 mb-6 font-bold text-white" style={{ fontSize: '16px' }}>
@@ -280,7 +280,7 @@ export default async function Top10CityPage({ params }: PageProps) {
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-green-600"><ShieldCheck className="w-6 h-6" /></div>
-                            <div><p className="font-black text-zinc-900" style={{ fontSize: '16px' }}>100% Verified</p><p className="text-zinc-500" style={{ fontSize: '16px' }}>ABN &amp; Licence Checked</p></div>
+                            <div><p className="font-black text-zinc-900" style={{ fontSize: '16px' }}>ABN Checked</p><p className="text-zinc-500" style={{ fontSize: '16px' }}>ABN &amp; Licence Checked</p></div>
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600"><Users className="w-6 h-6" /></div>
@@ -301,7 +301,7 @@ export default async function Top10CityPage({ params }: PageProps) {
                                 Top {businesses.length} {tradeName} in {cityName} — Ranked by Customer Rating
                             </h2>
                             <p className="text-zinc-500 mb-8" style={{ fontSize: '20px', lineHeight: 1.7 }}>
-                                Compare the highest-rated {tradeName.toLowerCase()} in {cityName}, {stateName}. All businesses listed are ABN-verified and surfaced without paid placement.
+                                Compare {tradeName.toLowerCase()} in {cityName}, {stateName} using ABN, profile, public review, and referral signals where available.
                             </p>
                             <div className="space-y-5">
                                 {businesses.map((biz: any, index: number) => (
@@ -323,7 +323,7 @@ export default async function Top10CityPage({ params }: PageProps) {
                                                     <span className="px-3 py-1.5 bg-zinc-100 text-zinc-600 rounded-full font-black uppercase tracking-wider" style={{ fontSize: '16px' }}>{biz.trade_category}</span>
                                                     {biz.is_verified && (
                                                         <span className="flex items-center gap-1 px-3 py-1.5 bg-green-50 text-green-700 border border-green-100 rounded-full font-black uppercase verified-pulse" style={{ fontSize: '16px' }}>
-                                                            <ShieldCheck className="w-3.5 h-3.5" /> Verified
+                                                            <ShieldCheck className="w-3.5 h-3.5" /> ABN checked
                                                         </span>
                                                     )}
                                                 </div>
@@ -331,7 +331,7 @@ export default async function Top10CityPage({ params }: PageProps) {
                                                     {biz.business_name}
                                                 </h3>
                                                 <p className="text-zinc-500 mb-4 line-clamp-2" style={{ fontSize: '16px', lineHeight: 1.6 }}>
-                                                    {biz.description || `${biz.trade_category} specialist based in ${biz.suburb}, ${cityName}. Serving the local community with expert, ABN-verified trade services.`}
+                                                    {biz.description || `${biz.trade_category} specialist based in ${biz.suburb}, ${cityName}. Serving the local community with expert, ABN-checked trade services.`}
                                                 </p>
                                                 <div className="flex flex-wrap items-center gap-5 font-bold mb-4" style={{ fontSize: '16px' }}>
                                                     <div className="flex items-center gap-1.5 text-orange-600">
@@ -469,7 +469,7 @@ export default async function Top10CityPage({ params }: PageProps) {
                             <Award className="w-10 h-10 text-[#FF6600] mx-auto mb-4" />
                             <h3 className="font-black mb-2 text-white" style={{ fontSize: '32px' }}>Are You a {tradeName} in {cityName}?</h3>
                             <p className="text-zinc-400 mb-6 max-w-md mx-auto" style={{ fontSize: '20px', lineHeight: 1.7 }}>
-                                Join {businesses.length}+ verified {tradeName.toLowerCase()} already listed on TradeRefer. Build your trust score and rank higher for free.
+                                Join {businesses.length}+ {tradeName.toLowerCase()} already listed on TradeRefer. Build your trust score and rank higher for free.
                             </p>
                             <Link prefetch={false} href="/register?type=business" className="bg-[#FF6600] hover:bg-[#E65C00] text-white font-black px-8 rounded-xl transition-colors inline-flex items-center justify-center" style={{ minHeight: '64px', fontSize: '18px' }}>List Your Business Free</Link>
                         </section>

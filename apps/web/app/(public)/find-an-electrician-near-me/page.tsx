@@ -50,7 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
 const FAQS = [
     {
         q: "How do I find a reliable electrician near me?",
-        a: "The best way to find a reliable electrician near you is to check their licence, read verified reviews from real customers, and compare at least two quotes. On TradeRefer, every listed electrician has been reviewed by homeowners — post your job and let licensed electricians in your area respond with quotes and availability.",
+        a: "The best way to find a reliable electrician near you is to check their licence, read public reviews from real customers, and compare at least two quotes. On TradeRefer, every listed electrician has been reviewed by homeowners — post your job and let licensed electricians in your area respond with quotes and availability.",
     },
     {
         q: "How much does an electrician cost in Australia?",
@@ -199,7 +199,7 @@ export default async function FindAnElectricianNearMePage() {
                             <br />Compare Quotes on TradeRefer
                         </h1>
                         <p className="text-xl text-gray-300 mb-8 max-w-2xl leading-relaxed">
-                            Australia&apos;s verified electrician directory. Compare real reviews, get free quotes from licensed electricians in your area, and hire safely — power points to full switchboard upgrades.
+                            Australia&apos;s electrician directory. Compare real reviews, get free quotes from licensed electricians in your area, and hire safely — power points to full switchboard upgrades.
                         </p>
 
                         <div className="flex flex-wrap gap-6 mb-10">
@@ -240,7 +240,7 @@ export default async function FindAnElectricianNearMePage() {
                 <section className="py-5 bg-orange-50 border-b border-orange-100">
                     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex flex-wrap items-center justify-center gap-6 text-sm font-semibold text-orange-800">
-                            <span className="flex items-center gap-2"><BadgeCheck className="w-4 h-4 text-[#FF6600]" /> ABN-verified businesses</span>
+                            <span className="flex items-center gap-2"><BadgeCheck className="w-4 h-4 text-[#FF6600]" /> ABN-checked businesses</span>
                             <span className="flex items-center gap-2"><Star className="w-4 h-4 text-[#FF6600]" /> Real customer reviews</span>
                             <span className="flex items-center gap-2"><Zap className="w-4 h-4 text-[#FF6600]" /> Licensed electricians only</span>
                             <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#FF6600]" /> Free to post your job</span>
@@ -255,7 +255,7 @@ export default async function FindAnElectricianNearMePage() {
                             <h2 className="text-2xl font-extrabold mb-2 text-[#1A1A1A] font-display">
                                 Top-Rated Electricians in Australia ({year})
                             </h2>
-                            <p className="text-gray-500 mb-8">Ranked by verified customer review score</p>
+                            <p className="text-gray-500 mb-8">Ranked by public customer review score</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {businesses.map((biz) => {
                                     const rating = biz.avg_rating ? parseFloat(String(biz.avg_rating)) : null;
@@ -360,7 +360,7 @@ export default async function FindAnElectricianNearMePage() {
                                 Electrical work is the most tightly regulated trade in Australia — and for good reason. All electrical work must be carried out by a licensed electrician, and completed work requires a Certificate of Electrical Safety (or equivalent in your state). This certificate is required for insurance claims, property sales, and council inspections.
                             </p>
                             <p>
-                                When finding an electrician near you, look for: a valid state electrical licence, public liability insurance of at least $5 million, genuine reviews from verified customers, and a written quote before work begins. Never hire someone who offers to do electrical work without a licence — the legal risk and safety risk are both significant.
+                                When finding an electrician near you, look for: a valid state electrical licence, public liability insurance of at least $5 million, genuine reviews from customers, and a written quote before work begins. Never hire someone who offers to do electrical work without a licence — the legal risk and safety risk are both significant.
                             </p>
                             <p>
                                 Common jobs range from <strong>$150 for a new power point</strong> to <strong>$3,000+ for a full switchboard upgrade</strong>. Getting multiple quotes is the most effective way to ensure fair pricing — and TradeRefer makes it free and fast to compare licensed electricians in your area.

@@ -304,7 +304,7 @@ export function BusinessLogo({
                 <img
                     ref={imgRef}
                     src={proxyUrl}
-                    alt=""
+                    alt={`${name} logo`}
                     crossOrigin="anonymous"
                     onLoad={handleLoad}
                     onError={() => setLogoState({ logoUrl, stats: null, error: true })}

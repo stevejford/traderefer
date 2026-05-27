@@ -104,7 +104,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const ogImageUrl = buildOgImageUrl({
         template: "top",
         title: `Top ${tradeName} in ${suburbName}`,
-        subtitle: `Ranked by verified Google reviews and local business signals in ${suburbName}, ${cityName} ${stateName}.`,
+        subtitle: `Ranked by public Google reviews and local business signals in ${suburbName}, ${cityName} ${stateName}.`,
         eyebrow: "Ranked suburb list",
         badge: "Top local picks",
         stat1: businesses.length > 0 ? `${businesses.length} ranked` : "Ranked list",
@@ -114,12 +114,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
     return {
         title: `Top ${tradeName} in ${suburbName} | TradeRefer`,
-        description: `The ${businesses.length} highest-rated ${tradeName.toLowerCase()} in ${suburbName}, ${cityName} ${stateName} ranked by ${totalReviews.toLocaleString()} verified reviews.${topBizStr} Get free quotes today.`,
+        description: `The ${businesses.length} highest-rated ${tradeName.toLowerCase()} in ${suburbName}, ${cityName} ${stateName} ranked by ${totalReviews.toLocaleString()} public reviews.${topBizStr} Get free quotes today.`,
         robots: { index: businesses.length >= 3, follow: true },
         alternates: { canonical: canonicalUrl },
         openGraph: {
             title: `Top ${tradeName} in ${suburbName} | TradeRefer`,
-            description: `Ranked by verified Google reviews. Best ${tradeName.toLowerCase()} in ${suburbName}.`,
+            description: `Ranked by public Google reviews. Best ${tradeName.toLowerCase()} in ${suburbName}.`,
             url: canonicalUrl,
             siteName: 'TradeRefer',
             type: 'website',
@@ -128,7 +128,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         twitter: {
             card: 'summary_large_image',
             title: `Top ${tradeName} in ${suburbName} | TradeRefer`,
-            description: `Ranked by verified Google reviews. Best ${tradeName.toLowerCase()} in ${suburbName}.`,
+            description: `Ranked by public Google reviews. Best ${tradeName.toLowerCase()} in ${suburbName}.`,
             images: [ogImageUrl],
         },
     };
@@ -178,7 +178,7 @@ export default async function Top10SuburbPage({ params }: PageProps) {
         "@context": "https://schema.org",
         "@type": "ItemList",
         "name": `Top 10 ${tradeName} in ${suburbName}, ${cityName} (${year})`,
-        "description": `The highest-rated ${tradeName.toLowerCase()} in ${suburbName} ranked by verified Google reviews.`,
+        "description": `The highest-rated ${tradeName.toLowerCase()} in ${suburbName} ranked by public Google reviews.`,
         "numberOfItems": businesses.length,
         "itemListElement": businesses.map((biz: any, i: number) => ({
             "@type": "ListItem",
@@ -256,7 +256,7 @@ export default async function Top10SuburbPage({ params }: PageProps) {
                             Top 10 <span className="text-orange-500">{tradeName}</span><br />in {suburbName}, {cityName}
                         </h1>
                         <p className="text-lg text-zinc-400 mb-4 leading-relaxed max-w-2xl">
-                            TradeRefer lists <strong className="text-white">{businesses.length} verified {tradeName.toLowerCase()} businesses</strong> in {suburbName} with an average Google rating of <strong className="text-white">{avgRating}★</strong> across <strong className="text-white">{totalReviews.toLocaleString()} reviews</strong>. The businesses below are ranked from highest to lowest rating — all ABN-verified and community-recommended.
+                            TradeRefer lists <strong className="text-white">{businesses.length} {tradeName.toLowerCase()} businesses</strong> in {suburbName} with an average Google rating of <strong className="text-white">{avgRating}★</strong> across <strong className="text-white">{totalReviews.toLocaleString()} reviews</strong>. The businesses below are ranked from highest to lowest rating — all ABN-checked and community-recommended.
                         </p>
                         {cost && (
                             <div className="inline-flex items-center gap-2 bg-white/10 border border-white/10 rounded-xl px-4 py-2 mb-6 text-sm font-bold text-white">
@@ -290,7 +290,7 @@ export default async function Top10SuburbPage({ params }: PageProps) {
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-green-600"><ShieldCheck className="w-5 h-5" /></div>
-                            <div><p className="text-sm font-black text-zinc-900">100% Verified</p><p className="text-xs text-zinc-500">ABN-checked</p></div>
+                            <div><p className="text-sm font-black text-zinc-900">ABN Checked</p><p className="text-xs text-zinc-500">ABN-checked</p></div>
                         </div>
                     </div>
                 </div>
@@ -307,7 +307,7 @@ export default async function Top10SuburbPage({ params }: PageProps) {
                                 Top {businesses.length} {tradeName} in {suburbName} — Ranked by Rating
                             </h2>
                             <p className="text-zinc-500 text-sm mb-8">
-                                Sorted by verified Google rating, highest first. All ABN-verified.
+                                Sorted by public Google rating, highest first. All ABN-checked.
                             </p>
                             <div className="space-y-5">
                                 {businesses.map((biz: any, index: number) => (
@@ -328,7 +328,7 @@ export default async function Top10SuburbPage({ params }: PageProps) {
                                                     <span className="px-2.5 py-1 bg-zinc-100 text-zinc-600 rounded-full text-[10px] font-black uppercase tracking-wider">{biz.trade_category}</span>
                                                     {biz.is_verified && (
                                                         <span className="flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 border border-green-100 rounded-full text-[10px] font-black uppercase">
-                                                            <ShieldCheck className="w-3 h-3" /> Verified
+                                                            <ShieldCheck className="w-3 h-3" /> ABN checked
                                                         </span>
                                                     )}
                                                 </div>

@@ -82,9 +82,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
     return {
 
-        title: `Verified Trade Services in ${stateName} | TradeRefer`,
+        title: `Trade Services in ${stateName} | TradeRefer`,
 
-        description: `Browse ${stateName}'s top ABN-verified local trade businesses. Find plumbers, electricians, builders and more in your city or suburb.`,
+        description: `Browse ${stateName}'s top ABN-checked local trade businesses. Find plumbers, electricians, builders and more in your city or suburb.`,
         robots: { index: businessCount > 0, follow: true },
         alternates: { canonical: `https://traderefer.au/local/${state}` },
 
@@ -245,7 +245,7 @@ export default async function StateDirectoryPage({ params, searchParams }: PageP
 
             { "@type": "ListItem", "position": 2, "name": "Directory", "item": "https://traderefer.au/local" },
 
-            { "@type": "ListItem", "position": 3, "name": `Verified Trade Services in ${stateName}` },
+            { "@type": "ListItem", "position": 3, "name": `Trade Services in ${stateName}` },
 
         ]
 
@@ -307,9 +307,9 @@ export default async function StateDirectoryPage({ params, searchParams }: PageP
 
                             {businessCount > 0
 
-                                ? `${stateName} has ${businessCount.toLocaleString()} ABN-verified trade businesses across ${cities.length} cities. TradeRefer eliminates the $21 lead-risk for ${stateName} pros — pay only when you win the work.`
+                                ? `${stateName} has ${businessCount.toLocaleString()} ABN-checked trade businesses across ${cities.length} cities. TradeRefer helps customers compare local profiles, services and quote options.`
 
-                                : `${stateName} verified trade directory. Find ABN-checked plumbers, electricians, builders and more. TradeRefer eliminates upfront lead risk across every city in ${stateName}.`
+                                : `${stateName} trade directory. Find ABN-checked plumbers, electricians, builders and more across local cities.`
 
                             }
 
@@ -329,9 +329,9 @@ export default async function StateDirectoryPage({ params, searchParams }: PageP
 
                             {businessCount > 0
 
-                                ? `${businessCount.toLocaleString()} verified businesses across ${cities.length} cities in ${stateName}. ABN-checked, community-ranked — not paid placement.`
+                                ? `${businessCount.toLocaleString()} trade profiles across ${cities.length} cities in ${stateName}. ABN-checked and organised for local comparison.`
 
-                                : `Find verified local trade businesses across ${stateName}. ABN-checked, community-ranked experts in your city.`
+                                : `Find local trade profiles across ${stateName}. Browse ABN-checked profiles in your city.`
 
                             }
 
@@ -397,7 +397,7 @@ export default async function StateDirectoryPage({ params, searchParams }: PageP
 
                                 <p className="text-gray-500" style={{ fontSize: '20px', lineHeight: 1.7 }}>
 
-                                    Request quotes once and we&apos;ll match your job with up to 3 verified local businesses across {stateName}.
+                                    Request quotes once and we&apos;ll match your job with up to 3 local trade profiles across {stateName}.
 
                                 </p>
 
@@ -435,7 +435,7 @@ export default async function StateDirectoryPage({ params, searchParams }: PageP
 
                                                 <p className="text-3xl font-black text-[#FF6600]">{count.toLocaleString()}</p>
 
-                                                <p className="text-gray-400 font-bold uppercase tracking-wider" style={{ fontSize: '16px' }}>Verified Pros</p>
+                                                <p className="text-gray-400 font-bold uppercase tracking-wider" style={{ fontSize: '16px' }}>Trade Profiles</p>
 
                                             </div>
 
@@ -471,7 +471,7 @@ export default async function StateDirectoryPage({ params, searchParams }: PageP
 
                                 </h2>
 
-                                <p className="text-gray-500 mb-8" style={{ fontSize: '20px', lineHeight: 1.7 }}>Based on verified businesses currently listed across {stateName}.</p>
+                                <p className="text-gray-500 mb-8" style={{ fontSize: '20px', lineHeight: 1.7 }}>Based on trade profiles currently listed across {stateName}.</p>
 
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
 
@@ -565,7 +565,7 @@ export default async function StateDirectoryPage({ params, searchParams }: PageP
 
                                     <span className="text-lg font-black text-zinc-900">{businessCount.toLocaleString()}</span>
 
-                                    <span style={{ fontSize: '16px' }}>verified businesses in {stateName}</span>
+                                    <span style={{ fontSize: '16px' }}>trade profiles in {stateName}</span>
 
                                 </div>
 
@@ -573,7 +573,7 @@ export default async function StateDirectoryPage({ params, searchParams }: PageP
 
                                     <ShieldCheck className="w-5 h-5 text-green-500" />
 
-                                    <span className="font-bold" style={{ fontSize: '16px' }}>100% ABN verified</span>
+                                    <span className="font-bold" style={{ fontSize: '16px' }}>ABN-checked profiles</span>
 
                                 </div>
 
@@ -581,7 +581,7 @@ export default async function StateDirectoryPage({ params, searchParams }: PageP
 
                                     <TrendingUp className="w-5 h-5 text-blue-500" />
 
-                                    <span className="font-bold" style={{ fontSize: '16px' }}>Community-ranked, not paid</span>
+                                    <span className="font-bold" style={{ fontSize: '16px' }}>community-informed, not paid</span>
 
                                 </div>
 

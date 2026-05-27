@@ -9,6 +9,7 @@ import { generateFallbackDescription } from "@/lib/business-utils";
 import { getBusinessHoursStatus, toOpeningHoursSchema, type OpeningHours } from "@/lib/business-hours";
 import { Metadata } from "next";
 import { TRADE_COST_GUIDE, TRADE_NOUNS } from "@/lib/constants";
+import { buildOgImageUrl } from "@/lib/og-image";
 
 export const dynamic = "force-dynamic";
 
@@ -103,7 +104,17 @@ async function getBusinesses(
 
         const catFilter = sCat ? sql`AND trade_category ILIKE ${'%' + mappedCat + '%'}` : sql``;
         const stateFilter = sState ? sql`AND state ILIKE ${sState}` : sql``;
-        const searchFilter = sQ ? sql`AND (business_name ILIKE ${'%' + sQ + '%'} OR trade_category ILIKE ${'%' + sQ + '%'} OR description ILIKE ${'%' + sQ + '%'})` : sql``;
+        const searchFilter = sQ ? sql`
+            AND (
+                business_name ILIKE ${'%' + sQ + '%'}
+                OR trade_category ILIKE ${'%' + sQ + '%'}
+                OR description ILIKE ${'%' + sQ + '%'}
+                OR suburb ILIKE ${'%' + sQ + '%'}
+                OR city ILIKE ${'%' + sQ + '%'}
+                OR state ILIKE ${'%' + sQ + '%'}
+                OR address ILIKE ${'%' + sQ + '%'}
+            )
+        ` : sql``;
 
         // Trading hours filters
         const open24hFilter = is24h ? sql`
@@ -304,22 +315,43 @@ export async function generateMetadata({
     if (state) parts.push(STATE_LABELS[state] || state);
 
     const cost = category ? TRADE_COST_GUIDE[category] : null;
-    const priceStr = cost ? ` | $${cost.low}–$${cost.high}${cost.unit}` : "";
+    const priceStr = cost ? ` Typical public guide: $${cost.low}-${cost.high}${cost.unit}.` : "";
 
     const title = parts.length > 0
-        ? `Best ${parts.join(', ')}${priceStr} | TradeRefer`
-        : "Find Verified Trades Near You | Business Directory | TradeRefer";
+        ? `Best ${parts.join(', ')} | TradeRefer`
+        : "Find Local Tradies | TradeRefer";
 
     const description = parts.length > 0
-        ? `Compare top rated ${(tradeNoun || 'tradespeople').toLowerCase()}${suburb ? ` in ${suburb}` : city ? ` in ${city}` : ''}${state ? `, ${STATE_LABELS[state] || state}` : ''}. ABN-verified, Google-reviewed local businesses. Get free quotes today on TradeRefer.`
-        : "Browse 14,000+ verified Australian tradespeople. Compare ratings, reviews, and prices. Get free quotes from local businesses on TradeRefer.";
+        ? `Compare top rated ${(tradeNoun || 'tradespeople').toLowerCase()}${suburb ? ` in ${suburb}` : city ? ` in ${city}` : ''}${state ? `, ${STATE_LABELS[state] || state}` : ''}. ABN-checked local businesses.${priceStr} Get free quotes on TradeRefer.`
+        : "Browse ABN-checked Australian tradespeople. Compare ratings, reviews, services and prices, then request free quotes from local businesses.";
+    const ogTitle = parts.length > 0 ? `Find ${parts.join(' ')}` : "Find local trade profiles";
+    const ogDescription = parts.length > 0
+        ? `Compare local ${(tradeNoun || 'tradespeople').toLowerCase()} and request free quotes.`
+        : "Browse TradeRefer's Australian trade directory and request free quotes.";
+    const ogImage = buildOgImageUrl({
+        template: "home",
+        title: ogTitle,
+        subtitle: ogDescription,
+        eyebrow: "TradeRefer directory",
+        badge: "Australia-wide",
+        stat1: "ABN-checked",
+        stat2: "Reviews",
+        stat3: "Free quotes",
+    });
 
     return {
         title,
         description,
         alternates: { canonical: "https://traderefer.au/businesses" },
-        openGraph: { title, description },
-        twitter: { card: 'summary_large_image', title, description },
+        openGraph: {
+            title,
+            description,
+            url: "https://traderefer.au/businesses",
+            siteName: "TradeRefer",
+            type: "website",
+            images: [{ url: ogImage, width: 1200, height: 630, alt: ogTitle }],
+        },
+        twitter: { card: 'summary_large_image', title, description, images: [ogImage] },
         robots: { index: true, follow: true },
     };
 }
@@ -359,10 +391,10 @@ export default async function BusinessDirectory({
     if (suburb) h1Parts.push(`in ${suburb}`);
     else if (city) h1Parts.push(`in ${city}`);
     if (state) h1Parts.push(STATE_LABELS[state] || state);
-    const h1 = h1Parts.length > 1 ? `Best ${h1Parts.join(' ')}` : "Find Verified Trades Near You";
+    const h1 = h1Parts.length > 1 ? `Best ${h1Parts.join(' ')}` : "Find Local Trades Near You";
     const subHeading = suburb
-        ? `Compare ${total.toLocaleString()} ${category || 'local trades'} in ${suburb}${city ? `, ${city}` : ''}. ABN-verified with real Google reviews.`
-        : `Browse ${total.toLocaleString()} verified Australian tradespeople. Compare ratings, reviews, and prices.`;
+        ? `Compare ${total.toLocaleString()} ${category || 'local trades'} in ${suburb}${city ? `, ${city}` : ''}. ABN-checked profiles with public review signals.`
+        : `Browse ${total.toLocaleString()} Australian trade profiles. Compare ratings, reviews, services and prices.`;
 
     // Breadcrumbs
     const breadcrumbs: { name: string; href: string }[] = [
@@ -460,9 +492,9 @@ export default async function BusinessDirectory({
     } : null;
 
     const faqItems = [
-        { q: `How much does a ${category || 'tradesperson'} cost${suburb ? ` in ${suburb}` : ''}?`, a: cost ? `${category} typically costs $${cost.low}–$${cost.high}${cost.unit} in Australia. Prices vary based on job complexity, materials, and location.` : `Costs vary depending on the trade, job complexity, and your location. Get free quotes from verified businesses on TradeRefer to compare prices.` },
-        { q: `How do I find a reliable ${category || 'tradesperson'}${suburb ? ` in ${suburb}` : ''}?`, a: `TradeRefer lists only ABN-verified businesses with real Google reviews. Compare ratings, read reviews, and get free quotes to find the right tradesperson for your job.` },
-        { q: `Are the businesses on TradeRefer verified?`, a: `Yes. Every business on TradeRefer is ABN-verified and listed with real Google reviews and ratings. We verify business details to ensure quality and trust.` },
+        { q: `How much does a ${category || 'tradesperson'} cost${suburb ? ` in ${suburb}` : ''}?`, a: cost ? `${category} typically costs $${cost.low}-${cost.high}${cost.unit} in Australia. Prices vary based on job complexity, materials, and location.` : `Costs vary depending on the trade, job complexity, and your location. Request free quotes from local businesses on TradeRefer to compare prices.` },
+        { q: `How do I find a reliable ${category || 'tradesperson'}${suburb ? ` in ${suburb}` : ''}?`, a: `Use TradeRefer to compare ABN-checked profiles, public review signals, service details and locations before requesting quotes.` },
+        { q: `Are the businesses on TradeRefer checked?`, a: `TradeRefer uses public business information such as ABN, location, category and review data where available so customers can make a more informed shortlist.` },
     ];
     const faqJsonLd = {
         "@context": "https://schema.org",
@@ -480,7 +512,7 @@ export default async function BusinessDirectory({
         "name": "TradeRefer",
         "url": "https://traderefer.au",
         "logo": "https://traderefer.au/logo.png",
-        "description": "Australia's verified trade referral marketplace. Find ABN-verified local tradespeople with real Google reviews.",
+        "description": "Australia's trade referral marketplace. Find ABN-checked local trade profiles with public review and service information.",
         "sameAs": ["https://www.facebook.com/traderefer", "https://www.instagram.com/traderefer"],
     };
 
@@ -502,7 +534,7 @@ export default async function BusinessDirectory({
 
     return (
         <>
-        <main className="flex-1 pt-20 md:pt-28 pb-12 bg-zinc-50 min-h-screen">
+        <main className="flex-1 pt-20 md:pt-28 pb-28 lg:pb-12 bg-zinc-50 min-h-screen">
             {/* ── JSON-LD SCHEMA (7 types) ── */}
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
@@ -537,6 +569,34 @@ export default async function BusinessDirectory({
                     </Button>
                 </div>
 
+                <form action="/businesses" className="mb-6 rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm">
+                    {category && <input type="hidden" name="category" value={category} />}
+                    {suburb && <input type="hidden" name="suburb" value={suburb} />}
+                    {state && <input type="hidden" name="state" value={state} />}
+                    {city && <input type="hidden" name="city" value={city} />}
+                    {openNow && <input type="hidden" name="openNow" value="true" />}
+                    {is24h && <input type="hidden" name="is24h" value="true" />}
+                    <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
+                        <label className="flex min-h-[56px] items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-4 focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-500/20">
+                            <Search className="h-5 w-5 shrink-0 text-[#FF6600]" />
+                            <span className="sr-only">Search business name, trade, suburb or city</span>
+                            <input
+                                name="q"
+                                type="search"
+                                defaultValue={q || ""}
+                                placeholder="Search business name, trade, suburb or city"
+                                className="w-full bg-transparent text-base font-semibold text-zinc-900 outline-none placeholder:text-zinc-400"
+                            />
+                        </label>
+                        <button
+                            type="submit"
+                            className="inline-flex min-h-[56px] items-center justify-center gap-2 rounded-xl bg-[#FF6600] px-6 py-3 text-base font-black text-white transition-colors hover:bg-[#E65C00]"
+                        >
+                            Search <ChevronRight className="h-5 w-5" />
+                        </button>
+                    </div>
+                </form>
+
                 {/* ── RESULT COUNT ── */}
                 <p className="font-bold text-orange-600 mb-6 text-base">
                     {total > 0
@@ -559,7 +619,7 @@ export default async function BusinessDirectory({
                 {/* ── SIDEBAR + LISTINGS LAYOUT ── */}
                 <div className="flex gap-8">
                     {/* Left Sidebar (desktop only) */}
-                    <aside className="hidden lg:block w-[280px] shrink-0 sticky top-28 self-start max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-200 scrollbar-track-transparent bg-white border border-zinc-200 rounded-2xl p-5">
+                    <aside className="hidden lg:block w-[280px] shrink-0 self-start bg-white border border-zinc-200 rounded-2xl p-5">
                         <Suspense fallback={null}><BusinessDirectorySidebar counts={counts} total={total} /></Suspense>
                     </aside>
                     {/* Main Content — Single Column Listings */}
@@ -610,7 +670,7 @@ export default async function BusinessDirectory({
                                                 </div>
                                             </div>
                                             {biz.is_verified && (
-                                                <div className="bg-orange-100 text-orange-600 p-1.5 rounded-full shrink-0 ml-2" title="ABN Verified">
+                                                <div className="bg-orange-100 text-orange-600 p-1.5 rounded-full shrink-0 ml-2" title="ABN checked">
                                                     <ShieldCheck className="w-4 h-4" />
                                                 </div>
                                             )}
@@ -823,7 +883,7 @@ export default async function BusinessDirectory({
             <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-zinc-200 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] py-3 px-4 md:px-6 lg:hidden">
                 <div className="container mx-auto flex items-center justify-between gap-4">
                     <div>
-                        <p className="font-black text-zinc-900 text-sm">{total.toLocaleString()} verified {category ? category.toLowerCase() : 'trades'}</p>
+                        <p className="font-black text-zinc-900 text-sm">{total.toLocaleString()} {category ? category.toLowerCase() : 'trades'}</p>
                         <p className="text-zinc-500 text-xs">ABN-checked · Google reviewed</p>
                     </div>
                     <Button asChild size="sm" className="bg-[#FF6600] hover:bg-[#E65C00] text-white rounded-xl font-black h-10 px-5 border-none">

@@ -16,7 +16,7 @@ const BASE_URL = "https://traderefer.au";
 export const metadata: Metadata = {
     title: "Asbestos Removal Bendigo — Licensed Removalists | TradeRefer",
     description:
-        "Find licensed asbestos removalists in Bendigo. Compare verified contractors, get free quotes, and ensure safe, compliant asbestos removal. Post your job free on TradeRefer.",
+        "Find licensed asbestos removalists in Bendigo. Compare contractors, get free quotes, and ensure safe, compliant asbestos removal. Post your job free on TradeRefer.",
     alternates: { canonical: `${BASE_URL}/local/asbestos-removal-bendigo` },
     openGraph: {
         title: "Asbestos Removal Bendigo — Licensed Removalists | TradeRefer",
@@ -196,7 +196,7 @@ export default async function AsbestosRemovalBendigoPage() {
                             <br />Licensed, Safe &amp; Compliant
                         </h1>
                         <p className="text-xl text-gray-300 mb-8 max-w-2xl leading-relaxed">
-                            Find WorkSafe-licensed asbestos removalists in Bendigo. Compare verified contractors with real reviews, get free quotes, and ensure compliant disposal — all in one place.
+                            Find WorkSafe-licensed asbestos removalists in Bendigo. Compare contractors with real reviews, get free quotes, and ensure compliant disposal — all in one place.
                         </p>
 
                         <div className="flex flex-wrap gap-6 mb-10">
@@ -244,7 +244,7 @@ export default async function AsbestosRemovalBendigoPage() {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div className="bg-[#FCFCFC] border border-gray-100 rounded-2xl p-6">
                                 <BadgeCheck className="w-8 h-8 text-[#FF6600] mb-3" />
-                                <h3 className="font-bold text-lg mb-2">Verified Licensed Contractors</h3>
+                                <h3 className="font-bold text-lg mb-2">Checked Licensed Contractors</h3>
                                 <p className="text-gray-600 text-sm leading-relaxed">Every asbestos removalist on TradeRefer must hold a valid WorkSafe Victoria licence — Class A or Class B depending on the material type.</p>
                             </div>
                             <div className="bg-[#FCFCFC] border border-gray-100 rounded-2xl p-6">
@@ -266,7 +266,7 @@ export default async function AsbestosRemovalBendigoPage() {
                     <section className="py-14 bg-[#FCFCFC] border-b border-gray-100">
                         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                             <h2 className="text-2xl font-extrabold mb-2 text-[#1A1A1A] font-display">Licensed Asbestos Removalists in Bendigo</h2>
-                            <p className="text-gray-500 mb-8">Verified contractors serving Greater Bendigo and surrounds</p>
+                            <p className="text-gray-500 mb-8">Checked contractors serving Greater Bendigo and surrounds</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {businesses.map((biz) => {
                                     const rating = biz.avg_rating ? parseFloat(String(biz.avg_rating)) : null;
