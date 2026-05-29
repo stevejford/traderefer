@@ -53,6 +53,7 @@ export async function generateMetadata({ searchParams }: RegisterPageProps): Pro
             description: copy.description,
             images: [registerOgImage],
         },
+        robots: { index: false, follow: true },
     };
 }
 
