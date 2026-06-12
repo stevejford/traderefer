@@ -193,14 +193,14 @@ export default async function CategoriesPage() {
                         <p className="text-zinc-500 mb-6" style={{ fontSize: '20px', lineHeight: 1.7 }}>Find the highest-rated tradies in Australia&apos;s major cities, ranked by public customer reviews.</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                             {[
-                                { label: "Top Electricians Melbourne", href: "/top/electrician/vic/melbourne" },
-                                { label: "Top Plumbers Sydney", href: "/top/plumber/nsw/sydney" },
-                                { label: "Top Electricians Brisbane", href: "/top/electrician/qld/brisbane" },
-                                { label: "Top Painters Melbourne", href: "/top/painter/vic/melbourne" },
-                                { label: "Top Electricians Perth", href: "/top/electrician/wa/perth" },
-                                { label: "Top Plumbers Melbourne", href: "/top/plumber/vic/melbourne" },
-                                { label: "Top Electricians Sydney", href: "/top/electrician/nsw/sydney" },
-                                { label: "Top Electricians Geelong", href: "/top/electrician/vic/geelong" },
+                                { label: "Top Electricians Melbourne", href: "/top/electrical/vic/melbourne" },
+                                { label: "Top Plumbers Sydney", href: "/top/plumbing/nsw/sydney" },
+                                { label: "Top Electricians Brisbane", href: "/top/electrical/qld/brisbane" },
+                                { label: "Top Painters Melbourne", href: "/top/painting/vic/melbourne" },
+                                { label: "Top Electricians Perth", href: "/top/electrical/wa/perth" },
+                                { label: "Top Plumbers Melbourne", href: "/top/plumbing/vic/melbourne" },
+                                { label: "Top Electricians Sydney", href: "/top/electrical/nsw/sydney" },
+                                { label: "Top Electricians Geelong", href: "/top/electrical/vic/geelong" },
                             ].map(link => (
                                 <Link
                                     key={link.href}

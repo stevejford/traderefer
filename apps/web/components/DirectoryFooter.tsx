@@ -158,8 +158,8 @@ export async function DirectoryFooter() {
                         <a href="https://www.masterbuilders.com.au" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-orange-400 font-bold flex items-center gap-1 transition-colors" style={{ fontSize: '16px' }}>Master Builders ↗</a>
                         <a href="https://www.neca.asn.au" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-orange-400 font-bold flex items-center gap-1 transition-colors" style={{ fontSize: '16px' }}>NECA ↗</a>
                         <a href="https://hia.com.au" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-orange-400 font-bold flex items-center gap-1 transition-colors" style={{ fontSize: '16px' }}>HIA ↗</a>
-                        <a href="https://www.abr.business.gov.au" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-orange-400 font-bold flex items-center gap-1 transition-colors" style={{ fontSize: '16px' }}>ABR ↗</a>
-                        <a href="https://www.fairtrading.nsw.gov.au" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-orange-400 font-bold flex items-center gap-1 transition-colors" style={{ fontSize: '16px' }}>NSW Fair Trading ↗</a>
+                        <a href="https://abr.business.gov.au" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-orange-400 font-bold flex items-center gap-1 transition-colors" style={{ fontSize: '16px' }}>ABR ↗</a>
+                        <a href="https://www.nsw.gov.au/departments-and-agencies/fair-trading" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-orange-400 font-bold flex items-center gap-1 transition-colors" style={{ fontSize: '16px' }}>NSW Fair Trading ↗</a>
                     </div>
                 </div>
 

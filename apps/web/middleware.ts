@@ -26,6 +26,15 @@ const isPublicRoute = createRouteMatcher([
     "/api/webhooks(.*)",
     "/api/ai(.*)",
     "/api/enrich-business(.*)",
+    // Anonymous-by-design backend endpoints (FastAPI takes only a db
+    // dependency for these): the quote form, the claim flow on every
+    // profile, and delist requests. Without these exemptions the Clerk
+    // gate 307'd anonymous POSTs to /login and silently dropped every
+    // lead/claim from logged-out visitors (found in QA 2026-06-12).
+    "/api/backend/website-quotes(.*)",
+    "/api/backend/auth/status",
+    "/api/backend/business/(.*)/claim(.*)",
+    "/api/backend/business/(.*)/delist",
     "/ingest(.*)",
     "/sitemap.xml",
     "/sitemaps(.*)",
