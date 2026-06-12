@@ -1,7 +1,8 @@
 import { sql } from "@/lib/db";
 import { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
+import { retiredTradeSlugTarget } from "@/lib/trade-redirects";
 import { BusinessLogo } from "@/components/BusinessLogo";
 import { Button } from "@/components/ui/button";
 import { TRADE_COST_GUIDE, TRADE_FAQ_BANK, STATE_LICENSING, HOW_TO_CHOOSE, jobToSlug, TRADE_NOUNS } from "@/lib/constants";
@@ -96,7 +97,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const topBiz = businesses[0] as any;
     const totalReviews = businesses.reduce((acc: number, biz: any) => acc + (parseInt(biz.total_reviews) || 0), 0);
     const topBizStr = topBiz ? ` #1: ${topBiz.business_name} (${parseFloat(topBiz.avg_rating).toFixed(1)}★).` : "";
-    const canonicalUrl = `https://traderefer.au/top/${trade}/${state}/${city}`;
+    // Canonical from normalized slugs — raw params can arrive in any casing.
+    const canonicalUrl = `https://traderefer.au/top/${retiredTradeSlugTarget(trade) ?? tradeToSlug(trade)}/${state.toLowerCase()}/${tradeToSlug(city)}`;
     const ogImageUrl = buildOgImageUrl({
         template: "top",
         title: `Top ${tradeNoun} in ${cityName}`,
@@ -132,6 +134,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function Top10CityPage({ params }: PageProps) {
     const { trade, state, city } = await params;
+
+    // Mixed-case or retired-synonym segments must not render duplicate pages —
+    // 308 to the canonical all-slug form (e.g. /top/Plumbing/VIC/Geelong and
+    // /top/plumber/vic/geelong both land on /top/plumbing/vic/geelong).
+    const canonicalTradeSeg = retiredTradeSlugTarget(trade) ?? tradeToSlug(trade);
+    const canonicalStateSeg = state.toLowerCase();
+    const canonicalCitySeg = tradeToSlug(city);
+    if (canonicalTradeSeg !== trade || canonicalStateSeg !== state || canonicalCitySeg !== city) {
+        permanentRedirect(`/top/${canonicalTradeSeg}/${canonicalStateSeg}/${canonicalCitySeg}`);
+    }
+
     const tradeName = getTradeDisplayName(trade);
     const cityName = formatSlug(city);
     const stateName = STATE_NAMES[state] || state.toUpperCase();

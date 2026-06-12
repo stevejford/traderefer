@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import { permanentRedirect } from "next/navigation";
 import { TRADE_COST_GUIDE, TRADE_FAQ_BANK, STATE_LICENSING, STATE_AUTHORITY_LINKS, SUBURB_CONTEXT, JOB_TYPES, TRADE_NOUNS, jobToSlug, generateLocalizedIntro, normalizeTradeName } from "@/lib/constants";
 import { parseSuburbSlug, getCanonicalSuburbSlug, getDisplayPostcode, isPostcodeValidForState } from "@/lib/postcodes";
+import { retiredTradeSlugTarget } from "@/lib/trade-redirects";
 import { generateFallbackDescription } from "@/lib/business-utils";
 import { buildOgImageUrl } from "@/lib/og-image";
 
@@ -227,6 +228,11 @@ export default async function TradeLocationPage({ params }: PageProps) {
     const canonicalSuburb = getCanonicalSuburbSlug(suburb, state);
     if (canonicalSuburb !== normalizedSuburb) {
         permanentRedirect(`/local/${state}/${city}/${canonicalSuburb}/${trade}`);
+    }
+
+    const canonicalTrade = retiredTradeSlugTarget(trade);
+    if (canonicalTrade) {
+        permanentRedirect(`/local/${state}/${city}/${canonicalSuburb}/${canonicalTrade}`);
     }
 
     const [businesses, relatedTrades, nearbySuburbs, cityReferralCount] = await Promise.all([

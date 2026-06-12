@@ -3,18 +3,20 @@ import { MapPin, ArrowRight } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { UrgencyTicker } from "@/components/UrgencyTicker";
 
+// Footer links carry sitewide equity — point them at the indexable /trades
+// cost-guide hubs, not parameterized /businesses?category= search URLs.
 const TOP_CATEGORIES = [
-    { name: "Electrician", category: "Electrical" },
+    { name: "Electrician", category: "Electrical", href: "/trades/electrical" },
     { name: "Plumber", category: "Plumbing", href: "/trades/plumbing" },
-    { name: "Painter", category: "Painting" },
-    { name: "Fencing", category: "Fencing" },
-    { name: "Landscaper", category: "Landscaping" },
-    { name: "Flooring", category: "Flooring" },
-    { name: "Air Conditioning & Heating", category: "Air Conditioning & Heating" },
-    { name: "Cleaning", category: "Cleaning" },
-    { name: "Solar & Energy", category: "Solar & Energy" },
-    { name: "Roofing", category: "Roofing" },
-    { name: "Cabinet Making", category: "Cabinet Making" },
+    { name: "Painter", category: "Painting", href: "/trades/painting" },
+    { name: "Fencing", category: "Fencing", href: "/trades/fencing" },
+    { name: "Landscaper", category: "Landscaping", href: "/trades/landscaping" },
+    { name: "Flooring", category: "Flooring", href: "/trades/flooring" },
+    { name: "Air Conditioning & Heating", category: "Air Conditioning & Heating", href: "/trades/air-conditioning" },
+    { name: "Cleaning", category: "Cleaning", href: "/trades/house-cleaning" },
+    { name: "Solar & Energy", category: "Solar & Energy", href: "/trades/solar-installation" },
+    { name: "Roofing", category: "Roofing", href: "/trades/roofing" },
+    { name: "Cabinet Making", category: "Cabinet Making", href: "/trades/cabinet-making" },
     { name: "Locksmith", category: "Locksmith" },
 ];
 
