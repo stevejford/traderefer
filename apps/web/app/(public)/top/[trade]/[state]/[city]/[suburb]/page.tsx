@@ -1,7 +1,8 @@
 import { sql } from "@/lib/db";
 import { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
+import { parseSuburbSlug, getCanonicalSuburbSlug } from "@/lib/postcodes";
 import { BusinessLogo } from "@/components/BusinessLogo";
 import { Button } from "@/components/ui/button";
 import { TRADE_COST_GUIDE, TRADE_FAQ_BANK, STATE_LICENSING, HOW_TO_CHOOSE, TRADE_NOUNS } from "@/lib/constants";
@@ -39,7 +40,8 @@ const STATE_NAMES: Record<string, string> = {
 async function getTopBusinesses(trade: string, state: string, suburb: string) {
     try {
         const tradeSlug = tradeToSlug(trade);
-        const suburbName = formatSlug(suburb);
+        // Strip postcode suffix (e.g. "bibra-lake-6163") — DB suburbs have no postcode
+        const suburbName = formatSlug(parseSuburbSlug(suburb).suburb);
         const stateUpper = state.toUpperCase();
         const results = await sql`
             SELECT b.*,
@@ -65,7 +67,7 @@ async function getNearbySuburbsWithTrade(trade: string, state: string, city: str
         const tradeSlug = tradeToSlug(trade);
         const stateUpper = state.toUpperCase();
         const cityName = formatSlug(city);
-        const suburbName = formatSlug(currentSuburb);
+        const suburbName = formatSlug(parseSuburbSlug(currentSuburb).suburb);
         const results = await sql`
             SELECT DISTINCT suburb, state, city, COUNT(*) as cnt
             FROM businesses
@@ -94,13 +96,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const { trade, state, city, suburb } = await params;
     const tradeName = getTradeDisplayName(trade);
     const cityName = formatSlug(city);
-    const suburbName = formatSlug(suburb);
+    const suburbName = formatSlug(parseSuburbSlug(suburb).suburb);
     const stateName = STATE_NAMES[state] || state.toUpperCase();
     const businesses = await getTopBusinesses(trade, state, suburb);
     const totalReviews = businesses.reduce((acc: number, biz: any) => acc + (parseInt(biz.total_reviews) || 0), 0);
     const topBiz = businesses[0] as any;
     const topBizStr = topBiz ? ` #1: ${topBiz.business_name} (${parseFloat(topBiz.avg_rating).toFixed(1)}★).` : "";
-    const canonicalUrl = `https://traderefer.au/top/${trade}/${state}/${city}/${suburb}`;
+    const canonicalUrl = `https://traderefer.au/top/${trade}/${state}/${city}/${getCanonicalSuburbSlug(suburb, state)}`;
     const ogImageUrl = buildOgImageUrl({
         template: "top",
         title: `Top ${tradeName} in ${suburbName}`,
@@ -136,9 +138,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function Top10SuburbPage({ params }: PageProps) {
     const { trade, state, city, suburb } = await params;
+
+    // Redirect non-canonical suburb slugs (e.g. bare "bibra-lake") to the
+    // postcode-suffixed form, matching the /local suburb pages.
+    const { postcode: urlPostcode, suburb: bareSuburb } = parseSuburbSlug(suburb);
+    const normalizedSuburb = urlPostcode ? `${bareSuburb}-${urlPostcode}` : bareSuburb;
+    const canonicalSuburb = getCanonicalSuburbSlug(suburb, state);
+    if (canonicalSuburb !== normalizedSuburb) {
+        permanentRedirect(`/top/${trade}/${state}/${city}/${canonicalSuburb}`);
+    }
+
     const tradeName = getTradeDisplayName(trade);
     const cityName = formatSlug(city);
-    const suburbName = formatSlug(suburb);
+    const suburbName = formatSlug(bareSuburb);
     const stateName = STATE_NAMES[state] || state.toUpperCase();
     const stateUpper = state.toUpperCase();
     const year = new Date().getFullYear();
@@ -169,7 +181,7 @@ export default async function Top10SuburbPage({ params }: PageProps) {
             { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://traderefer.au" },
             { "@type": "ListItem", "position": 2, "name": "Categories", "item": "https://traderefer.au/categories" },
             { "@type": "ListItem", "position": 3, "name": cityName, "item": `https://traderefer.au/local/${state}/${citySlug}` },
-            { "@type": "ListItem", "position": 4, "name": suburbName, "item": `https://traderefer.au/local/${state}/${citySlug}/${suburb}` },
+            { "@type": "ListItem", "position": 4, "name": suburbName, "item": `https://traderefer.au/local/${state}/${citySlug}/${canonicalSuburb}` },
             { "@type": "ListItem", "position": 5, "name": `Top 10 ${tradeName} in ${suburbName}` },
         ]
     };
@@ -232,9 +244,9 @@ export default async function Top10SuburbPage({ params }: PageProps) {
                     <nav className="flex items-center gap-2 text-xs font-bold text-zinc-500 uppercase tracking-widest flex-wrap">
                         <Link prefetch={false} href="/" className="hover:text-white transition-colors">Home</Link>
                         <ChevronRight className="w-3 h-3" />
-                        <Link prefetch={false} href={`/local/${state}/${citySlug}/${suburb}`} className="hover:text-white transition-colors">{suburbName}</Link>
+                        <Link prefetch={false} href={`/local/${state}/${citySlug}/${canonicalSuburb}`} className="hover:text-white transition-colors">{suburbName}</Link>
                         <ChevronRight className="w-3 h-3" />
-                        <Link prefetch={false} href={`/local/${state}/${citySlug}/${suburb}/${tradeSlug}`} className="hover:text-white transition-colors">{tradeName}</Link>
+                        <Link prefetch={false} href={`/local/${state}/${citySlug}/${canonicalSuburb}/${tradeSlug}`} className="hover:text-white transition-colors">{tradeName}</Link>
                         <ChevronRight className="w-3 h-3" />
                         <span className="text-orange-400">Top 10</span>
                     </nav>
@@ -455,7 +467,7 @@ export default async function Top10SuburbPage({ params }: PageProps) {
                                 <p className="text-zinc-500 text-sm mb-6">Find ranked {tradeName.toLowerCase()} in suburbs close to {suburbName}.</p>
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                     {nearbySuburbs.map(({ suburb: nearSub, city: nearCity, state: nearState }) => {
-                                        const nearSubSlug = nearSub.toLowerCase().replace(/\s+/g, '-');
+                                        const nearSubSlug = getCanonicalSuburbSlug(nearSub.toLowerCase().replace(/\s+/g, '-'), nearState);
                                         const nearCitySlug = nearCity.toLowerCase().replace(/\s+/g, '-');
                                         const nearStateSlug = nearState.toLowerCase();
                                         return (

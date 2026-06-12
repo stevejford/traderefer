@@ -1039,7 +1039,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                     <div>
                                         <p className="text-sm font-black text-zinc-900">Profile checked</p>
                                         <p className="text-xs text-zinc-500 mt-1 leading-relaxed">Market insights on this page are reviewed by our Verification Team — ABN, licence, and community referral checks since 2024.</p>
-                                        <Link prefetch={false} href="/about" className="inline-flex items-center gap-1 mt-2 text-xs font-bold text-orange-600 hover:underline">
+                                        <Link prefetch={false} href="/about#how-we-verify" className="inline-flex items-center gap-1 mt-2 text-xs font-bold text-orange-600 hover:underline">
                                             How we verify <ArrowRight className="w-3 h-3" />
                                         </Link>
                                     </div>
@@ -1066,7 +1066,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                         </li>
                                     </ul>
                                     <Button asChild size="lg" className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold h-12 border-none">
-                                        <Link prefetch={false} href="/about">How It Works <ArrowRight className="w-4 h-4 ml-2" /></Link>
+                                        <Link prefetch={false} href="/about#how-it-works">How It Works <ArrowRight className="w-4 h-4 ml-2" /></Link>
                                     </Button>
                                 </div>
                             </div>

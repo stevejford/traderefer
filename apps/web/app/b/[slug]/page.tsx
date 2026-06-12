@@ -296,6 +296,32 @@ async function getRelatedBusinesses(tradeCategory: string, suburb: string, state
     }
 }
 
+// Mirrors the getTopBusinesses queries in /top/[trade]/[state]/[city] and
+// /top/.../[suburb] — those pages call notFound() below 3 rated businesses,
+// so the profile page must not link a level that would 404.
+async function getTopRatedCounts(tradeCategory: string, suburb: string, city: string, state: string) {
+    try {
+        const tradeSlug = slugifySegment(tradeCategory);
+        const rows = await sql<{ suburb_count: string; city_count: string }[]>`
+            SELECT
+                COUNT(*) FILTER (WHERE b.suburb ILIKE ${'%' + suburb + '%'}) AS suburb_count,
+                COUNT(*) FILTER (WHERE b.city ILIKE ${'%' + city + '%'}) AS city_count
+            FROM businesses b
+            WHERE b.status = 'active'
+              AND (b.listing_visibility = 'public' OR b.listing_visibility IS NULL)
+              AND TRIM(BOTH '-' FROM REGEXP_REPLACE(LOWER(b.trade_category), '[^a-z0-9]+', '-', 'g')) = ${tradeSlug}
+              AND b.state = ${state.toUpperCase()}
+              AND b.avg_rating IS NOT NULL
+        `;
+        return {
+            suburbCount: Number(rows[0]?.suburb_count ?? 0),
+            cityCount: Number(rows[0]?.city_count ?? 0),
+        };
+    } catch {
+        return { suburbCount: 0, cityCount: 0 };
+    }
+}
+
 function formatPublicValue(value: unknown) {
     return String(value || "").trim();
 }
@@ -463,13 +489,16 @@ export default async function PublicProfilePage({
         permanentRedirect(buildBusinessProfilePath(canonicalSlug, referralCode));
     }
 
-    const [projects, googleReviews, deals, relatedBusinesses] = await Promise.all([
+    const [projects, googleReviews, deals, relatedBusinesses, topRatedCounts] = await Promise.all([
         getProjects(canonicalSlug),
         getGoogleReviews(canonicalSlug),
         getDeals(canonicalSlug),
         business.trade_category && business.suburb && business.state
             ? getRelatedBusinesses(business.trade_category, business.suburb, business.state, canonicalSlug)
             : Promise.resolve([]),
+        business.trade_category && business.suburb && business.state
+            ? getTopRatedCounts(business.trade_category, business.suburb, business.city || business.suburb, business.state)
+            : Promise.resolve({ suburbCount: 0, cityCount: 0 }),
     ]);
 
     // Enrich this business with Google Places photos if needed (client-side trigger)
@@ -1181,7 +1210,16 @@ export default async function PublicProfilePage({
                                 const tradeSlug = business.trade_category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
                                 const postcode = getPostcode(suburbSlug, stateSlug);
                                 const suburbWithPostcode = postcode ? `${suburbSlug}-${postcode}` : suburbSlug;
-                                
+                                // /top pages 404 below 3 rated businesses — link the deepest level that resolves
+                                const topRatedHref = topRatedCounts.suburbCount >= 3
+                                    ? `/top/${tradeSlug}/${stateSlug}/${citySlug}/${suburbWithPostcode}`
+                                    : topRatedCounts.cityCount >= 3
+                                        ? `/top/${tradeSlug}/${stateSlug}/${citySlug}`
+                                        : null;
+                                const topRatedLabel = topRatedCounts.suburbCount >= 3
+                                    ? business.suburb
+                                    : (business.city || business.suburb);
+
                                 return (
                                     <nav className="bg-zinc-50 rounded-2xl border border-zinc-100 p-6 space-y-5">
                                         <div>
@@ -1190,9 +1228,11 @@ export default async function PublicProfilePage({
                                                 <Link href={`/local/${stateSlug}/${citySlug}/${suburbWithPostcode}/${tradeSlug}`} prefetch={false} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-sm font-bold text-zinc-600 hover:border-orange-400 hover:text-orange-600 transition-colors">
                                                     <MapPin className="w-3 h-3" /> {business.trade_category} in {business.suburb}
                                                 </Link>
-                                                <Link href={`/top/${tradeSlug}/${stateSlug}/${citySlug}/${suburbWithPostcode}`} prefetch={false} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-sm font-bold text-zinc-600 hover:border-orange-400 hover:text-orange-600 transition-colors">
-                                                    <Star className="w-3 h-3" /> Top Rated in {business.suburb}
-                                                </Link>
+                                                {topRatedHref && (
+                                                    <Link href={topRatedHref} prefetch={false} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-sm font-bold text-zinc-600 hover:border-orange-400 hover:text-orange-600 transition-colors">
+                                                        <Star className="w-3 h-3" /> Top Rated in {topRatedLabel}
+                                                    </Link>
+                                                )}
                                                 <Link href={`/local/${stateSlug}/${citySlug}/${suburbWithPostcode}`} prefetch={false} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-sm font-bold text-zinc-600 hover:border-orange-400 hover:text-orange-600 transition-colors">
                                                     <MapPin className="w-3 h-3" /> All Trades in {business.suburb}
                                                 </Link>
