@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { JOB_TYPES } from "@/lib/constants";
 import { getCanonicalSuburbSlug, isPostcodeValidForState, parseSuburbSlug } from "@/lib/postcodes";
+import { PROFILES_CHUNK_SIZE } from "@/lib/sitemaps";
 
 export const runtime = "nodejs";
 export const revalidate = 86400;
@@ -14,7 +15,7 @@ const LOCAL_TRADE_PAGES = [
     "local/bathroom-renovations-perth",
 ];
 
-type SitemapName = "general" | "profiles" | "suburbs" | "trades" | "top";
+type SitemapName = "general" | "suburbs" | "trades" | "top";
 
 type SitemapParams = {
     params: Promise<{ sitemap: string }>;
@@ -98,6 +99,7 @@ async function generalSitemap() {
         url(`${BASE_URL}/categories`, today, "weekly", "0.95"),
         url(`${BASE_URL}/locations`, today, "weekly", "0.95"),
         url(`${BASE_URL}/local`, today, "weekly", "0.9"),
+        url(`${BASE_URL}/about`, today, "monthly", "0.5"),
         url(`${BASE_URL}/contact`, today, "monthly", "0.5"),
         url(`${BASE_URL}/terms`, today, "monthly", "0.3"),
         url(`${BASE_URL}/privacy`, today, "monthly", "0.3"),
@@ -147,7 +149,11 @@ async function generalSitemap() {
     return entries;
 }
 
-async function profilesSitemap() {
+async function profilesSitemap(chunk: number) {
+    // Stable ordering (created_at, then id as tiebreaker) keeps chunk
+    // membership consistent between regenerations as new rows append.
+    // The quality gate must stay identical to countProfileUrls() in
+    // lib/sitemaps.ts — the sitemap index derives the chunk count from it.
     const rows = await sql<{ slug: string; lastmod: Date | string | null }[]>`
         SELECT slug, COALESCE(updated_at, created_at)::date AS lastmod
         FROM businesses
@@ -157,7 +163,13 @@ async function profilesSitemap() {
           AND slug != ''
           AND business_name IS NOT NULL
           AND business_name != ''
-        ORDER BY created_at ASC
+          AND (
+              total_reviews >= 5
+              OR (total_reviews >= 1 AND COALESCE(array_length(photo_urls, 1), 0) > 0)
+          )
+        ORDER BY created_at ASC, id ASC
+        LIMIT ${PROFILES_CHUNK_SIZE}
+        OFFSET ${(chunk - 1) * PROFILES_CHUNK_SIZE}
     `;
     return rows.map((row) => url(`${BASE_URL}/b/${row.slug}`, dateString(row.lastmod), "weekly", "0.5"));
 }
@@ -201,8 +213,7 @@ async function tradesSitemap() {
                trade_category,
                MAX(COALESCE(updated_at, created_at))::date AS lastmod,
                MAX(address) AS addr,
-               COUNT(*) AS business_count,
-               COALESCE(SUM(total_reviews), 0) AS review_count
+               COUNT(*) AS business_count
         FROM businesses
         WHERE status = 'active'
           AND (listing_visibility = 'public' OR listing_visibility IS NULL)
@@ -215,7 +226,9 @@ async function tradesSitemap() {
           AND trade_category IS NOT NULL
           AND trade_category != ''
         GROUP BY LOWER(state), LOWER(REPLACE(city, ' ', '-')), LOWER(REPLACE(suburb, ' ', '-')), trade_category
-        HAVING COUNT(*) >= 2 OR COALESCE(SUM(total_reviews), 0) > 0
+        -- Single-business trade pages duplicate that business's profile under a
+        -- second URL, so they stay out of the sitemap (audit 2026-06-12).
+        HAVING COUNT(*) >= 2
     `;
     const entries: UrlEntry[] = [];
     for (const row of rows) {
@@ -252,14 +265,22 @@ async function topSitemap() {
 
 export async function GET(_request: NextRequest, { params }: SitemapParams) {
     const { sitemap } = await params;
-    if (!["general", "profiles", "suburbs", "trades", "top"].includes(sitemap)) {
+
+    // Profile URLs are served as numbered chunks; the unchunked
+    // /sitemaps/profiles intentionally 404s so Google drops it.
+    const profilesChunk = sitemap.match(/^profiles-([1-9]\d*)$/);
+    if (profilesChunk) {
+        const entries = await profilesSitemap(Number(profilesChunk[1]));
+        return entries.length > 0 ? sitemapResponse(entries) : sitemapResponse([], 404);
+    }
+
+    if (!["general", "suburbs", "trades", "top"].includes(sitemap)) {
         return sitemapResponse([], 404);
     }
 
     const sitemapName = sitemap as SitemapName;
     const entries = {
         general: generalSitemap,
-        profiles: profilesSitemap,
         suburbs: suburbsSitemap,
         trades: tradesSitemap,
         top: topSitemap,
