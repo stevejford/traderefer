@@ -296,6 +296,33 @@ async function getRelatedBusinesses(tradeCategory: string, suburb: string, state
     }
 }
 
+// Businesses delisted by the 2026-06-12 dedupe/purge keep their rows but lose
+// status='active'. The upstream API doesn't filter on status, so the page has
+// to: 'duplicate' rows 308 to the surviving copy of the same business
+// (same name + suburb + state), any other non-active status 404s.
+async function getDelistGate(slug: string): Promise<{ active: boolean; winnerSlug: string | null } | null> {
+    try {
+        const rows = await sql<{ status: string; winner_slug: string | null }[]>`
+            SELECT b.status,
+                   CASE WHEN b.status = 'duplicate' THEN (
+                       SELECT w.slug FROM businesses w
+                       WHERE w.status = 'active'
+                         AND LOWER(TRIM(w.business_name)) = LOWER(TRIM(b.business_name))
+                         AND LOWER(COALESCE(w.suburb, '')) = LOWER(COALESCE(b.suburb, ''))
+                         AND UPPER(w.state) = UPPER(b.state)
+                       LIMIT 1
+                   ) END AS winner_slug
+            FROM businesses b
+            WHERE b.slug = ${slug}
+            LIMIT 1
+        `;
+        if (!rows.length) return null;
+        return { active: rows[0].status === 'active', winnerSlug: rows[0].winner_slug ?? null };
+    } catch {
+        return null; // fail open — serve the profile rather than break it
+    }
+}
+
 // Mirrors the getTopBusinesses queries in /top/[trade]/[state]/[city] and
 // /top/.../[suburb] — those pages call notFound() below 3 rated businesses,
 // so the profile page must not link a level that would 404.
@@ -485,6 +512,15 @@ export default async function PublicProfilePage({
     }
 
     const canonicalSlug = String(business.slug || slug).trim() || slug;
+
+    const gate = await getDelistGate(canonicalSlug);
+    if (gate && !gate.active) {
+        if (gate.winnerSlug) {
+            permanentRedirect(buildBusinessProfilePath(gate.winnerSlug, referralCode));
+        }
+        notFound();
+    }
+
     if (canonicalSlug !== slug) {
         permanentRedirect(buildBusinessProfilePath(canonicalSlug, referralCode));
     }

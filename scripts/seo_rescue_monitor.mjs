@@ -8,14 +8,16 @@ const STATIC_SITEMAPS = ["general", "suburbs", "trades", "top"];
 // Profile URLs are split across /sitemaps/profiles-N chunks; limits for
 // "profiles" apply to the total across all chunks discovered in the index.
 const PROFILES_CHUNK_MAX = 10000;
-// Profiles/trades bounds reflect the 2026-06-12 sitemap quality gates:
-// profiles need reviews>=5 or (reviews>=1 + photos) (~26.2k), trade pages
-// need >=2 businesses (~8.1k).
+// Profiles/trades bounds reflect the 2026-06-12 sitemap quality gates
+// (profiles need reviews>=5 or reviews>=1+photos; trade pages need >=2
+// businesses) AND the 2026-06-12 dedupe/no-logo purge, which delisted ~9.8k
+// businesses (3,318 duplicates + 6,464 logo-less) leaving 23,850 active:
+// gated profiles ~20.5k, gated trade pages ~6.0k.
 const EXPECTED_LIMITS = {
   general: { max: 900 },
-  profiles: { min: 24000, max: 29000 },
+  profiles: { min: 18000, max: 24000 },
   suburbs: { max: 1300 },
-  trades: { min: 7000, max: 9000 },
+  trades: { min: 5000, max: 7500 },
   top: { max: 1400 },
 };
 
