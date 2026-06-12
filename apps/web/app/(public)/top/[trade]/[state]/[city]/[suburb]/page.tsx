@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { parseSuburbSlug, getCanonicalSuburbSlug } from "@/lib/postcodes";
 import { retiredTradeSlugTarget } from "@/lib/trade-redirects";
+import { getCanonicalCitySlug } from "@/lib/suburb-cities";
 import { BusinessLogo } from "@/components/BusinessLogo";
 import { Button } from "@/components/ui/button";
 import { TRADE_COST_GUIDE, TRADE_FAQ_BANK, STATE_LICENSING, HOW_TO_CHOOSE, TRADE_NOUNS } from "@/lib/constants";
@@ -104,7 +105,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const topBiz = businesses[0] as any;
     const topBizStr = topBiz ? ` #1: ${topBiz.business_name} (${parseFloat(topBiz.avg_rating).toFixed(1)}★).` : "";
     // Canonical from normalized slugs — raw params can arrive in any casing.
-    const canonicalUrl = `https://traderefer.au/top/${retiredTradeSlugTarget(trade) ?? tradeToSlug(trade)}/${state.toLowerCase()}/${tradeToSlug(city)}/${getCanonicalSuburbSlug(suburb, state)}`;
+    const canonicalUrl = `https://traderefer.au/top/${retiredTradeSlugTarget(trade) ?? tradeToSlug(trade)}/${state.toLowerCase()}/${getCanonicalCitySlug(state, suburb) ?? tradeToSlug(city)}/${getCanonicalSuburbSlug(suburb, state)}`;
     const ogImageUrl = buildOgImageUrl({
         template: "top",
         title: `Top ${tradeName} in ${suburbName}`,
@@ -149,7 +150,7 @@ export default async function Top10SuburbPage({ params }: PageProps) {
     const canonicalSuburb = getCanonicalSuburbSlug(suburb, state);
     const canonicalTradeSeg = retiredTradeSlugTarget(trade) ?? tradeToSlug(trade);
     const canonicalStateSeg = state.toLowerCase();
-    const canonicalCitySeg = tradeToSlug(city);
+    const canonicalCitySeg = getCanonicalCitySlug(state, bareSuburb) ?? tradeToSlug(city);
     if (
         canonicalSuburb !== normalizedSuburb ||
         canonicalTradeSeg !== trade ||

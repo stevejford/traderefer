@@ -8,6 +8,7 @@ import { TRADE_COST_GUIDE, TRADE_FAQ_BANK, STATE_LICENSING, JOB_TYPES, TRADE_NOU
 import { permanentRedirect } from "next/navigation";
 import { parseSuburbSlug, getCanonicalSuburbSlug, getDisplayPostcode } from "@/lib/postcodes";
 import { retiredTradeSlugTarget } from "@/lib/trade-redirects";
+import { getCanonicalCitySlug } from "@/lib/suburb-cities";
 import { buildOgImageUrl } from "@/lib/og-image";
 
 export const dynamic = "force-dynamic";
@@ -50,7 +51,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const count = businesses.length;
     const postcode = getDisplayPostcode(canonicalSuburb, state);
     const suburbWithPostcode = postcode ? `${suburbName} ${postcode}` : suburbName;
-    const canonicalUrl = `https://traderefer.au/local/${state}/${city}/${canonicalSuburb}/${retiredTradeSlugTarget(trade) ?? trade}/${job}`;
+    const canonicalUrl = `https://traderefer.au/local/${state}/${getCanonicalCitySlug(state, suburb) ?? city}/${canonicalSuburb}/${retiredTradeSlugTarget(trade) ?? trade}/${job}`;
     const ogImageUrl = buildOgImageUrl({
         template: "job",
         title: `${jobName} in ${suburbWithPostcode}`,
@@ -145,13 +146,10 @@ export default async function JobTypePage({ params }: PageProps) {
     const { postcode: urlPostcode, suburb: bareSuburb } = parseSuburbSlug(suburb);
     const normalizedSuburb = urlPostcode ? `${bareSuburb}-${urlPostcode}` : bareSuburb;
     const canonicalSuburb = getCanonicalSuburbSlug(suburb, state);
-    if (canonicalSuburb !== normalizedSuburb) {
-        permanentRedirect(`/local/${state}/${city}/${canonicalSuburb}/${trade}/${job}`);
-    }
-
-    const canonicalTrade = retiredTradeSlugTarget(trade);
-    if (canonicalTrade) {
-        permanentRedirect(`/local/${state}/${city}/${canonicalSuburb}/${canonicalTrade}/${job}`);
+    const canonicalCity = getCanonicalCitySlug(state, bareSuburb) ?? city;
+    const canonicalTrade = retiredTradeSlugTarget(trade) ?? trade;
+    if (canonicalSuburb !== normalizedSuburb || canonicalCity !== city || canonicalTrade !== trade) {
+        permanentRedirect(`/local/${state}/${canonicalCity}/${canonicalSuburb}/${canonicalTrade}/${job}`);
     }
 
     const tradeName = getTradeDisplayName(trade);

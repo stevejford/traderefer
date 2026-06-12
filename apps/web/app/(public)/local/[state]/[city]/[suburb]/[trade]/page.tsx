@@ -8,6 +8,7 @@ import { permanentRedirect } from "next/navigation";
 import { TRADE_COST_GUIDE, TRADE_FAQ_BANK, STATE_LICENSING, STATE_AUTHORITY_LINKS, SUBURB_CONTEXT, JOB_TYPES, TRADE_NOUNS, jobToSlug, generateLocalizedIntro, normalizeTradeName } from "@/lib/constants";
 import { parseSuburbSlug, getCanonicalSuburbSlug, getDisplayPostcode, isPostcodeValidForState } from "@/lib/postcodes";
 import { retiredTradeSlugTarget } from "@/lib/trade-redirects";
+import { getCanonicalCitySlug } from "@/lib/suburb-cities";
 import { generateFallbackDescription } from "@/lib/business-utils";
 import { buildOgImageUrl } from "@/lib/og-image";
 
@@ -77,7 +78,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const suburbWithPostcode = postcode ? `${suburbName} ${postcode}` : suburbName;
     const cityDisplay = suburbName.toLowerCase() === cityName.toLowerCase() ? '' : `, ${cityName}`;
     const totalReviews = businesses.reduce((acc: number, biz: any) => acc + (parseInt(biz.total_reviews) || 0), 0);
-    const canonicalUrl = `https://traderefer.au/local/${state}/${city}/${canonicalSuburb}/${trade}`;
+    const canonicalUrl = `https://traderefer.au/local/${state}/${getCanonicalCitySlug(state, suburb) ?? city}/${canonicalSuburb}/${retiredTradeSlugTarget(trade) ?? trade}`;
     const titlePrefix = count > 0 ? `${count} ` : "";
     const costSnippet = cost ? ` Avg cost $${cost.low}-${cost.high}${cost.unit}.` : "";
     const reviewSnippet = totalReviews > 0 ? ` ${totalReviews} reviews.` : "";
@@ -226,13 +227,10 @@ export default async function TradeLocationPage({ params }: PageProps) {
     const { postcode: urlPostcode, suburb: bareSuburb } = parseSuburbSlug(suburb);
     const normalizedSuburb = urlPostcode ? `${bareSuburb}-${urlPostcode}` : bareSuburb;
     const canonicalSuburb = getCanonicalSuburbSlug(suburb, state);
-    if (canonicalSuburb !== normalizedSuburb) {
-        permanentRedirect(`/local/${state}/${city}/${canonicalSuburb}/${trade}`);
-    }
-
-    const canonicalTrade = retiredTradeSlugTarget(trade);
-    if (canonicalTrade) {
-        permanentRedirect(`/local/${state}/${city}/${canonicalSuburb}/${canonicalTrade}`);
+    const canonicalCity = getCanonicalCitySlug(state, bareSuburb) ?? city;
+    const canonicalTrade = retiredTradeSlugTarget(trade) ?? trade;
+    if (canonicalSuburb !== normalizedSuburb || canonicalCity !== city || canonicalTrade !== trade) {
+        permanentRedirect(`/local/${state}/${canonicalCity}/${canonicalSuburb}/${canonicalTrade}`);
     }
 
     const [businesses, relatedTrades, nearbySuburbs, cityReferralCount] = await Promise.all([

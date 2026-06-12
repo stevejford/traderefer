@@ -1,6 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import { LOCATION_REDIRECTS } from "@/lib/location-redirects";
 
 const isPublicRoute = createRouteMatcher([
     "/",
@@ -35,32 +34,11 @@ const isPublicRoute = createRouteMatcher([
 const isOnboardingRoute = createRouteMatcher(["/onboarding(.*)"]);
 const isOnboardingRootOnly = createRouteMatcher(["/onboarding"]);
 
+// NOTE: the old LOCATION_REDIRECTS block that lived here never ran — the
+// config.matcher below excludes /local entirely. Wrong-city URLs now 308 at
+// render time via getCanonicalCitySlug (lib/suburb-cities.ts) in the
+// /local suburb/trade/job pages (audit 2026-06-12 §B).
 export default clerkMiddleware(async (auth, req: NextRequest) => {
-    const pathname = req.nextUrl.pathname;
-
-    // 0a. Location 301 redirects (old → corrected URLs) - handle before auth
-    if (pathname.startsWith("/local/")) {
-        // Check exact path match first
-        const redirectTo = LOCATION_REDIRECTS[pathname];
-        if (redirectTo) {
-            const url = req.nextUrl.clone();
-            url.pathname = redirectTo;
-            return NextResponse.redirect(url, 301);
-        }
-        // Also handle /local/state/city/suburb/trade paths where the base suburb path has a redirect
-        const segments = pathname.split("/").filter(Boolean); // ["local", state, city, suburb, ...]
-        if (segments.length >= 4) {
-            const basePath = `/${segments.slice(0, 4).join("/")}`;
-            const baseRedirect = LOCATION_REDIRECTS[basePath];
-            if (baseRedirect) {
-                const remaining = segments.slice(4).join("/");
-                const url = req.nextUrl.clone();
-                url.pathname = remaining ? `${baseRedirect}/${remaining}` : baseRedirect;
-                return NextResponse.redirect(url, 301);
-            }
-        }
-    }
-
     // 1. Public routes: always accessible, no auth needed
     if (isPublicRoute(req)) {
         return NextResponse.next();

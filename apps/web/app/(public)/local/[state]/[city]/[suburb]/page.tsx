@@ -6,6 +6,7 @@ import { Metadata } from "next";
 import { permanentRedirect, redirect } from "next/navigation";
 import { SUBURB_CONTEXT } from "@/lib/constants";
 import { parseSuburbSlug, getPostcode, getCanonicalSuburbSlug, getDisplayPostcode } from "@/lib/postcodes";
+import { getCanonicalCitySlug } from "@/lib/suburb-cities";
 import { buildOgImageUrl } from "@/lib/og-image";
 
 export const revalidate = 3600; // ISR — match the [state]/[city]/[trade] pages
@@ -63,7 +64,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const pc = getDisplayPostcode(canonicalSuburb, state);
     const pcLabel = pc ? ` ${stateUpper} ${pc}` : ` ${stateUpper}`;
     const stats = await getSuburbStats(state, city, canonicalSuburb);
-    const canonicalUrl = `https://traderefer.au/local/${state}/${city}/${canonicalSuburb}`;
+    const canonicalUrl = `https://traderefer.au/local/${state}/${getCanonicalCitySlug(state, suburb) ?? city}/${canonicalSuburb}`;
     const ogImageUrl = buildOgImageUrl({
         template: "suburb",
         title: `Trusted tradies in ${suburbName}${pcLabel}`,
@@ -164,8 +165,12 @@ export default async function SuburbDirectoryPage({ params, searchParams }: Page
     const { postcode: urlPostcode, suburb: bareSuburb } = parseSuburbSlug(suburb);
     const normalizedSuburb = urlPostcode ? `${bareSuburb}-${urlPostcode}` : bareSuburb;
     const canonicalSuburb = getCanonicalSuburbSlug(suburb, state);
-    if (canonicalSuburb !== normalizedSuburb) {
-        permanentRedirect(`/local/${state}/${city}/${canonicalSuburb}`);
+    // The city segment is otherwise unvalidated — any junk city renders a
+    // duplicate subtree, so 308 to the suburb's canonical parent city
+    // (audit 2026-06-12 §B; supersedes the dead LOCATION_REDIRECTS map).
+    const canonicalCity = getCanonicalCitySlug(state, bareSuburb) ?? city;
+    if (canonicalSuburb !== normalizedSuburb || canonicalCity !== city) {
+        permanentRedirect(`/local/${state}/${canonicalCity}/${canonicalSuburb}`);
     }
     const postcode = getDisplayPostcode(canonicalSuburb, state);
     const quoteHref = `/quotes?suburb=${encodeURIComponent(suburbName)}&city=${encodeURIComponent(cityName)}&state=${stateUpper}&source=${encodeURIComponent(`/local/${state}/${city}/${canonicalSuburb}`)}`;
