@@ -2,16 +2,38 @@ import { sql } from "@/lib/db";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight, MapPin, Users, Building2, ArrowRight } from "lucide-react";
+import { buildOgImageUrl } from "@/lib/og-image";
 
 export const dynamic = "force-dynamic";
 
+const locationsOgImage = buildOgImageUrl({
+    template: "home",
+    title: "Find tradies by location",
+    subtitle: "Every Australian state, city and suburb — local trade profiles with ABN and review signals.",
+    eyebrow: "TradeRefer locations",
+    badge: "All states",
+    stat1: "8 states",
+    stat2: "80+ cities",
+    stat3: "1,000+ suburbs",
+});
+
 export const metadata: Metadata = {
-    title: "Find Tradies by Location | All Australian States & Cities | TradeRefer",
+    title: "Find Tradies by Location — Every State & City | TradeRefer",
     description: "Browse Australian trade profiles by location. Find electricians, plumbers, painters and more by state, city, and suburb with ABN and public review signals where available.",
     alternates: { canonical: "https://traderefer.au/locations" },
     openGraph: {
         title: "Find Local Tradies by Location | TradeRefer Australia",
-        description: "All 8 Australian states, 89 cities, 997 suburbs. Find local trade profiles near you.",
+        description: "All Australian states, cities and suburbs. Find local trade profiles near you.",
+        url: "https://traderefer.au/locations",
+        siteName: "TradeRefer",
+        type: "website",
+        images: [{ url: locationsOgImage, width: 1200, height: 630, alt: "Find tradies by location on TradeRefer" }],
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Find Local Tradies by Location | TradeRefer Australia",
+        description: "All Australian states, cities and suburbs. Find local trade profiles near you.",
+        images: [locationsOgImage],
     },
 };
 

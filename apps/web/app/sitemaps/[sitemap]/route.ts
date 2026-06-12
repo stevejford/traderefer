@@ -9,11 +9,9 @@ export const revalidate = 86400;
 
 const BASE_URL = "https://traderefer.au";
 const FIND_TRADE_PAGES = ["find-a-plumber-near-me", "find-an-electrician-near-me"];
-const LOCAL_TRADE_PAGES = [
-    "local/gutter-cleaning-geelong",
-    "local/asbestos-removal-bendigo",
-    "local/bathroom-renovations-perth",
-];
+// The legacy hand-built /local landing pages now 308 into the dynamic
+// directory (audit 2026-06-12 PM) and must not be sitemapped.
+const LOCAL_TRADE_PAGES: string[] = [];
 
 type SitemapName = "general" | "suburbs" | "trades" | "top";
 

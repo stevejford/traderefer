@@ -4,16 +4,38 @@ import Link from "next/link";
 import { JOB_TYPES, jobToSlug } from "@/lib/constants";
 import { PublicMultiQuoteForm } from "@/components/PublicMultiQuoteForm";
 import { ChevronRight, Wrench, Users, ArrowRight, Search } from "lucide-react";
+import { buildOgImageUrl } from "@/lib/og-image";
 
 export const dynamic = "force-dynamic";
 
+const categoriesOgImage = buildOgImageUrl({
+    template: "home",
+    title: "Browse every trade category",
+    subtitle: "Electricians, plumbers, painters, builders and 50+ more trades across Australia.",
+    eyebrow: "TradeRefer categories",
+    badge: "50+ trades",
+    stat1: "ABN checked",
+    stat2: "Real reviews",
+    stat3: "Free quotes",
+});
+
 export const metadata: Metadata = {
-    title: "Trade Categories Australia | Browse Local Trade Services | TradeRefer",
+    title: "Browse 50+ Trade Categories | TradeRefer Australia",
     description: "Browse 50+ trade categories on TradeRefer. Find electricians, plumbers, painters, builders & more across Australia. ABN-checked, community-informed. Free quotes.",
     alternates: { canonical: "https://traderefer.au/categories" },
     openGraph: {
         title: "All Trade Categories | TradeRefer Australia",
         description: "50+ trade categories. Find local trade profiles across all Australian states and cities.",
+        url: "https://traderefer.au/categories",
+        siteName: "TradeRefer",
+        type: "website",
+        images: [{ url: categoriesOgImage, width: 1200, height: 630, alt: "Browse trade categories on TradeRefer" }],
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "All Trade Categories | TradeRefer Australia",
+        description: "50+ trade categories. Find local trade profiles across all Australian states and cities.",
+        images: [categoriesOgImage],
     },
 };
 

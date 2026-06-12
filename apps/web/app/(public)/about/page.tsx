@@ -4,19 +4,38 @@ import {
     BadgeCheck, FileText, Users, ShieldCheck, Search, CheckCircle2,
     ArrowRight, HeartHandshake, Wrench, Home, KeyRound, Zap,
 } from "lucide-react";
+import { buildOgImageUrl } from "@/lib/og-image";
 
 const CANONICAL_URL = "https://traderefer.au/about";
 
+const aboutOgImage = buildOgImageUrl({
+    template: "home",
+    title: "How TradeRefer verifies local tradies",
+    subtitle: "ABN checks, state licence checks and community referral signals on every listed business.",
+    eyebrow: "About TradeRefer",
+    badge: "Verification process",
+    stat1: "ABN checked",
+    stat2: "Licence checked",
+    stat3: "Referral signals",
+});
+
 export const metadata: Metadata = {
-    title: "About TradeRefer — How We Verify Local Tradies | TradeRefer",
+    title: "About TradeRefer — How We Verify Local Tradies",
     description: "TradeRefer is an Australian trades directory built on real referrals. Learn how we verify every business — ABN checks, state licence checks and community referral signals — and how the platform works for homeowners, tradies and referrers.",
     alternates: { canonical: CANONICAL_URL },
     openGraph: {
-        title: "About TradeRefer | TradeRefer",
+        title: "About TradeRefer — How We Verify Local Tradies",
         description: "How TradeRefer verifies local trade businesses and connects them with homeowners through real community referrals.",
         url: CANONICAL_URL,
         siteName: "TradeRefer",
         type: "website",
+        images: [{ url: aboutOgImage, width: 1200, height: 630, alt: "How TradeRefer verifies local tradies" }],
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "About TradeRefer — How We Verify Local Tradies",
+        description: "ABN checks, state licence checks and community referral signals on every listed business.",
+        images: [aboutOgImage],
     },
 };
 

@@ -3,13 +3,39 @@ import { PublicMultiQuoteForm } from "@/components/PublicMultiQuoteForm";
 import { ChevronRight, MapPin, Users, Building2 } from "lucide-react";
 import Link from "next/link";
 import { Metadata } from "next";
+import { buildOgImageUrl } from "@/lib/og-image";
 
 export const dynamic = "force-dynamic";
 
+const localOgImage = buildOgImageUrl({
+    template: "home",
+    title: "Australia's local trade directory",
+    subtitle: "Browse trusted tradies by state, city and suburb — electricians, plumbers, painters and more.",
+    eyebrow: "TradeRefer directory",
+    badge: "All states",
+    stat1: "ABN checked",
+    stat2: "Real reviews",
+    stat3: "Free quotes",
+});
+
 export const metadata: Metadata = {
-    title: "Local Trade Directory | Find Trusted Tradies in Australia | TradeRefer",
+    title: "Local Trade Directory Australia | TradeRefer",
     description: "Browse local tradies across all Australian states and cities. Find electricians, plumbers, painters & more in your suburb. ABN-checked, community-informed. Free quotes.",
     alternates: { canonical: "https://traderefer.au/local" },
+    openGraph: {
+        title: "Local Trade Directory Australia | TradeRefer",
+        description: "Browse trusted tradies by state, city and suburb across Australia.",
+        url: "https://traderefer.au/local",
+        siteName: "TradeRefer",
+        type: "website",
+        images: [{ url: localOgImage, width: 1200, height: 630, alt: "TradeRefer local trade directory" }],
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Local Trade Directory Australia | TradeRefer",
+        description: "Browse trusted tradies by state, city and suburb across Australia.",
+        images: [localOgImage],
+    },
 };
 
 const STATE_NAMES: Record<string, string> = {

@@ -8,6 +8,8 @@ import { SUBURB_CONTEXT } from "@/lib/constants";
 import { parseSuburbSlug, getPostcode, getCanonicalSuburbSlug, getDisplayPostcode } from "@/lib/postcodes";
 import { buildOgImageUrl } from "@/lib/og-image";
 
+export const revalidate = 3600; // ISR — match the [state]/[city]/[trade] pages
+
 interface PageProps {
     params: Promise<{ state: string; city: string; suburb: string }>;
     searchParams: Promise<{ category?: string }>;

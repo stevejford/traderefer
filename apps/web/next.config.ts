@@ -59,6 +59,19 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      // skipTrailingSlashRedirect (below) disables Next's sitewide
+      // trailing-slash 308 so the PostHog /ingest proxy keeps working — this
+      // restores it for everything except /ingest and /api, killing the
+      // duplicate-URL surface (every page also resolved with a trailing /).
+      {
+        source: "/:path((?!ingest|api)(?:.*[^/])?)/",
+        destination: "/:path",
+        permanent: true,
+      },
+    ];
+  },
   // This is required to support PostHog trailing slash API requests
   skipTrailingSlashRedirect: true,
 };
