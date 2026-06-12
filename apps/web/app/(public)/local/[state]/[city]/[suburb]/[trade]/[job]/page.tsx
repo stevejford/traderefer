@@ -7,6 +7,7 @@ import { Metadata } from "next";
 import { TRADE_COST_GUIDE, TRADE_FAQ_BANK, STATE_LICENSING, JOB_TYPES, TRADE_NOUNS, jobToSlug, normalizeTradeName } from "@/lib/constants";
 import { permanentRedirect } from "next/navigation";
 import { parseSuburbSlug, getCanonicalSuburbSlug, getDisplayPostcode } from "@/lib/postcodes";
+import { retiredTradeSlugTarget } from "@/lib/trade-redirects";
 import { buildOgImageUrl } from "@/lib/og-image";
 
 export const dynamic = "force-dynamic";
@@ -49,7 +50,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const count = businesses.length;
     const postcode = getDisplayPostcode(canonicalSuburb, state);
     const suburbWithPostcode = postcode ? `${suburbName} ${postcode}` : suburbName;
-    const canonicalUrl = `https://traderefer.au/local/${state}/${city}/${canonicalSuburb}/${trade}/${job}`;
+    const canonicalUrl = `https://traderefer.au/local/${state}/${city}/${canonicalSuburb}/${retiredTradeSlugTarget(trade) ?? trade}/${job}`;
     const ogImageUrl = buildOgImageUrl({
         template: "job",
         title: `${jobName} in ${suburbWithPostcode}`,
@@ -64,7 +65,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
         title: `${jobName} in ${suburbWithPostcode} | TradeRefer`,
         description: `Compare ${count > 0 ? count : 'available'} ${jobName.toLowerCase()} specialists in ${suburbName}, ${cityName} ${stateUpper}.${cost ? ` Typical cost $${cost.low}–$${cost.high}${cost.unit}.` : ''} ABN and referral signals where available. Get free quotes today.`,
-        robots: { index: false, follow: true },
+        // Long-tail job pages earn indexation once they list enough businesses
+        // to be a real comparison page — same gate as the /top pages.
+        robots: { index: count >= 3, follow: true },
         alternates: { canonical: canonicalUrl },
         openGraph: {
             title: `${jobName} in ${suburbWithPostcode} | TradeRefer`,
@@ -97,7 +100,7 @@ async function getBusinesses(state: string, city: string, trade: string, suburb:
                 COUNT(r.id) as referral_count,
                 COALESCE(b.trust_score, 0) as trust_score
             FROM businesses b
-            LEFT JOIN referrals r ON r.business_id = b.id
+            LEFT JOIN referral_links r ON r.business_id = b.id
             WHERE b.status = 'active'
               AND (b.listing_visibility = 'public' OR b.listing_visibility IS NULL)
               AND UPPER(b.state) = ${stateCode}
@@ -144,6 +147,11 @@ export default async function JobTypePage({ params }: PageProps) {
     const canonicalSuburb = getCanonicalSuburbSlug(suburb, state);
     if (canonicalSuburb !== normalizedSuburb) {
         permanentRedirect(`/local/${state}/${city}/${canonicalSuburb}/${trade}/${job}`);
+    }
+
+    const canonicalTrade = retiredTradeSlugTarget(trade);
+    if (canonicalTrade) {
+        permanentRedirect(`/local/${state}/${city}/${canonicalSuburb}/${canonicalTrade}/${job}`);
     }
 
     const tradeName = getTradeDisplayName(trade);
