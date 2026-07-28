@@ -11,6 +11,7 @@ import {
     DollarSign, FileText, CheckCircle2, ArrowRight, Trophy
 } from "lucide-react";
 import { buildOgImageUrl } from "@/lib/og-image";
+import { directoryRobots } from "@/lib/seo/index-policy";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600; // Cache for 1 hour, ISR revalidation
@@ -113,7 +114,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
         title: `Top ${tradeNoun} in ${cityName} | TradeRefer`,
         description: `The ${count > 0 ? count : ''} highest-rated ${tradeNoun.toLowerCase()} in ${cityName}, ${stateName} ranked by ${totalReviews > 0 ? totalReviews.toLocaleString() + ' ' : ''}Google reviews.${topBizStr} Free quotes from local trade profiles.`,
-        robots: { index: count >= 3, follow: true },
+        robots: directoryRobots({ page: "topCity", businessCount: count, totalReviews }),
         alternates: { canonical: canonicalUrl },
         openGraph: {
             title: `Top ${tradeNoun} in ${cityName} | TradeRefer`,

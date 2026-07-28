@@ -8,6 +8,7 @@ import { SUBURB_CONTEXT } from "@/lib/constants";
 import { parseSuburbSlug, getPostcode, getCanonicalSuburbSlug, getDisplayPostcode } from "@/lib/postcodes";
 import { getCanonicalCitySlug } from "@/lib/suburb-cities";
 import { buildOgImageUrl } from "@/lib/og-image";
+import { directoryRobots } from "@/lib/seo/index-policy";
 
 export const revalidate = 3600; // ISR — match the [state]/[city]/[trade] pages
 
@@ -78,7 +79,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
         title: `${stats.total > 0 ? stats.total + ' ' : ''}Trusted Tradies in ${suburbName}${pcLabel} | TradeRefer`,
         description: `Compare ${stats.total > 0 ? stats.total : 'available'} local tradespeople in ${suburbName}, ${cityName}${pcLabel}. Browse ${stats.categories > 0 ? stats.categories + ' trade categories' : 'plumbers, electricians, builders & more'} — ABN and public review signals where available. Free quotes.`,
-        robots: { index: stats.total >= 2 || stats.categories >= 2, follow: true },
+        robots: directoryRobots({ page: "suburb", categories: stats.categories }),
         alternates: { canonical: canonicalUrl },
         openGraph: {
             title: `${stats.total > 0 ? stats.total + ' ' : ''}Trusted Tradies in ${suburbName}${pcLabel} | TradeRefer`,

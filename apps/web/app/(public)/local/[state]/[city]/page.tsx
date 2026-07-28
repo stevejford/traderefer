@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { getCanonicalSuburbSlug } from "@/lib/postcodes";
+import { directoryRobots } from "@/lib/seo/index-policy";
 
 interface PageProps {
     params: Promise<{ state: string; city: string }>;
@@ -57,7 +58,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
         title: `${totalBusinesses > 0 ? totalBusinesses + ' ' : ''}Trusted Tradies in ${cityName} ${stateUpper} | TradeRefer`,
         description: `Find ${totalBusinesses > 0 ? totalBusinesses + ' ' : ''}ABN-checked trade businesses across ${cityName}, ${stateUpper}. Browse by suburb to discover top-rated plumbers, electricians, painters & more. Free quotes.`,
-        robots: { index: totalBusinesses >= 2, follow: true },
+        robots: directoryRobots({ page: "city", businessCount: totalBusinesses }),
         alternates: { canonical: `https://traderefer.au/local/${state}/${city}` },
         openGraph: {
             title: `Trusted Tradies in ${cityName} ${stateUpper} | TradeRefer`,

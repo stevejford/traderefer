@@ -8,6 +8,8 @@ import { Metadata } from "next";
 
 import { sql } from "@/lib/db";
 
+import { directoryRobots } from "@/lib/seo/index-policy";
+
 import { PublicMultiQuoteForm } from "@/components/PublicMultiQuoteForm";
 
 import { STATE_LICENSING, STATE_AUTHORITY_LINKS } from "@/lib/constants";
@@ -85,7 +87,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         title: `Trade Services in ${stateName} | TradeRefer`,
 
         description: `Browse ${stateName}'s top ABN-checked local trade businesses. Find plumbers, electricians, builders and more in your city or suburb.`,
-        robots: { index: businessCount > 0, follow: true },
+        robots: directoryRobots({ page: "state", businessCount }),
         alternates: { canonical: `https://traderefer.au/local/${state}` },
 
     };

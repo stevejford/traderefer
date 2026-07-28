@@ -10,6 +10,7 @@ import { parseSuburbSlug, getCanonicalSuburbSlug, getDisplayPostcode } from "@/l
 import { retiredTradeSlugTarget } from "@/lib/trade-redirects";
 import { getCanonicalCitySlug } from "@/lib/suburb-cities";
 import { buildOgImageUrl } from "@/lib/og-image";
+import { directoryRobots } from "@/lib/seo/index-policy";
 
 export const dynamic = "force-dynamic";
 
@@ -66,9 +67,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
         title: `${jobName} in ${suburbWithPostcode} | TradeRefer`,
         description: `Compare ${count > 0 ? count : 'available'} ${jobName.toLowerCase()} specialists in ${suburbName}, ${cityName} ${stateUpper}.${cost ? ` Typical cost $${cost.low}–$${cost.high}${cost.unit}.` : ''} ABN and referral signals where available. Get free quotes today.`,
-        // Long-tail job pages earn indexation once they list enough businesses
-        // to be a real comparison page — same gate as the /top pages.
-        robots: { index: count >= 3, follow: true },
+        robots: directoryRobots({ page: "localJob", businessCount: count }),
         alternates: { canonical: canonicalUrl },
         openGraph: {
             title: `${jobName} in ${suburbWithPostcode} | TradeRefer`,

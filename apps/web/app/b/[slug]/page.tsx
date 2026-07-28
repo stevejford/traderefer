@@ -54,6 +54,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
+import { directoryRobots } from "@/lib/seo/index-policy";
 import type { ReactNode } from "react";
 import { BusinessLogo } from "@/components/BusinessLogo";
 import { proxyLogoUrl } from "@/lib/logo";
@@ -477,6 +478,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return {
         title,
         description,
+        // Unclaimed scraped stubs stay Bing-indexable but out of Google until
+        // claimed or heavily reviewed — claiming flips this automatically.
+        robots: directoryRobots({
+            page: "profile",
+            isClaimed: business.is_claimed === true,
+            totalReviews: Number.isFinite(reviewCount) ? reviewCount : 0,
+            photoCount: Array.isArray(business.photo_urls) ? business.photo_urls.length : 0,
+        }),
         alternates: { canonical: url },
         openGraph: {
             title,

@@ -1,5 +1,6 @@
 import { sql } from "@/lib/db";
 import { Metadata } from "next";
+import { directoryRobots } from "@/lib/seo/index-policy";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { parseSuburbSlug, getCanonicalSuburbSlug } from "@/lib/postcodes";
@@ -120,7 +121,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
         title: `Top ${tradeName} in ${suburbName} | TradeRefer`,
         description: `The ${businesses.length} highest-rated ${tradeName.toLowerCase()} in ${suburbName}, ${cityName} ${stateName} ranked by ${totalReviews.toLocaleString()} public reviews.${topBizStr} Get free quotes today.`,
-        robots: { index: businesses.length >= 3, follow: true },
+        robots: directoryRobots({ page: "topSuburb", businessCount: businesses.length, totalReviews }),
         alternates: { canonical: canonicalUrl },
         openGraph: {
             title: `Top ${tradeName} in ${suburbName} | TradeRefer`,

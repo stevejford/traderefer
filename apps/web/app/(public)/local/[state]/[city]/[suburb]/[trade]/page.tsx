@@ -11,6 +11,7 @@ import { retiredTradeSlugTarget } from "@/lib/trade-redirects";
 import { getCanonicalCitySlug } from "@/lib/suburb-cities";
 import { generateFallbackDescription } from "@/lib/business-utils";
 import { buildOgImageUrl } from "@/lib/og-image";
+import { directoryRobots } from "@/lib/seo/index-policy";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600; // Cache for 1 hour, ISR revalidation
@@ -96,7 +97,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
         title: `${titlePrefix}${tradeNamePlural} in ${suburbWithPostcode}`,
         description: `Compare ${count > 0 ? count : 'available'} ${count === 1 ? tradeName.toLowerCase() : tradeNamePlural.toLowerCase()} in ${suburbWithPostcode}${cityDisplay} ${stateUpper}.${costSnippet}${reviewSnippet} ABN-checked. Free quotes.`,
-        robots: { index: count >= 2 || totalReviews > 0, follow: true },
+        robots: directoryRobots({ page: "localTrade", businessCount: count }),
         alternates: { canonical: canonicalUrl },
         openGraph: {
             title: `${tradeName} in ${suburbWithPostcode} | TradeRefer`,
