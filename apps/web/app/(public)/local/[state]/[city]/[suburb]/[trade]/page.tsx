@@ -452,7 +452,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                 View Top {businesses.length > 0 ? businesses.length : ''} Trades
                             </Link>
                             <Link prefetch={false} href="/register?type=business" className="inline-flex items-center justify-center text-sm font-bold text-zinc-600 hover:text-[#FF6600] transition-colors px-1 py-1 sm:py-3">
-                                Are you a {tradeName.toLowerCase()}? List your business free →
+                                {tradeName} business? List it free →
                             </Link>
                         </div>
                     </div>
@@ -463,7 +463,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
             <div className="bg-white border-b border-zinc-100 py-5">
                 <div className="container mx-auto px-4">
                     <div className="flex flex-wrap items-center justify-between gap-6">
-                        <p className="font-black text-zinc-400 uppercase tracking-widest hidden sm:block" style={{ fontSize: '16px' }}>How We Verify</p>
+                        <p className="font-black text-zinc-500 uppercase tracking-widest hidden sm:block" style={{ fontSize: '16px' }}>How We Verify</p>
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 shrink-0">
                                 <BadgeCheck className="w-5 h-5" />
@@ -618,7 +618,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                             <ShieldCheck className="w-5 h-5 text-blue-600" />
                                         </div>
                                         <div>
-                                            <p className="font-black text-zinc-900 text-lg mb-1">Are you a {tradeName.toLowerCase()} in {suburbName}?</p>
+                                            <p className="font-black text-zinc-900 text-lg mb-1">{tradeName} business in {suburbName}?</p>
                                             <p className="text-zinc-600" style={{ fontSize: '15px' }}>Claim your free listing to manage your profile, respond to reviews, and connect with customers.</p>
                                         </div>
                                     </div>
@@ -872,7 +872,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                                 <p className="text-zinc-500" style={{ fontSize: '16px' }}>{businesses.length > 0 ? "local providers" : "no obligation"}</p>
                                             </div>
                                         </div>
-                                        <p className="text-zinc-400 mt-4" style={{ fontSize: '16px' }}>Prices are estimates only. Always get 2–3 written quotes before proceeding with any work.</p>
+                                        <p className="text-zinc-600 mt-4" style={{ fontSize: '16px' }}>Prices are estimates only. Always get 2–3 written quotes before proceeding with any work.</p>
                                     </section>
                                 )}
 
@@ -1125,7 +1125,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
 
                             {/* CTA */}
                             <div className="bg-orange-500 rounded-3xl p-8 text-white text-center">
-                                <h3 className="text-xl font-black mb-2">Are you a {tradeName}?</h3>
+                                <h3 className="text-xl font-black mb-2">{tradeName} business?</h3>
                                 <p className="text-white/80 text-sm mb-6">Build your trust score and grow your business with referrals that actually close in {suburbName}.</p>
                                 <Button asChild size="lg" className="bg-white text-orange-600 hover:bg-zinc-100 rounded-xl font-bold px-8 h-12 w-full shadow-lg shadow-black/10 border-none">
                                     <Link prefetch={false} href="/register?type=business">Apply to Join</Link>

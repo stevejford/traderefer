@@ -37,7 +37,7 @@ export function JobMaterialsCard({
                 <Wrench className="w-6 h-6 text-orange-500" />
                 Materials You&apos;ll Need for {jobName}
             </h2>
-            <p className="text-zinc-500 mb-6 text-sm">
+            <p className="text-zinc-600 mb-6 text-base max-w-prose">
                 What a tradie typically uses for {jobName.toLowerCase()}, with current retail price ranges.
                 Your tradie usually supplies these — the quote should itemise them.
             </p>
@@ -46,15 +46,15 @@ export function JobMaterialsCard({
                     <li key={m.name} className="py-3 flex items-baseline justify-between gap-4">
                         <div className="min-w-0">
                             <span className="font-bold text-zinc-900">{m.name}</span>
-                            <span className="text-zinc-400 text-sm"> · {m.unit}</span>
-                            {m.qty_note && <span className="block text-xs text-zinc-500">{m.qty_note}</span>}
+                            <span className="text-zinc-500 text-base"> · {m.unit}</span>
+                            {m.qty_note && <span className="block text-sm text-zinc-600">{m.qty_note}</span>}
                             {m.optional && (
                                 <span className="inline-block mt-0.5 text-[10px] font-black uppercase tracking-wider text-zinc-400 bg-zinc-100 rounded px-1.5 py-0.5">
                                     If needed
                                 </span>
                             )}
                         </div>
-                        <span className="shrink-0 font-bold text-zinc-700 text-sm tabular-nums">
+                        <span className="shrink-0 font-bold text-zinc-800 text-base tabular-nums">
                             {m.price_low != null && m.price_high != null
                                 ? `${money(m.price_low)}–${money(m.price_high)}`
                                 : "varies"}
@@ -71,7 +71,7 @@ export function JobMaterialsCard({
                         <p className="text-2xl font-black text-zinc-900">
                             {money(totalLow)}–{money(totalHigh)}
                         </p>
-                        <p className="text-xs text-zinc-500">Core items only — labour is on top (see cost guide above)</p>
+                        <p className="text-sm text-zinc-600">Core items only — labour is on top (see cost guide above)</p>
                     </div>
                     <a
                         href="#businesses"
@@ -82,7 +82,7 @@ export function JobMaterialsCard({
                     </a>
                 </div>
             )}
-            <p className="text-xs text-zinc-400">
+            <p className="text-sm text-zinc-500">
                 Price ranges sampled from major Australian hardware retailers
                 {sampledLabel ? ` (${sampledLabel})` : ""}. Estimates only — quantities and final costs depend on your
                 job. Always confirm inclusions in writing with your tradie.

@@ -54,11 +54,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const count = businesses.length;
     const postcode = getDisplayPostcode(canonicalSuburb, state);
     const suburbWithPostcode = postcode ? `${suburbName} ${postcode}` : suburbName;
+    const cityDisplay = suburbName.toLowerCase() === cityName.toLowerCase() ? "" : `, ${cityName}`;
     const canonicalUrl = `https://traderefer.au/local/${state}/${getCanonicalCitySlug(state, suburb) ?? city}/${canonicalSuburb}/${retiredTradeSlugTarget(trade) ?? trade}/${job}`;
     const ogImageUrl = buildOgImageUrl({
         template: "job",
         title: `${jobName} in ${suburbWithPostcode}`,
-        subtitle: `Compare ${count > 0 ? count : "available"} local specialists in ${suburbName}, ${cityName} ${stateUpper}. ABN and referral signals where available, with quote-ready paths.`,
+        subtitle: `Compare ${count > 0 ? count : "available"} local specialists in ${suburbName}${cityDisplay} ${stateUpper}. ABN and referral signals where available, with quote-ready paths.`,
         eyebrow: "Local job guide",
         badge: `${stateUpper} service page`,
         stat1: count > 0 ? `${count} specialists` : "Available specialists",
@@ -68,7 +69,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
     return {
         title: `${jobName} in ${suburbWithPostcode} | TradeRefer`,
-        description: `Compare ${count > 0 ? count : 'available'} ${jobName.toLowerCase()} specialists in ${suburbName}, ${cityName} ${stateUpper}.${cost ? ` Typical cost $${cost.low}–$${cost.high}${cost.unit}.` : ''} ABN and referral signals where available. Get free quotes today.`,
+        description: `Compare ${count > 0 ? count : 'available'} ${jobName.toLowerCase()} specialists in ${suburbName}${cityDisplay} ${stateUpper}.${cost ? ` Typical cost $${cost.low}–$${cost.high}${cost.unit}.` : ''} ABN and referral signals where available. Get free quotes today.`,
         robots: directoryRobots({ page: "localJob", businessCount: count }),
         alternates: { canonical: canonicalUrl },
         openGraph: {
@@ -245,7 +246,7 @@ export default async function JobTypePage({ params }: PageProps) {
                 </div>
                 <div className="container mx-auto px-4 relative z-10">
                     {/* Breadcrumb */}
-                    <nav className="flex flex-wrap items-center gap-2 text-xs font-bold text-zinc-500 uppercase tracking-widest mb-8">
+                    <nav className="flex flex-wrap items-center gap-2 text-xs font-bold text-zinc-400 uppercase tracking-widest mb-8">
                         <Link href="/" className="hover:text-white transition-colors">Home</Link>
                         <ChevronRight className="w-3 h-3" />
                         <Link href={`/local/${state}`} className="hover:text-white transition-colors">{stateName}</Link>
@@ -259,42 +260,55 @@ export default async function JobTypePage({ params }: PageProps) {
                         <span className="text-orange-400">{jobName}</span>
                     </nav>
 
-                    <div className="max-w-3xl">
-                        <div className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-500/30 rounded-full px-4 py-1.5 text-xs font-black text-orange-400 uppercase tracking-widest mb-6">
-                            <Wrench className="w-3 h-3" />
-                            {tradeName} Specialist Service
-                        </div>
-                        <h1 className="text-4xl md:text-5xl font-black mb-6 leading-tight text-white">
-                            <span className="text-orange-500">{jobName}</span> in {suburbName}, {cityName}
-                        </h1>
-                        <p className="text-xl text-zinc-400 mb-6 leading-relaxed">
-                            Compare {jobName.toLowerCase()} specialists in {suburbName} using ABN, profile, public review, and referral signals where available.
-                            {cost && ` Typical ${tradeName.toLowerCase()} rates in ${stateName} range from $${cost.low}–$${cost.high}${cost.unit}.`}
-                        </p>
-                        {cost && (
-                            <div className="inline-flex items-center gap-2 bg-white/10 border border-white/10 rounded-xl px-4 py-2 mb-6 text-sm font-bold text-white">
-                                <DollarSign className="w-4 h-4 text-orange-400" />
-                                Est. cost: ${cost.low}–${cost.high}{cost.unit}
+                    <div className="grid lg:grid-cols-[1fr_400px] gap-12 items-start">
+                        <div className="max-w-3xl">
+                            <div className="flex items-center gap-3 mb-6">
+                                <span className="text-sm font-black text-orange-400 uppercase tracking-widest">{tradeName} Specialist Service</span>
+                                <span className="hidden sm:block flex-1 max-w-[160px] h-px bg-orange-400/40" aria-hidden="true" />
                             </div>
-                        )}
-                        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
-                            <Button asChild size="lg" className="bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold h-14 px-8 text-lg border-none w-full sm:w-auto">
-                                <Link href="/register?type=homeowner">Request a Free {jobName} Quote</Link>
-                            </Button>
-                            <Button asChild variant="outline" size="lg" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl font-bold h-14 px-8 text-lg w-full sm:w-auto">
-                                <Link href={businesses.length > 0 ? "#businesses" : broaderTradeHref}>See {businesses.length > 0 ? businesses.length : ''} Local Specialists</Link>
-                            </Button>
-                            <Link href="/register?type=business" className="inline-flex items-center justify-center text-sm font-bold text-zinc-300 hover:text-white transition-colors px-1 py-1 sm:py-3">
-                                Are you a {tradeName.toLowerCase()}? List your business free →
-                            </Link>
+                            <h1 className="text-4xl md:text-5xl font-black mb-6 leading-tight text-white">
+                                <span className="text-orange-500">{jobName}</span> in {suburbName}{suburbName.toLowerCase() === cityName.toLowerCase() ? "" : `, ${cityName}`}
+                            </h1>
+                            <p className="text-xl text-zinc-300 mb-6 leading-relaxed">
+                                Compare {jobName.toLowerCase()} specialists in {suburbName} using ABN, profile, public review, and referral signals where available.
+                                {cost && ` Typical ${tradeName.toLowerCase()} rates in ${stateName} range from $${cost.low}–$${cost.high}${cost.unit}.`}
+                            </p>
+                            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
+                                <Button asChild size="lg" className="bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold h-14 px-8 text-lg border-none w-full sm:w-auto">
+                                    <Link href="/register?type=homeowner">Request a Free {jobName} Quote</Link>
+                                </Button>
+                                <Button asChild variant="outline" size="lg" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl font-bold h-14 px-8 text-lg w-full sm:w-auto">
+                                    <Link href={businesses.length > 0 ? "#businesses" : broaderTradeHref}>See {businesses.length > 0 ? businesses.length : ''} Local Specialists</Link>
+                                </Button>
+                                <Link href="/register?type=business" className="inline-flex items-center justify-center text-base font-bold text-zinc-300 hover:text-white transition-colors px-1 py-1 sm:py-3">
+                                    {tradeName} business? List it free →
+                                </Link>
+                            </div>
                         </div>
+                        <aside className="hidden lg:block bg-white/5 border border-white/10 rounded-2xl p-8">
+                            <p className="text-sm font-black text-orange-400 uppercase tracking-widest mb-3">Free quotes</p>
+                            <h2 className="text-2xl font-black text-white mb-4 leading-snug">Get 2–3 quotes for {jobName.toLowerCase()}</h2>
+                            {cost && (
+                                <p className="text-lg text-zinc-300 mb-5">
+                                    Typical range in {stateName}: <span className="font-black text-white">${cost.low}–${cost.high}{cost.unit}</span>
+                                </p>
+                            )}
+                            <ul className="space-y-3 mb-6 text-base text-zinc-300">
+                                <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-orange-400 shrink-0" />ABN-checked local specialists</li>
+                                <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-orange-400 shrink-0" />Free, no obligation</li>
+                                <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-orange-400 shrink-0" />Takes about a minute</li>
+                            </ul>
+                            <Button asChild size="lg" className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold h-14 text-lg border-none">
+                                <Link href="/register?type=homeowner">Start your quote request</Link>
+                            </Button>
+                        </aside>
                     </div>
                 </div>
             </div>
 
             {/* Main Content */}
             <div className="container mx-auto px-4 py-16">
-                <div className="max-w-5xl mx-auto space-y-16">
+                <div className="max-w-6xl mx-auto space-y-16">
 
                     {/* Business Listings */}
                     <section id="businesses">
@@ -319,9 +333,9 @@ export default async function JobTypePage({ params }: PageProps) {
                                                                 <h3 className="font-black text-zinc-900 group-hover:text-orange-600 transition-colors text-lg leading-tight">
                                                                     {biz.business_name}
                                                                 </h3>
-                                                                <p className="text-sm text-zinc-500 mt-0.5 flex items-center gap-1.5">
-                                                                    <MapPin className="w-3 h-3" />
-                                                                    {biz.suburb}, {biz.city}
+                                                                <p className="text-base text-zinc-600 mt-0.5 flex items-center gap-1.5">
+                                                                    <MapPin className="w-4 h-4" />
+                                                                    {biz.suburb}{biz.city && String(biz.city).toLowerCase() !== String(biz.suburb).toLowerCase() ? `, ${biz.city}` : ""}
                                                                 </p>
                                                             </div>
                                                             {i === 0 && (
@@ -330,7 +344,7 @@ export default async function JobTypePage({ params }: PageProps) {
                                                                 </span>
                                                             )}
                                                         </div>
-                                                        <div className="flex flex-wrap items-center gap-4 mt-3 text-xs text-zinc-500 font-medium">
+                                                        <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-zinc-600 font-medium">
                                                             {parseFloat(rating) > 0 && (
                                                                 <span className="flex items-center gap-1">
                                                                     <Star className="w-3 h-3 fill-orange-400 text-orange-400" />
@@ -360,8 +374,7 @@ export default async function JobTypePage({ params }: PageProps) {
                             <div className="bg-zinc-50 rounded-3xl border border-dashed border-zinc-200 p-12 text-center">
                                 <Wrench className="w-10 h-10 text-zinc-300 mx-auto mb-4" />
                                 <h3 className="text-lg font-black text-zinc-600 mb-2">No listings yet in {suburbName}</h3>
-                                <p className="text-zinc-500 text-sm mb-3 max-w-xl mx-auto">No specialists listed in {suburbName} yet — get quotes from {tradeName.toLowerCase()} across {cityName} instead.</p>
-                                <p className="text-zinc-400 text-sm mb-6">Join 1,200+ homeowners who&apos;ve found their tradie on TradeRefer.</p>
+                                <p className="text-zinc-600 text-base mb-6 max-w-xl mx-auto">No specialists listed in {suburbName} yet. Get quotes from {tradeName.toLowerCase()} businesses across {cityName} instead.</p>
                                 <div className="flex flex-col sm:flex-row justify-center gap-3">
                                     <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold border-none">
                                         <Link href={broaderTradeHref}>See {tradeName} Across {cityName}</Link>
@@ -381,27 +394,27 @@ export default async function JobTypePage({ params }: PageProps) {
                                 <DollarSign className="w-6 h-6 text-orange-500" />
                                 How Much Does {jobName} Cost in {suburbName}?
                             </h2>
-                            <p className="text-zinc-500 mb-6 text-sm">
+                            <p className="text-zinc-600 mb-6 text-base max-w-prose">
                                 The following cost estimates are based on industry averages for {tradeName.toLowerCase()} work in {stateName}. Actual prices will vary based on the scope of work, materials required, and access. Always get 2–3 written quotes before proceeding.
                             </p>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                 <div className="bg-zinc-50 rounded-2xl p-5 border border-zinc-100">
                                     <p className="text-xs font-black text-zinc-400 uppercase tracking-wider mb-1">Typical Range</p>
                                     <p className="text-2xl font-black text-zinc-900">${cost.low}–${cost.high}</p>
-                                    <p className="text-sm text-zinc-500">{cost.unit}</p>
+                                    <p className="text-sm text-zinc-600">{cost.unit}</p>
                                 </div>
                                 <div className="bg-zinc-50 rounded-2xl p-5 border border-zinc-100">
                                     <p className="text-xs font-black text-zinc-400 uppercase tracking-wider mb-1">Emergency Rate</p>
                                     <p className="text-2xl font-black text-zinc-900">${Math.round(cost.high * 1.5)}</p>
-                                    <p className="text-sm text-zinc-500">After-hours / urgent</p>
+                                    <p className="text-sm text-zinc-600">After-hours / urgent</p>
                                 </div>
                                 <div className="bg-zinc-50 rounded-2xl p-5 border border-zinc-100">
                                     <p className="text-xs font-black text-zinc-400 uppercase tracking-wider mb-1">Free Quotes</p>
                                     <p className="text-2xl font-black text-zinc-900">2–3</p>
-                                    <p className="text-sm text-zinc-500">Always get multiple</p>
+                                    <p className="text-sm text-zinc-600">Always get multiple</p>
                                 </div>
                             </div>
-                            <p className="text-xs text-zinc-400">Price estimates only. Confirm scope, timing, and final cost with your chosen tradie before work begins.</p>
+                            <p className="text-sm text-zinc-500">Price estimates only. Confirm scope, timing, and final cost with your chosen tradie before work begins.</p>
                         </section>
                     )}
 
@@ -420,7 +433,7 @@ export default async function JobTypePage({ params }: PageProps) {
                             <FileText className="w-6 h-6 text-blue-500 shrink-0 mt-0.5" />
                             <div>
                                 <h3 className="font-black text-zinc-900 mb-1">{tradeName} Licensing Requirements in {stateName}</h3>
-                                <p className="text-sm text-zinc-600 leading-relaxed">{licenceText}</p>
+                                <p className="text-base text-zinc-600 leading-relaxed max-w-prose">{licenceText}</p>
                             </div>
                         </section>
                     )}
@@ -429,7 +442,7 @@ export default async function JobTypePage({ params }: PageProps) {
                     {relatedJobs.length > 0 && (
                         <section className="bg-white rounded-3xl border border-zinc-200 p-8">
                             <h2 className="text-xl font-black text-zinc-900 mb-2">Other {tradeName} Services in {suburbName}</h2>
-                            <p className="text-sm text-zinc-500 mb-6">Also looking for related {tradeName.toLowerCase()} work in {suburbName}?</p>
+                            <p className="text-base text-zinc-600 mb-6">Also looking for related {tradeName.toLowerCase()} work in {suburbName}?</p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 {relatedJobs.map((j) => (
                                     <Link
@@ -454,8 +467,8 @@ export default async function JobTypePage({ params }: PageProps) {
                             <div className="space-y-4">
                                 {faqEntries.map((faq, i) => (
                                     <div key={i} className="bg-white rounded-2xl border border-zinc-200 p-6">
-                                        <h3 className="font-bold text-zinc-900 mb-2">{faq.q}</h3>
-                                        <p className="text-sm text-zinc-500 leading-relaxed">{faq.a}</p>
+                                        <h3 className="font-bold text-zinc-900 mb-2 text-lg">{faq.q}</h3>
+                                        <p className="text-base text-zinc-600 leading-relaxed max-w-prose">{faq.a}</p>
                                     </div>
                                 ))}
                             </div>

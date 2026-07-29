@@ -121,7 +121,7 @@ export default async function LocationsPage() {
             {/* Hero */}
             <div className="bg-[#1A1A1A] pt-32 pb-16 text-white">
                 <div className="container mx-auto px-4">
-                    <nav className="flex items-center gap-2 font-bold text-zinc-400 uppercase tracking-widest mb-8" style={{ fontSize: '16px' }}>
+                    <nav className="flex items-center gap-2 font-bold text-zinc-500 uppercase tracking-widest mb-8" style={{ fontSize: '16px' }}>
                         <Link href="/" className="hover:text-white transition-colors">Home</Link>
                         <ChevronRight className="w-4 h-4" />
                         <span className="text-[#FF6600]">All Locations</span>
@@ -161,13 +161,13 @@ export default async function LocationsPage() {
                                                 <ArrowRight className="w-6 h-6 text-zinc-300 group-hover:text-[#FF6600] transition-colors" />
                                             </h2>
                                         </Link>
-                                        <p className="text-zinc-500 mt-1" style={{ fontSize: '16px' }}>
+                                        <p className="text-zinc-600 mt-1" style={{ fontSize: '16px' }}>
                                             {cities.length} {cities.length === 1 ? 'city' : 'cities'} · {stateSubs} suburbs · {stateBiz.toLocaleString()} businesses
                                         </p>
                                     </div>
                                     <Link
                                         href={`/local/${stateSlug}`}
-                                        className="hidden md:flex items-center gap-2 font-black text-zinc-500 hover:text-[#FF6600] uppercase tracking-widest transition-colors" style={{ fontSize: '16px' }}
+                                        className="hidden md:flex items-center gap-2 font-black text-zinc-600 hover:text-[#FF6600] uppercase tracking-widest transition-colors" style={{ fontSize: '16px' }}
                                     >
                                         View All in {state}
                                         <ChevronRight className="w-4 h-4" />
@@ -193,7 +193,7 @@ export default async function LocationsPage() {
                                                         <Users className="w-4 h-4 text-[#FF6600]" />
                                                         {count} businesses
                                                     </div>
-                                                    <div className="text-zinc-500 font-medium">{suburbs} suburbs</div>
+                                                    <div className="text-zinc-600 font-medium">{suburbs} suburbs</div>
                                                 </div>
                                             </Link>
                                         );

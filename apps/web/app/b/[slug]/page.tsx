@@ -444,7 +444,7 @@ function PublicGallery({ images = [], businessName }: { images?: string[]; busin
                 ))}
             </div>
             {validImages.length > visibleImages.length && (
-                <p className="text-sm font-semibold text-zinc-500">
+                <p className="text-sm font-semibold text-zinc-600">
                     Showing {visibleImages.length} of {validImages.length} project photos.
                 </p>
             )}
@@ -772,7 +772,7 @@ export default async function PublicProfilePage({
                 {/* ── BREADCRUMBS ── */}
                 <div className="bg-white border-b border-zinc-100 pt-20 md:pt-28 pb-3">
                     <div className="container mx-auto px-4">
-                        <nav className="flex items-center gap-1.5 text-sm text-zinc-500">
+                        <nav className="flex items-center gap-1.5 text-base text-zinc-600">
                             <Link href="/" prefetch={false} className="hover:text-zinc-800 transition-colors">Home</Link>
                             <ChevronRight className="w-3.5 h-3.5 text-zinc-300" />
                             {business.state && business.suburb && business.trade_category ? (
@@ -816,7 +816,7 @@ export default async function PublicProfilePage({
                                 </div>
                             )}
                             {business.suburb && (
-                                <span className="flex items-center gap-1 text-sm text-zinc-500 font-medium">
+                                <span className="flex items-center gap-1 text-base text-zinc-600 font-medium">
                                     <MapPin className="w-3.5 h-3.5 text-orange-500" /> {business.suburb}{business.state ? `, ${business.state}` : ''}
                                 </span>
                             )}
@@ -917,16 +917,16 @@ export default async function PublicProfilePage({
                                     </div>
 
                                     {memberSinceYear && (
-                                        <div className="flex items-center gap-2 font-medium text-zinc-500" style={{ fontSize: '16px' }}>
+                                        <div className="flex items-center gap-2 font-medium text-zinc-600" style={{ fontSize: '16px' }}>
                                             <Clock className="w-4 h-4 shrink-0" />
                                             Member since {memberSinceYear}
                                         </div>
                                     )}
 
                                     {hasYearsExperience && (
-                                        <div className="flex items-center gap-2 font-medium text-zinc-500" style={{ fontSize: '16px' }}>
+                                        <div className="flex items-center gap-2 font-medium text-zinc-600" style={{ fontSize: '16px' }}>
                                             <Award className="w-4 h-4 text-[#FF6600] shrink-0" />
-                                            <span className="font-medium text-zinc-500" style={{ fontSize: '16px' }}>{business.years_experience}</span>
+                                            <span className="font-medium text-zinc-600" style={{ fontSize: '16px' }}>{business.years_experience}</span>
                                             <span>experience</span>
                                         </div>
                                     )}
@@ -945,7 +945,7 @@ export default async function PublicProfilePage({
 
                             {/* Contact details */}
                             <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm space-y-4">
-                                <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest pb-2 mb-1 border-b border-zinc-100">Contact &amp; Location</h3>
+                                <h3 className="text-xs font-semibold text-zinc-600 uppercase tracking-widest pb-2 mb-1 border-b border-zinc-100">Contact &amp; Location</h3>
                                 <PublicContactField label="Phone" value={business.business_phone} href={business.business_phone ? `tel:${business.business_phone}` : null} icon={<Phone className="w-4 h-4" />} />
                                 {!!business.address && (
                                     <div className="flex items-start gap-3">
@@ -966,7 +966,7 @@ export default async function PublicProfilePage({
                             {/* Licence Number */}
                             {business.licence_number && (
                                 <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm space-y-3">
-                                    <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest pb-2 mb-1 border-b border-zinc-100 flex items-center gap-2">
+                                    <h3 className="text-xs font-semibold text-zinc-600 uppercase tracking-widest pb-2 mb-1 border-b border-zinc-100 flex items-center gap-2">
                                         <BadgeCheck className="w-4 h-4 text-orange-500" /> Licences
                                     </h3>
                                     <div className="flex items-start gap-3">
@@ -984,7 +984,7 @@ export default async function PublicProfilePage({
                             {/* Ways to Pay */}
                             {business.payment_methods?.length > 0 && (
                                 <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm space-y-3">
-                                    <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest pb-2 mb-1 border-b border-zinc-100 flex items-center gap-2">
+                                    <h3 className="text-xs font-semibold text-zinc-600 uppercase tracking-widest pb-2 mb-1 border-b border-zinc-100 flex items-center gap-2">
                                         <CreditCard className="w-4 h-4 text-orange-500" /> Ways to Pay
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
@@ -1000,20 +1000,20 @@ export default async function PublicProfilePage({
                             {/* Social Links */}
                             {(business.facebook_url || business.instagram_url || business.linkedin_url) && (
                                 <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm space-y-3">
-                                    <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest pb-2 mb-1 border-b border-zinc-100">Follow Us</h3>
+                                    <h3 className="text-xs font-semibold text-zinc-600 uppercase tracking-widest pb-2 mb-1 border-b border-zinc-100">Follow Us</h3>
                                     <div className="flex items-center gap-3">
                                         {business.facebook_url && (
-                                            <a href={business.facebook_url} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-center text-zinc-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all">
+                                            <a href={business.facebook_url} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-center text-zinc-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all">
                                                 <Facebook className="w-5 h-5" />
                                             </a>
                                         )}
                                         {business.instagram_url && (
-                                            <a href={business.instagram_url} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-center text-zinc-500 hover:text-pink-600 hover:border-pink-200 hover:bg-pink-50 transition-all">
+                                            <a href={business.instagram_url} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-center text-zinc-600 hover:text-pink-600 hover:border-pink-200 hover:bg-pink-50 transition-all">
                                                 <Instagram className="w-5 h-5" />
                                             </a>
                                         )}
                                         {business.linkedin_url && (
-                                            <a href={business.linkedin_url} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-center text-zinc-500 hover:text-blue-700 hover:border-blue-200 hover:bg-blue-50 transition-all">
+                                            <a href={business.linkedin_url} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-center text-zinc-600 hover:text-blue-700 hover:border-blue-200 hover:bg-blue-50 transition-all">
                                                 <Linkedin className="w-5 h-5" />
                                             </a>
                                         )}
@@ -1024,7 +1024,7 @@ export default async function PublicProfilePage({
                             {/* Location Map */}
                             {(business.address || business.suburb) && (
                                 <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm">
-                                    <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest pb-3">Location</h3>
+                                    <h3 className="text-xs font-semibold text-zinc-600 uppercase tracking-widest pb-3">Location</h3>
                                     <a
                                         href={mapHref}
                                         target="_blank"
@@ -1036,7 +1036,7 @@ export default async function PublicProfilePage({
                                         </span>
                                         <span className="min-w-0">
                                             <span className="block text-sm font-black text-zinc-900">Open location in Google Maps</span>
-                                            <span className="mt-1 block text-sm font-semibold leading-snug text-zinc-500">{mapQuery}</span>
+                                            <span className="mt-1 block text-sm font-semibold leading-snug text-zinc-600">{mapQuery}</span>
                                         </span>
                                     </a>
                                 </div>
@@ -1060,7 +1060,7 @@ export default async function PublicProfilePage({
                             {/* Active Deals */}
                             {deals.length > 0 && (
                                 <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm space-y-3">
-                                    <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest pb-2 mb-1 border-b border-zinc-100 flex items-center gap-2">
+                                    <h3 className="text-xs font-semibold text-zinc-600 uppercase tracking-widest pb-2 mb-1 border-b border-zinc-100 flex items-center gap-2">
                                         <Tag className="w-4 h-4 text-[#FF6600]" /> Special Offers
                                     </h3>
                                     {deals.map((deal: any) => (
@@ -1073,7 +1073,7 @@ export default async function PublicProfilePage({
                                                 <p className="text-zinc-600 font-medium" style={{ fontSize: '16px', lineHeight: 1.5 }}>{deal.description}</p>
                                             )}
                                             {deal.expires_at && (
-                                                <p className="text-zinc-500 font-bold" style={{ fontSize: '16px' }}>Expires {new Date(deal.expires_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                                                <p className="text-zinc-600 font-bold" style={{ fontSize: '16px' }}>Expires {new Date(deal.expires_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                                             )}
                                         </div>
                                     ))}
@@ -1171,7 +1171,7 @@ export default async function PublicProfilePage({
                                 <div className="grid grid-cols-3 gap-4">
                                     <div className="text-center p-5 bg-zinc-50 rounded-xl border border-zinc-100">
                                         <p className="text-3xl font-black text-zinc-900">{trustScore}</p>
-                                        <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide mt-1">TradeRefer Score</p>
+                                        <p className="text-xs font-semibold text-zinc-600 uppercase tracking-wide mt-1">TradeRefer Score</p>
                                     </div>
                                     <div className="text-center p-5 bg-zinc-50 rounded-xl border border-zinc-100 flex flex-col items-center justify-center">
                                         <div className="flex items-center text-orange-400 mb-1">
@@ -1179,12 +1179,12 @@ export default async function PublicProfilePage({
                                                 <Star key={i} className={`w-4 h-4 ${i < Math.floor(googleRating || 5) ? 'fill-current' : 'opacity-30'}`} />
                                             ))}
                                         </div>
-                                        <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide mt-1">Rating</p>
+                                        <p className="text-xs font-semibold text-zinc-600 uppercase tracking-wide mt-1">Rating</p>
                                         {reviewCount > 0 && <p className="text-zinc-400 mt-0.5 text-sm">{reviewCount} reviews</p>}
                                     </div>
                                     <div className="text-center p-5 bg-zinc-50 rounded-xl border border-zinc-100">
                                         <p className="text-3xl font-black text-zinc-900">{jobsCompleted}</p>
-                                        <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide mt-1">Connections</p>
+                                        <p className="text-xs font-semibold text-zinc-600 uppercase tracking-wide mt-1">Connections</p>
                                     </div>
                                 </div>
                             </section>
@@ -1206,7 +1206,7 @@ export default async function PublicProfilePage({
                                     <h2 className="text-sm font-bold text-zinc-700 uppercase tracking-wider mb-3 pl-3 border-l-2 border-orange-500">
                                         Frequently Asked Questions
                                     </h2>
-                                    <p className="text-xs text-zinc-400 mb-5">General {business.trade_category} questions for {business.suburb || 'your area'}</p>
+                                    <p className="text-sm text-zinc-600 mb-5">General {business.trade_category} questions for {business.suburb || 'your area'}</p>
                                     <div className="space-y-4">
                                         {TRADE_FAQ_BANK[business.trade_category].slice(0, 5).map((faq: { q: string; a: string }, i: number) => (
                                             <details key={i} className="group rounded-xl border border-zinc-100 bg-zinc-50 hover:bg-white hover:border-zinc-200 transition-all">
@@ -1227,7 +1227,7 @@ export default async function PublicProfilePage({
                             {/* Enquiry Form */}
                             <div id="enquiry-form" className="bg-white rounded-2xl border border-zinc-200 p-7 shadow-sm scroll-mt-24">
                                 <h3 className="font-black text-zinc-900 mb-1" style={{ fontSize: '24px' }}>Get a Free Quote</h3>
-                                <p className="text-zinc-500 mb-6 italic" style={{ fontSize: '16px' }}>Expect a response within 24 hours.</p>
+                                <p className="text-zinc-600 mb-6 italic" style={{ fontSize: '16px' }}>Expect a response within 24 hours.</p>
                                 <LeadForm businessName={business.business_name} businessId={business.id} referralCode={referralCode} />
                             </div>
 
@@ -1268,7 +1268,7 @@ export default async function PublicProfilePage({
                                 return (
                                     <nav className="bg-zinc-50 rounded-2xl border border-zinc-100 p-6 space-y-5">
                                         <div>
-                                            <h3 className="font-bold text-zinc-500 text-xs uppercase tracking-widest mb-3">Browse More</h3>
+                                            <h3 className="font-bold text-zinc-600 text-xs uppercase tracking-widest mb-3">Browse More</h3>
                                             <div className="flex flex-wrap gap-2">
                                                 <Link href={`/local/${stateSlug}/${citySlug}/${suburbWithPostcode}/${tradeSlug}`} prefetch={false} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-sm font-bold text-zinc-600 hover:border-orange-400 hover:text-orange-600 transition-colors">
                                                     <MapPin className="w-3 h-3" /> {business.trade_category} in {business.suburb}
@@ -1288,7 +1288,7 @@ export default async function PublicProfilePage({
                                         </div>
                                         {relatedBusinesses.length > 0 && (
                                             <div>
-                                                <h3 className="font-bold text-zinc-500 text-xs uppercase tracking-widest mb-3">Other {business.trade_category} in {business.suburb}</h3>
+                                                <h3 className="font-bold text-zinc-600 text-xs uppercase tracking-widest mb-3">Other {business.trade_category} in {business.suburb}</h3>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                                     {relatedBusinesses.map((biz: any) => (
                                                         <Link
@@ -1299,7 +1299,7 @@ export default async function PublicProfilePage({
                                                         >
                                                             <span className="text-sm font-bold text-zinc-700 group-hover:text-orange-600 truncate">{biz.business_name}</span>
                                                             {biz.avg_rating && parseFloat(biz.avg_rating) > 0 && (
-                                                                <span className="flex items-center gap-1 text-xs font-bold text-zinc-500 shrink-0 ml-2">
+                                                                <span className="flex items-center gap-1 text-xs font-bold text-zinc-600 shrink-0 ml-2">
                                                                     <Star className="w-3 h-3 fill-orange-400 text-orange-400" />
                                                                     {parseFloat(biz.avg_rating).toFixed(1)}
                                                                 </span>

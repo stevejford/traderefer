@@ -104,7 +104,7 @@ export default async function CategoriesPage() {
                     <h1 className="font-black mb-6 leading-[1.1] font-display text-white" style={{ fontSize: 'clamp(48px, 8vw, 80px)' }}>
                         All Trade <span className="text-[#FF6600]">Categories</span>
                     </h1>
-                    <p className="text-zinc-400 max-w-2xl mb-8" style={{ fontSize: '20px', lineHeight: 1.7 }}>
+                    <p className="text-zinc-300 max-w-2xl mb-8" style={{ fontSize: '20px', lineHeight: 1.7 }}>
                         Browse {totalTrades} trade categories across Australia. Find local trade profiles with ABN and public review signals where available.
                     </p>
                     <div className="flex flex-wrap gap-4 mb-8">
@@ -132,7 +132,7 @@ export default async function CategoriesPage() {
                     {tradeStats.length > 0 && (
                         <section className="mb-16">
                             <h2 className="font-black text-[#1A1A1A] mb-2 font-display" style={{ fontSize: '40px' }}>Browse by Trade</h2>
-                            <p className="text-zinc-500 mb-8" style={{ fontSize: '20px', lineHeight: 1.7 }}>Click any trade to find local specialists in your area.</p>
+                            <p className="text-zinc-600 mb-8" style={{ fontSize: '20px', lineHeight: 1.7 }}>Click any trade to find local specialists in your area.</p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                 {tradeStats.map(({ trade, count, suburbs }) => {
                                     const slug = tradeToSlug(trade);
@@ -155,7 +155,7 @@ export default async function CategoriesPage() {
                                                     </h3>
                                                     <ArrowRight className="w-5 h-5 text-zinc-300 group-hover:text-[#FF6600] shrink-0 mt-0.5 transition-colors" />
                                                 </div>
-                                                <div className="flex items-center gap-3 text-zinc-500 font-bold" style={{ fontSize: '16px' }}>
+                                                <div className="flex items-center gap-3 text-zinc-600 font-bold" style={{ fontSize: '16px' }}>
                                                     <span className="flex items-center gap-1.5">
                                                         <Users className="w-4 h-4 text-[#FF6600]" />
                                                         {count} businesses
@@ -166,7 +166,7 @@ export default async function CategoriesPage() {
                                             </Link>
                                             {jobs.length > 0 && (
                                                 <div className="border-t border-zinc-100 px-6 py-4">
-                                                    <p className="font-black text-zinc-400 uppercase tracking-wider mb-3" style={{ fontSize: '16px' }}>Common Services</p>
+                                                    <p className="font-black text-zinc-500 uppercase tracking-wider mb-3" style={{ fontSize: '16px' }}>Common Services</p>
                                                     <div className="flex flex-wrap gap-2">
                                                         {jobs.slice(0, 3).map(job => (
                                                             <Link
@@ -190,7 +190,7 @@ export default async function CategoriesPage() {
                     {/* Quick Links to Top 10 pages */}
                     <section className="bg-white rounded-3xl border border-zinc-200 p-8 md:p-10 mb-16">
                         <h2 className="font-black text-[#1A1A1A] mb-2 font-display" style={{ fontSize: '32px' }}>Top Rated Tradies by City</h2>
-                        <p className="text-zinc-500 mb-6" style={{ fontSize: '20px', lineHeight: 1.7 }}>Find the highest-rated tradies in Australia&apos;s major cities, ranked by public customer reviews.</p>
+                        <p className="text-zinc-600 mb-6" style={{ fontSize: '20px', lineHeight: 1.7 }}>Find the highest-rated tradies in Australia&apos;s major cities, ranked by public customer reviews.</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                             {[
                                 { label: "Top Electricians Melbourne", href: "/top/electrical/vic/melbourne" },
@@ -217,7 +217,7 @@ export default async function CategoriesPage() {
                     <section className="bg-white rounded-3xl border border-zinc-200 p-8 md:p-10 mb-16">
                         <div className="max-w-3xl mb-8">
                             <h2 className="font-black text-[#1A1A1A] mb-3 font-display" style={{ fontSize: '32px' }}>Get 3 Free Quotes</h2>
-                            <p className="text-zinc-500" style={{ fontSize: '20px', lineHeight: 1.7 }}>
+                            <p className="text-zinc-600" style={{ fontSize: '20px', lineHeight: 1.7 }}>
                                 Tell us what trade you need and where the job is located. We&apos;ll match your request with up to 3 local trade profiles.
                             </p>
                         </div>

@@ -233,7 +233,7 @@ export default async function Top10CityPage({ params }: PageProps) {
             {/* Breadcrumbs */}
             <div className="bg-[#1A1A1A] pt-32 pb-4">
                 <div className="container mx-auto px-4">
-                    <nav className="flex items-center gap-2 font-bold text-zinc-400 uppercase tracking-widest" style={{ fontSize: '16px' }}>
+                    <nav className="flex items-center gap-2 font-bold text-zinc-500 uppercase tracking-widest" style={{ fontSize: '16px' }}>
                         <Link prefetch={false} href="/" className="hover:text-white transition-colors">Home</Link>
                         <ChevronRight className="w-4 h-4" />
                         <Link prefetch={false} href="/categories" className="hover:text-white transition-colors">Categories</Link>
@@ -283,19 +283,19 @@ export default async function Top10CityPage({ params }: PageProps) {
                     <div className="flex flex-wrap gap-8 items-center">
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600"><Trophy className="w-6 h-6" /></div>
-                            <div><p className="font-black text-zinc-900" style={{ fontSize: '16px' }}>Ranked #{year}</p><p className="text-zinc-500" style={{ fontSize: '16px' }}>By Google Rating</p></div>
+                            <div><p className="font-black text-zinc-900" style={{ fontSize: '16px' }}>Ranked #{year}</p><p className="text-zinc-600" style={{ fontSize: '16px' }}>By Google Rating</p></div>
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center text-yellow-600"><Star className="w-6 h-6 fill-yellow-400" /></div>
-                            <div><p className="font-black text-zinc-900" style={{ fontSize: '16px' }}>{avgRating}★ Avg Rating</p><p className="text-zinc-500" style={{ fontSize: '16px' }}>{totalReviews.toLocaleString()} Google reviews</p></div>
+                            <div><p className="font-black text-zinc-900" style={{ fontSize: '16px' }}>{avgRating}★ Avg Rating</p><p className="text-zinc-600" style={{ fontSize: '16px' }}>{totalReviews.toLocaleString()} Google reviews</p></div>
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-green-600"><ShieldCheck className="w-6 h-6" /></div>
-                            <div><p className="font-black text-zinc-900" style={{ fontSize: '16px' }}>ABN Checked</p><p className="text-zinc-500" style={{ fontSize: '16px' }}>ABN &amp; Licence Checked</p></div>
+                            <div><p className="font-black text-zinc-900" style={{ fontSize: '16px' }}>ABN Checked</p><p className="text-zinc-600" style={{ fontSize: '16px' }}>ABN &amp; Licence Checked</p></div>
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600"><Users className="w-6 h-6" /></div>
-                            <div><p className="font-black text-zinc-900" style={{ fontSize: '16px' }}>{businesses.length} Businesses</p><p className="text-zinc-500" style={{ fontSize: '16px' }}>In {cityName}</p></div>
+                            <div><p className="font-black text-zinc-900" style={{ fontSize: '16px' }}>{businesses.length} Businesses</p><p className="text-zinc-600" style={{ fontSize: '16px' }}>In {cityName}</p></div>
                         </div>
                     </div>
                 </div>
@@ -311,7 +311,7 @@ export default async function Top10CityPage({ params }: PageProps) {
                             <h2 className="font-black text-[#1A1A1A] mb-2 font-display" style={{ fontSize: '40px' }}>
                                 Top {businesses.length} {tradeName} in {cityName} — Ranked by Customer Rating
                             </h2>
-                            <p className="text-zinc-500 mb-8" style={{ fontSize: '20px', lineHeight: 1.7 }}>
+                            <p className="text-zinc-600 mb-8" style={{ fontSize: '20px', lineHeight: 1.7 }}>
                                 Compare {tradeName.toLowerCase()} in {cityName}, {stateName} using ABN, profile, public review, and referral signals where available.
                             </p>
                             <div className="space-y-5">
@@ -341,7 +341,7 @@ export default async function Top10CityPage({ params }: PageProps) {
                                                 <h3 className="text-xl md:text-2xl font-black text-zinc-900 mb-1 group-hover:text-[#FF6600] transition-colors">
                                                     {biz.business_name}
                                                 </h3>
-                                                <p className="text-zinc-500 mb-4 line-clamp-2" style={{ fontSize: '16px', lineHeight: 1.6 }}>
+                                                <p className="text-zinc-600 mb-4 line-clamp-2" style={{ fontSize: '16px', lineHeight: 1.6 }}>
                                                     {biz.description || `${biz.trade_category} specialist based in ${biz.suburb}, ${cityName}. Serving the local community with expert, ABN-checked trade services.`}
                                                 </p>
                                                 <div className="flex flex-wrap items-center gap-5 font-bold mb-4" style={{ fontSize: '16px' }}>
@@ -350,12 +350,12 @@ export default async function Top10CityPage({ params }: PageProps) {
                                                         <span className="text-zinc-900">{parseFloat(biz.avg_rating).toFixed(1)}</span>
                                                         {biz.total_reviews > 0 && <span className="text-zinc-400 font-normal">({biz.total_reviews} reviews)</span>}
                                                     </div>
-                                                    <div className="flex items-center gap-1.5 text-zinc-500">
+                                                    <div className="flex items-center gap-1.5 text-zinc-600">
                                                         <MapPin className="w-4 h-4 text-zinc-400" />
                                                         {biz.suburb}
                                                     </div>
                                                     {biz.trusted_count > 0 && (
-                                                        <div className="flex items-center gap-1.5 text-zinc-500">
+                                                        <div className="flex items-center gap-1.5 text-zinc-600">
                                                             <Users className="w-4 h-4 text-zinc-400" />
                                                             {biz.trusted_count} trusted referrals
                                                         </div>
@@ -380,22 +380,22 @@ export default async function Top10CityPage({ params }: PageProps) {
                                     <DollarSign className="w-6 h-6 text-[#FF6600]" />
                                     How Much Do {tradeName} Cost in {cityName}?
                                 </h2>
-                                <p className="text-zinc-500 mb-6" style={{ fontSize: '16px' }}>Pricing data based on Australian industry averages for {stateName}. Always get 2–3 written quotes.</p>
+                                <p className="text-zinc-600 mb-6" style={{ fontSize: '16px' }}>Pricing data based on Australian industry averages for {stateName}. Always get 2–3 written quotes.</p>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                     <div className="bg-zinc-50 rounded-2xl p-5 border border-zinc-100">
-                                        <p className="font-black text-zinc-400 uppercase tracking-wider mb-1" style={{ fontSize: '16px' }}>Typical Range</p>
+                                        <p className="font-black text-zinc-500 uppercase tracking-wider mb-1" style={{ fontSize: '16px' }}>Typical Range</p>
                                         <p className="text-2xl font-black text-zinc-900">${cost.low}–${cost.high}</p>
-                                        <p className="text-zinc-500" style={{ fontSize: '16px' }}>{cost.unit}</p>
+                                        <p className="text-zinc-600" style={{ fontSize: '16px' }}>{cost.unit}</p>
                                     </div>
                                     <div className="bg-zinc-50 rounded-2xl p-5 border border-zinc-100">
-                                        <p className="font-black text-zinc-400 uppercase tracking-wider mb-1" style={{ fontSize: '16px' }}>After-Hours Rate</p>
+                                        <p className="font-black text-zinc-500 uppercase tracking-wider mb-1" style={{ fontSize: '16px' }}>After-Hours Rate</p>
                                         <p className="text-2xl font-black text-zinc-900">${Math.round(cost.high * 1.5)}</p>
-                                        <p className="text-zinc-500" style={{ fontSize: '16px' }}>Emergency callout</p>
+                                        <p className="text-zinc-600" style={{ fontSize: '16px' }}>Emergency callout</p>
                                     </div>
                                     <div className="bg-zinc-50 rounded-2xl p-5 border border-zinc-100">
-                                        <p className="font-black text-zinc-400 uppercase tracking-wider mb-1" style={{ fontSize: '16px' }}>Avg Hourly Rate</p>
+                                        <p className="font-black text-zinc-500 uppercase tracking-wider mb-1" style={{ fontSize: '16px' }}>Avg Hourly Rate</p>
                                         <p className="text-2xl font-black text-zinc-900">${Math.round((cost.low + cost.high) / 2)}</p>
-                                        <p className="text-zinc-500" style={{ fontSize: '16px' }}>{cityName} market average</p>
+                                        <p className="text-zinc-600" style={{ fontSize: '16px' }}>{cityName} market average</p>
                                     </div>
                                 </div>
                                 <p className="text-zinc-400" style={{ fontSize: '16px' }}>Prices are estimates only. Always request a written quote before authorising any work.</p>
@@ -417,7 +417,7 @@ export default async function Top10CityPage({ params }: PageProps) {
                         {howToChoose && (
                             <section className="bg-white rounded-3xl border border-zinc-200 p-8 md:p-10">
                                 <h2 className="font-black text-[#1A1A1A] mb-2 font-display" style={{ fontSize: '32px' }}>How to Choose the Best {tradeName} in {cityName}</h2>
-                                <p className="text-zinc-500 mb-6" style={{ fontSize: '16px' }}>Use this checklist before hiring any {tradeName.toLowerCase()} in {cityName}, {stateName}.</p>
+                                <p className="text-zinc-600 mb-6" style={{ fontSize: '16px' }}>Use this checklist before hiring any {tradeName.toLowerCase()} in {cityName}, {stateName}.</p>
                                 <ol className="space-y-4">
                                     {howToChoose.map((tip, i) => (
                                         <li key={i} className="flex gap-4 items-start">
@@ -455,7 +455,7 @@ export default async function Top10CityPage({ params }: PageProps) {
                                     <MapPin className="w-5 h-5 text-[#FF6600]" />
                                     Top {tradeName} in Nearby Cities
                                 </h2>
-                                <p className="text-zinc-500 mb-6" style={{ fontSize: '16px' }}>Find the highest-rated {tradeName.toLowerCase()} in other cities across {stateName}.</p>
+                                <p className="text-zinc-600 mb-6" style={{ fontSize: '16px' }}>Find the highest-rated {tradeName.toLowerCase()} in other cities across {stateName}.</p>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     {nearbyCities.map(({ city: nearCity, state: nearState }) => {
                                         const nearCitySlug = nearCity.toLowerCase().replace(/\s+/g, '-');

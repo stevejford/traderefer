@@ -254,7 +254,7 @@ export default async function Top10SuburbPage({ params }: PageProps) {
             {/* Breadcrumbs */}
             <div className="bg-zinc-900 pt-32 pb-4">
                 <div className="container mx-auto px-4">
-                    <nav className="flex items-center gap-2 text-xs font-bold text-zinc-500 uppercase tracking-widest flex-wrap">
+                    <nav className="flex items-center gap-2 text-xs font-bold text-zinc-600 uppercase tracking-widest flex-wrap">
                         <Link prefetch={false} href="/" className="hover:text-white transition-colors">Home</Link>
                         <ChevronRight className="w-3 h-3" />
                         <Link prefetch={false} href={`/local/${state}/${citySlug}/${canonicalSuburb}`} className="hover:text-white transition-colors">{suburbName}</Link>
@@ -307,15 +307,15 @@ export default async function Top10SuburbPage({ params }: PageProps) {
                     <div className="flex flex-wrap gap-8 items-center">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600"><Trophy className="w-5 h-5" /></div>
-                            <div><p className="text-sm font-black text-zinc-900">Ranked #{year}</p><p className="text-xs text-zinc-500">By Google Rating</p></div>
+                            <div><p className="text-sm font-black text-zinc-900">Ranked #{year}</p><p className="text-xs text-zinc-600">By Google Rating</p></div>
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center text-yellow-600"><Star className="w-5 h-5 fill-yellow-400" /></div>
-                            <div><p className="text-sm font-black text-zinc-900">{avgRating}★ Avg Rating</p><p className="text-xs text-zinc-500">{totalReviews.toLocaleString()} reviews</p></div>
+                            <div><p className="text-sm font-black text-zinc-900">{avgRating}★ Avg Rating</p><p className="text-xs text-zinc-600">{totalReviews.toLocaleString()} reviews</p></div>
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-green-600"><ShieldCheck className="w-5 h-5" /></div>
-                            <div><p className="text-sm font-black text-zinc-900">ABN Checked</p><p className="text-xs text-zinc-500">ABN-checked</p></div>
+                            <div><p className="text-sm font-black text-zinc-900">ABN Checked</p><p className="text-xs text-zinc-600">ABN-checked</p></div>
                         </div>
                     </div>
                 </div>
@@ -331,7 +331,7 @@ export default async function Top10SuburbPage({ params }: PageProps) {
                             <h2 className="text-2xl font-black text-zinc-900 mb-2">
                                 Top {businesses.length} {tradeName} in {suburbName} — Ranked by Rating
                             </h2>
-                            <p className="text-zinc-500 text-sm mb-8">
+                            <p className="text-zinc-600 text-sm mb-8">
                                 Sorted by public Google rating, highest first. All ABN-checked.
                             </p>
                             <div className="space-y-5">
@@ -360,7 +360,7 @@ export default async function Top10SuburbPage({ params }: PageProps) {
                                                 <h3 className="text-xl md:text-2xl font-black text-zinc-900 mb-1 group-hover:text-orange-600 transition-colors">
                                                     {biz.business_name}
                                                 </h3>
-                                                <p className="text-zinc-500 text-sm mb-4 line-clamp-2 leading-relaxed">
+                                                <p className="text-zinc-600 text-sm mb-4 line-clamp-2 leading-relaxed">
                                                     {biz.description || `${biz.trade_category} specialist based in ${biz.suburb}, serving ${suburbName} and surrounding ${cityName} suburbs.`}
                                                 </p>
                                                 <div className="flex flex-wrap items-center gap-5 text-sm font-bold mb-4">
@@ -369,12 +369,12 @@ export default async function Top10SuburbPage({ params }: PageProps) {
                                                         <span className="text-zinc-900">{parseFloat(biz.avg_rating).toFixed(1)}</span>
                                                         {biz.total_reviews > 0 && <span className="text-zinc-400 font-normal text-xs">({biz.total_reviews} reviews)</span>}
                                                     </div>
-                                                    <div className="flex items-center gap-1.5 text-zinc-500">
+                                                    <div className="flex items-center gap-1.5 text-zinc-600">
                                                         <MapPin className="w-4 h-4 text-zinc-400" />
                                                         {biz.suburb}
                                                     </div>
                                                     {biz.trusted_count > 0 && (
-                                                        <div className="flex items-center gap-1.5 text-zinc-500">
+                                                        <div className="flex items-center gap-1.5 text-zinc-600">
                                                             <Users className="w-4 h-4 text-zinc-400" />
                                                             {biz.trusted_count} referrals
                                                         </div>
@@ -402,22 +402,22 @@ export default async function Top10SuburbPage({ params }: PageProps) {
                                     <DollarSign className="w-6 h-6 text-orange-500" />
                                     How Much Do {tradeName} Cost in {suburbName}?
                                 </h2>
-                                <p className="text-zinc-500 text-sm mb-6">Based on {stateName} industry rates. Always get 2–3 written quotes.</p>
+                                <p className="text-zinc-600 text-sm mb-6">Based on {stateName} industry rates. Always get 2–3 written quotes.</p>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                     <div className="bg-zinc-50 rounded-2xl p-5 border border-zinc-100">
-                                        <p className="text-xs font-black text-zinc-400 uppercase tracking-wider mb-1">Typical Range</p>
+                                        <p className="text-xs font-black text-zinc-500 uppercase tracking-wider mb-1">Typical Range</p>
                                         <p className="text-2xl font-black text-zinc-900">${cost.low}–${cost.high}</p>
-                                        <p className="text-sm text-zinc-500">{cost.unit}</p>
+                                        <p className="text-sm text-zinc-600">{cost.unit}</p>
                                     </div>
                                     <div className="bg-zinc-50 rounded-2xl p-5 border border-zinc-100">
-                                        <p className="text-xs font-black text-zinc-400 uppercase tracking-wider mb-1">After-Hours</p>
+                                        <p className="text-xs font-black text-zinc-500 uppercase tracking-wider mb-1">After-Hours</p>
                                         <p className="text-2xl font-black text-zinc-900">${Math.round(cost.high * 1.5)}</p>
-                                        <p className="text-sm text-zinc-500">Emergency callout</p>
+                                        <p className="text-sm text-zinc-600">Emergency callout</p>
                                     </div>
                                     <div className="bg-zinc-50 rounded-2xl p-5 border border-zinc-100">
-                                        <p className="text-xs font-black text-zinc-400 uppercase tracking-wider mb-1">Avg Hourly</p>
+                                        <p className="text-xs font-black text-zinc-500 uppercase tracking-wider mb-1">Avg Hourly</p>
                                         <p className="text-2xl font-black text-zinc-900">${Math.round((cost.low + cost.high) / 2)}</p>
-                                        <p className="text-sm text-zinc-500">{suburbName} market</p>
+                                        <p className="text-sm text-zinc-600">{suburbName} market</p>
                                     </div>
                                 </div>
                                 <p className="text-xs text-zinc-400">Estimates only. Always request a written quote before authorising work.</p>
@@ -439,7 +439,7 @@ export default async function Top10SuburbPage({ params }: PageProps) {
                         {howToChoose && (
                             <section className="bg-white rounded-3xl border border-zinc-200 p-8 md:p-10">
                                 <h2 className="text-2xl font-black text-zinc-900 mb-2">How to Choose the Best {tradeName} in {suburbName}</h2>
-                                <p className="text-zinc-500 text-sm mb-6">A checklist before hiring any {tradeName.toLowerCase()} in {suburbName}, {cityName}.</p>
+                                <p className="text-zinc-600 text-sm mb-6">A checklist before hiring any {tradeName.toLowerCase()} in {suburbName}, {cityName}.</p>
                                 <ol className="space-y-4">
                                     {howToChoose.map((tip, i) => (
                                         <li key={i} className="flex gap-4 items-start">
@@ -463,7 +463,7 @@ export default async function Top10SuburbPage({ params }: PageProps) {
                                     {faqEntries.map((faq, i) => (
                                         <div key={i} className="bg-white rounded-2xl border border-zinc-200 p-6">
                                             <h3 className="font-bold text-zinc-900 mb-2">{faq.q}</h3>
-                                            <p className="text-sm text-zinc-500 leading-relaxed">{faq.a}</p>
+                                            <p className="text-sm text-zinc-600 leading-relaxed">{faq.a}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -477,7 +477,7 @@ export default async function Top10SuburbPage({ params }: PageProps) {
                                     <MapPin className="w-5 h-5 text-orange-500" />
                                     Top {tradeName} in Nearby Suburbs
                                 </h2>
-                                <p className="text-zinc-500 text-sm mb-6">Find ranked {tradeName.toLowerCase()} in suburbs close to {suburbName}.</p>
+                                <p className="text-zinc-600 text-sm mb-6">Find ranked {tradeName.toLowerCase()} in suburbs close to {suburbName}.</p>
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                     {nearbySuburbs.map(({ suburb: nearSub, city: nearCity, state: nearState }) => {
                                         const nearSubSlug = getCanonicalSuburbSlug(nearSub.toLowerCase().replace(/\s+/g, '-'), nearState);
