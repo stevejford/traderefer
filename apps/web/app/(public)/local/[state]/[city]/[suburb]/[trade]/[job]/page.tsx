@@ -217,9 +217,18 @@ export default async function JobTypePage({ params }: PageProps) {
 
     // Job-specific Q&As (real Google PAA questions, in-house answers) lead;
     // generic trade FAQs fill the remainder.
+    const normQ = (t: string) => t.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+    const authoredFaqs = jobQuestions.map((q) => ({ q: q.question, a: q.answer }));
+    const authoredNorms = authoredFaqs.map((f) => normQ(f.q));
+    const overlaps = (a: string, b: string) => {
+        if (a.includes(b) || b.includes(a)) return true;
+        const wa = new Set(a.split(" ")), wb = new Set(b.split(" "));
+        const shared = [...wa].filter((w) => wb.has(w)).length;
+        return shared / Math.min(wa.size, wb.size) >= 0.7;
+    };
     const faqEntries = [
-        ...jobQuestions.map((q) => ({ q: q.question, a: q.answer })),
-        ...faqs,
+        ...authoredFaqs,
+        ...faqs.filter((f) => !authoredNorms.some((an) => overlaps(an, normQ(f.q)))),
     ].slice(0, 8);
     const faqJsonLd = faqEntries.length > 0 ? {
         "@context": "https://schema.org",
@@ -251,8 +260,10 @@ export default async function JobTypePage({ params }: PageProps) {
                         <ChevronRight className="w-3 h-3" />
                         <Link href={`/local/${state}`} className="hover:text-white transition-colors">{stateName}</Link>
                         <ChevronRight className="w-3 h-3" />
+                        {cityName.toLowerCase() !== suburbName.toLowerCase() && (<>
                         <Link href={`/local/${state}/${city}`} className="hover:text-white transition-colors">{cityName}</Link>
                         <ChevronRight className="w-3 h-3" />
+                        </>)}
                         <Link href={`/local/${state}/${city}/${canonicalSuburb}`} className="hover:text-white transition-colors">{suburbName}</Link>
                         <ChevronRight className="w-3 h-3" />
                         <Link href={`/local/${state}/${city}/${canonicalSuburb}/${trade}`} className="hover:text-white transition-colors">{tradeName}</Link>
@@ -275,12 +286,12 @@ export default async function JobTypePage({ params }: PageProps) {
                             </p>
                             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
                                 <Button asChild size="lg" className="bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold h-14 px-8 text-lg border-none w-full sm:w-auto">
-                                    <Link href="/register?type=homeowner">Request a Free {jobName} Quote</Link>
+                                    <Link href={`/register?type=homeowner&job=${job}&suburb=${canonicalSuburb}`}>Request a Free {jobName} Quote</Link>
                                 </Button>
                                 <Button asChild variant="outline" size="lg" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl font-bold h-14 px-8 text-lg w-full sm:w-auto">
                                     <Link href={businesses.length > 0 ? "#businesses" : broaderTradeHref}>See {businesses.length > 0 ? businesses.length : ''} Local Specialists</Link>
                                 </Button>
-                                <Link href="/register?type=business" className="inline-flex items-center justify-center text-base font-bold text-zinc-300 hover:text-white transition-colors px-1 py-1 sm:py-3">
+                                <Link href="/register?type=business" className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white/25 px-6 h-14 text-base font-bold text-white hover:bg-white/10 transition-colors w-full sm:w-auto">
                                     {tradeName} business? List it free →
                                 </Link>
                             </div>
@@ -299,7 +310,7 @@ export default async function JobTypePage({ params }: PageProps) {
                                 <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-orange-400 shrink-0" />Takes about a minute</li>
                             </ul>
                             <Button asChild size="lg" className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold h-14 text-lg border-none">
-                                <Link href="/register?type=homeowner">Start your quote request</Link>
+                                <Link href={`/register?type=homeowner&job=${job}&suburb=${canonicalSuburb}`}>Start your quote request</Link>
                             </Button>
                         </aside>
                     </div>
@@ -345,10 +356,10 @@ export default async function JobTypePage({ params }: PageProps) {
                                                             )}
                                                         </div>
                                                         <div className="flex flex-wrap items-center gap-4 mt-3 text-base text-zinc-600 font-medium">
-                                                            {parseFloat(rating) > 0 && (
+                                                            {parseInt(biz.total_reviews) > 0 && (
                                                                 <span className="flex items-center gap-1">
                                                                     <Star className="w-3 h-3 fill-orange-400 text-orange-400" />
-                                                                    {rating}
+                                                                    {parseFloat(biz.avg_rating).toFixed(1)} ({biz.total_reviews})
                                                                 </span>
                                                             )}
                                                             {biz.referral_count > 0 && (
@@ -357,13 +368,13 @@ export default async function JobTypePage({ params }: PageProps) {
                                                                     {biz.referral_count} referral{biz.referral_count !== 1 ? 's' : ''}
                                                                 </span>
                                                             )}
-                                                            <span className="flex items-center gap-1">
+                                                            <span className="flex items-center gap-1" title="Business number verified as active">
                                                                 <ShieldCheck className="w-3 h-3 text-green-400" />
                                                                 ABN checked
                                                             </span>
                                                         </div>
                                                     </div>
-                                                    <ArrowRight className="w-5 h-5 text-zinc-300 group-hover:text-orange-500 shrink-0 mt-1 transition-colors" />
+                                                    <span className="shrink-0 mt-1 inline-flex items-center gap-1 text-base font-bold text-orange-600">View profile<ArrowRight className="w-4 h-4" /></span>
                                                 </div>
                                             </div>
                                         </Link>
@@ -380,7 +391,7 @@ export default async function JobTypePage({ params }: PageProps) {
                                         <Link href={broaderTradeHref}>See {tradeName} Across {cityName}</Link>
                                     </Button>
                                     <Button asChild variant="outline" className="rounded-xl font-bold">
-                                        <Link href="/register?type=homeowner">Request a Free Quote</Link>
+                                        <Link href={`/register?type=homeowner&job=${job}&suburb=${canonicalSuburb}`}>Request a Free Quote</Link>
                                     </Button>
                                 </div>
                             </div>
@@ -417,6 +428,14 @@ export default async function JobTypePage({ params }: PageProps) {
                             <p className="text-sm text-zinc-500">Price estimates only. Confirm scope, timing, and final cost with your chosen tradie before work begins.</p>
                         </section>
                     )}
+
+                    {/* Inline quote CTA (post-cost readers are highest intent) */}
+                    <section className="rounded-3xl bg-zinc-900 p-8 flex flex-wrap items-center justify-between gap-4">
+                        <p className="text-xl font-black text-white m-0">Ready for exact prices? Get 2–3 free quotes for {jobName.toLowerCase()}.</p>
+                        <Button asChild size="lg" className="bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold h-12 px-6 text-base border-none">
+                            <Link href={`/register?type=homeowner&job=${job}&suburb=${canonicalSuburb}`}>Get Free Quotes</Link>
+                        </Button>
+                    </section>
 
                     {/* Materials */}
                     {jobMaterials.length > 0 && (
@@ -517,6 +536,11 @@ export default async function JobTypePage({ params }: PageProps) {
                 </div>
             </div>
 
+        <div className="fixed bottom-0 inset-x-0 z-40 p-3 bg-white/95 backdrop-blur border-t border-zinc-200 lg:hidden">
+            <Button asChild size="lg" className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold h-13 text-base border-none">
+                <Link href={`/register?type=homeowner&job=${job}&suburb=${canonicalSuburb}`}>Get Free {jobName} Quotes</Link>
+            </Button>
+        </div>
         </main>
         </>
     );

@@ -8,22 +8,44 @@ import { Suspense } from "react";
 import { Logo } from "@/components/Logo";
 
 type RegisterPageProps = {
-    searchParams?: Promise<{ type?: string }>;
+    searchParams?: Promise<{ type?: string; job?: string; suburb?: string }>;
 };
+
+function labelFromSlug(slug?: string) {
+    if (!slug) return "";
+    return slug.split("-").filter(w => !/^\d+$/.test(w)).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+}
 
 const registerOgImage = "https://traderefer.au/invite-preview/opengraph-image";
 
 function getRegisterCopy(type?: string) {
     const isBusiness = type === "business";
+    const isHomeowner = type === "homeowner";
+
+    if (isHomeowner) {
+        return {
+            isBusiness,
+            isHomeowner,
+            title: "Get free quotes from local tradies",
+            description: "Tell us about your job once and compare quotes from ABN-checked local businesses. Free, no obligation.",
+            eyebrow: "For homeowners",
+            redirectUrl: "/dashboard",
+            stepLabel: "Step 1 of 2 · Create your free account",
+            nextLabel: "Next: tell us about your job",
+        };
+    }
 
     return {
         isBusiness,
+        isHomeowner,
         title: isBusiness ? "Create your TradeRefer business account" : "Create your TradeRefer referrer account",
         description: isBusiness
             ? "Claim or create your trade profile, show the areas you service, and review referral lead terms before you unlock paid leads."
             : "Join TradeRefer to refer trusted trade businesses and receive rewards when eligible referrals are accepted.",
         eyebrow: isBusiness ? "For trade businesses" : "For referrers",
         redirectUrl: isBusiness ? "/onboarding/business" : "/onboarding/referrer",
+        stepLabel: isBusiness ? "Step 1 of 2 · Create your account" : "Create your account",
+        nextLabel: isBusiness ? "Next: your business details" : "Next: your referrer profile",
     };
 }
 
@@ -74,7 +96,9 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
 
                     <div className="space-y-8">
                         <div className="text-4xl md:text-5xl font-black text-white leading-tight font-display tracking-tight">
-                            {copy.isBusiness ? (
+                            {copy.isHomeowner ? (
+                                <>Get 2–3 quotes from <span className="text-orange-500">checked local tradies</span></>
+                            ) : copy.isBusiness ? (
                                 <>Create a clearer path for <span className="text-orange-500">local enquiries</span></>
                             ) : (
                                 <>Refer trusted tradies through a <span className="text-orange-500">clearer reward flow</span></>
@@ -84,7 +108,9 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                         <div className="relative p-8 bg-white/5 border border-white/10 rounded-[40px] backdrop-blur-sm">
                             <Quote className="absolute top-6 left-6 w-12 h-12 text-orange-500/20" aria-hidden="true" />
                             <p className="text-zinc-300 text-lg italic leading-relaxed mb-6 relative z-10">
-                                "Set up your profile once, keep your trade details tidy, and make referral terms clear before anyone commits."
+                                {copy.isHomeowner
+                                    ? "Tell us the job once. We match you with local businesses so the quotes come to you."
+                                    : "Set up your profile once, keep your trade details tidy, and make referral terms clear before anyone commits."}
                             </p>
                             <div className="flex items-center gap-4 relative z-10">
                                 <div className="w-12 h-12 bg-zinc-800 rounded-full border-2 border-orange-500/30 overflow-hidden">
@@ -126,8 +152,25 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                     <p className="text-sm font-bold text-zinc-500 max-w-[260px]">{copy.description}</p>
                 </header>
                 
+                <div className="w-full max-w-sm">
+                    <p className="text-sm font-black uppercase tracking-widest text-orange-600 mb-1">{copy.stepLabel}</p>
+                    <p className="text-base text-zinc-600 mb-4">{copy.nextLabel}</p>
+                    {(params?.job || params?.suburb) && (
+                        <div className="mb-4 rounded-2xl border border-orange-200 bg-orange-50 px-4 py-3 text-base font-bold text-zinc-800">
+                            Your request: {labelFromSlug(params?.job) || "Free quote"}{params?.suburb ? ` in ${labelFromSlug(params.suburb)}` : ""} · free, no obligation
+                        </div>
+                    )}
+                </div>
                 <div className="w-full max-w-sm shadow-2xl lg:shadow-none rounded-[28px] overflow-hidden">
-                    <Suspense fallback={<div className="p-12 text-center text-zinc-400 font-black animate-pulse">Initializing...</div>}>
+                    <Suspense fallback={
+                        <div className="p-8 space-y-4" aria-label="Loading sign-up form">
+                            <div className="h-7 w-2/3 rounded-lg bg-zinc-200 animate-pulse" />
+                            <div className="h-12 rounded-2xl bg-zinc-100 animate-pulse" />
+                            <div className="h-12 rounded-2xl bg-zinc-100 animate-pulse" />
+                            <div className="h-12 rounded-2xl bg-zinc-100 animate-pulse" />
+                            <div className="h-12 rounded-2xl bg-orange-100 animate-pulse" />
+                        </div>
+                    }>
                         <SignUp 
                             fallbackRedirectUrl={copy.redirectUrl}
                             signInUrl="/login" 
@@ -146,6 +189,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
                         />
                     </Suspense>
                 </div>
+                <p className="mt-4 max-w-sm text-center text-sm text-zinc-500">Your details are encrypted and never shared without your say-so.</p>
 
                 <footer className="mt-8 flex flex-wrap justify-center gap-4 text-sm font-bold text-zinc-500">
                     <Link href="/privacy" className="hover:text-zinc-900 transition-colors">Privacy</Link>
