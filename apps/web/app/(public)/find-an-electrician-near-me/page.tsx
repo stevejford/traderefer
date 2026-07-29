@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
         stat3: "Free quotes",
     });
     return {
-        title: `Find an Electrician Near Me | Licensed Electricians | TradeRefer`,
+        title: "Find an Electrician Near Me | TradeRefer",
         description:
             "Find a licensed electrician near you Australia-wide. Compare real reviews, get free quotes, and hire safely. Residential, commercial, and emergency electricians. Post your job free.",
         alternates: { canonical: `${BASE_URL}/find-an-electrician-near-me` },

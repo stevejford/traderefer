@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
         stat3: "Free quotes",
     });
     return {
-        title: `Find a Plumber Near Me | Compare Licensed Plumbers | TradeRefer`,
+        title: "Find a Plumber Near Me | TradeRefer",
         description:
             "Find a licensed plumber near you Australia-wide. Compare real reviews, get free quotes, and hire with confidence. Emergency plumbers available. Post your job free on TradeRefer.",
         alternates: { canonical: `${BASE_URL}/find-a-plumber-near-me` },

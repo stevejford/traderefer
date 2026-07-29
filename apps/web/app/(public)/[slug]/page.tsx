@@ -62,7 +62,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     });
 
     return {
-        title: `Best ${noun} Near Me | TradeRefer`,
+        title: `${noun} Near Me | TradeRefer`,
         description: `Find trusted ${noun.toLowerCase()} near you. Compare ${count > 0 ? count.toLocaleString() + "+" : ""} ${noun.toLowerCase()} across Australia.${cost ? ` Costs from $${cost.low}–$${cost.high}${cost.unit}.` : ""} Free quotes, real reviews.`,
         robots: { index: false, follow: true },
         alternates: { canonical: `https://traderefer.au/${slug}` },

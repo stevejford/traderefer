@@ -43,7 +43,7 @@ const defaultOgImage = buildOgImageUrl({
 });
 
 export const metadata: Metadata = {
-  title: "TradeRefer | Australia's Trade Referral Marketplace",
+  title: "TradeRefer | Trade Referrals Australia",
   description: "Find ABN-checked trade profiles near you, compare reviews, request free quotes, and receive rewards for eligible referrals.",
   openGraph: {
     title: "TradeRefer | Australia's Trade Referral Marketplace",

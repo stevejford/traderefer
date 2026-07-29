@@ -28,7 +28,7 @@ const homeOgImage = buildOgImageUrl({
 });
 
 export const metadata: Metadata = {
-  title: "TradeRefer | Find Trusted Local Tradies & Get Free Quotes",
+  title: "TradeRefer | Local Tradies & Free Quotes",
   description: "Find ABN-checked Australian tradies, request free quotes, or earn rewards by referring trade businesses you trust. Browse TradeRefer free.",
   openGraph: {
     title: "TradeRefer | Find Trusted Local Tradies & Get Free Quotes",
