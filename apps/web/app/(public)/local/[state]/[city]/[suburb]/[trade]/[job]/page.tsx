@@ -308,7 +308,7 @@ export default async function JobTypePage({ params }: PageProps) {
 
             {/* Main Content */}
             <div className="container mx-auto px-4 py-16">
-                <div className="max-w-6xl mx-auto space-y-16">
+                <div className="max-w-7xl mx-auto space-y-16">
 
                     {/* Business Listings */}
                     <section id="businesses">
@@ -326,11 +326,11 @@ export default async function JobTypePage({ params }: PageProps) {
                                         <Link key={biz.id} href={`/b/${biz.slug}`} className="group block">
                                             <div className="bg-white rounded-2xl border border-zinc-200 hover:border-orange-500 hover:shadow-lg transition-all duration-300 p-6">
                                                 <div className="flex items-start gap-4">
-                                                    <BusinessLogo logoUrl={biz.logo_url || null} name={biz.business_name || "?"} size="sm" photoUrls={biz.photo_urls} bgColor={biz.logo_bg_color} />
+                                                    <BusinessLogo logoUrl={biz.logo_url || null} name={biz.business_name || "?"} size="md" photoUrls={biz.photo_urls} bgColor={biz.logo_bg_color} />
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-start justify-between gap-2">
                                                             <div>
-                                                                <h3 className="font-black text-zinc-900 group-hover:text-orange-600 transition-colors text-lg leading-tight">
+                                                                <h3 className="font-black text-zinc-900 group-hover:text-orange-600 transition-colors text-xl leading-tight">
                                                                     {biz.business_name}
                                                                 </h3>
                                                                 <p className="text-base text-zinc-600 mt-0.5 flex items-center gap-1.5">
@@ -344,7 +344,7 @@ export default async function JobTypePage({ params }: PageProps) {
                                                                 </span>
                                                             )}
                                                         </div>
-                                                        <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-zinc-600 font-medium">
+                                                        <div className="flex flex-wrap items-center gap-4 mt-3 text-base text-zinc-600 font-medium">
                                                             {parseFloat(rating) > 0 && (
                                                                 <span className="flex items-center gap-1">
                                                                     <Star className="w-3 h-3 fill-orange-400 text-orange-400" />
