@@ -251,7 +251,7 @@ export default async function Top10CityPage({ params }: PageProps) {
                     <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
                 </div>
                 <div className="container mx-auto px-4 relative z-10 pt-8">
-                    <div className="max-w-3xl">
+                    <div className="max-w-5xl">
                         <div className="flex items-center gap-2 mb-4">
                             <Trophy className="w-6 h-6 text-[#FF6600]" />
                             <span className="text-[#FF6600] font-black uppercase tracking-widest" style={{ fontSize: '16px' }}>Ranked by Real Reviews</span>

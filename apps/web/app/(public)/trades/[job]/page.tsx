@@ -200,8 +200,8 @@ export default async function TradeHubPage({ params }: PageProps) {
                         <span className="text-[#FF6600]">{jobName} Cost Guide</span>
                     </nav>
 
-                    <div className="max-w-3xl">
-                        <div className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-500/30 rounded-full px-4 py-2 font-black text-orange-400 uppercase tracking-widest mb-6" style={{ fontSize: '16px' }}>
+                    <div className="max-w-5xl">
+                        <div className="inline-flex items-center gap-3 font-black text-orange-400 uppercase tracking-widest mb-6" style={{ fontSize: '16px' }}>
                             <Wrench className="w-4 h-4" />
                             Australia-Wide Cost Guide · {year}
                         </div>

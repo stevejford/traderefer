@@ -176,7 +176,7 @@ export default async function HomePage() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white/90 px-4 py-2 text-sm font-black uppercase tracking-widest text-[#FF6600] shadow-sm">
+            <div className="inline-flex items-center gap-3 text-sm font-black uppercase tracking-widest text-[#FF6600]">
               <ShieldCheck className="w-4 h-4" />
               ABN-checked Australian trade directory
             </div>

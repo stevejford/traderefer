@@ -199,7 +199,7 @@ export default async function FindAPlumberNearMePage() {
                             <br />Compare Quotes on TradeRefer
                         </h1>
                         <p className="text-xl text-gray-300 mb-8 max-w-2xl leading-relaxed">
-                            Australia&apos;s plumber directory. Compare real reviews, get free quotes from licensed plumbers in your area, and hire with confidence — leaky taps to full bathroom renovations.
+                            Australia&apos;s plumber directory. Compare real reviews, get free quotes from licensed plumbers in your area, and hire with confidence: leaky taps to full bathroom renovations.
                         </p>
 
                         <div className="flex flex-wrap gap-6 mb-10">

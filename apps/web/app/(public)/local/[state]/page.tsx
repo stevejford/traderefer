@@ -319,7 +319,7 @@ export default async function StateDirectoryPage({ params, searchParams }: PageP
 
                     </div>
 
-                    <div className="max-w-4xl">
+                    <div className="max-w-6xl">
 
                         <h1 className="text-[42px] md:text-7xl lg:text-[80px] font-black mb-6 leading-[1.1] text-[#1A1A1A] font-display">
 
