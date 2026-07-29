@@ -11,7 +11,7 @@ import { retiredTradeSlugTarget } from "@/lib/trade-redirects";
 import { getCanonicalCitySlug } from "@/lib/suburb-cities";
 import { buildOgImageUrl } from "@/lib/og-image";
 import { directoryRobots } from "@/lib/seo/index-policy";
-import { getJobMaterials } from "@/lib/materials";
+import { getJobMaterials, getJobQuestions } from "@/lib/materials";
 import { JobMaterialsCard } from "@/components/JobMaterialsCard";
 
 export const dynamic = "force-dynamic";
@@ -159,10 +159,11 @@ export default async function JobTypePage({ params }: PageProps) {
     const jobName = formatSlug(job);
     const stateName = state.toUpperCase();
 
-    const [businesses, nearbySuburbs, jobMaterials] = await Promise.all([
+    const [businesses, nearbySuburbs, jobMaterials, jobQuestions] = await Promise.all([
         getBusinesses(state, city, trade, canonicalSuburb),
         getNearbySuburbs(state, city, canonicalSuburb, trade),
         getJobMaterials(job),
+        getJobQuestions(job),
     ]);
 
     const avgRating = businesses.length > 0
@@ -213,7 +214,12 @@ export default async function JobTypePage({ params }: PageProps) {
         } : {})
     };
 
-    const faqEntries = faqs.slice(0, 5);
+    // Job-specific Q&As (real Google PAA questions, in-house answers) lead;
+    // generic trade FAQs fill the remainder.
+    const faqEntries = [
+        ...jobQuestions.map((q) => ({ q: q.question, a: q.answer })),
+        ...faqs,
+    ].slice(0, 8);
     const faqJsonLd = faqEntries.length > 0 ? {
         "@context": "https://schema.org",
         "@type": "FAQPage",

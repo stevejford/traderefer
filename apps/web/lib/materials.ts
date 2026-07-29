@@ -11,6 +11,29 @@ export type JobMaterial = {
     sampled_at: string | null;
 };
 
+export type JobQuestion = {
+    question: string;
+    answer: string;
+};
+
+/**
+ * Answered job-specific questions (sourced from real Google PAA/related
+ * searches, answers authored in-house). Unanswered rows never render.
+ */
+export async function getJobQuestions(jobSlug: string): Promise<JobQuestion[]> {
+    try {
+        return await sql<JobQuestion[]>`
+            SELECT question, answer
+            FROM job_questions
+            WHERE job_slug = ${jobSlug} AND answer IS NOT NULL AND answer != ''
+            ORDER BY sort ASC
+            LIMIT 8
+        `;
+    } catch {
+        return [];
+    }
+}
+
 /**
  * Materials mapped to a job slug, each with the latest sampled retail price
  * range (null until a sample lands — the card renders those rows without a
