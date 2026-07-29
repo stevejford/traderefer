@@ -11,6 +11,8 @@ import { retiredTradeSlugTarget } from "@/lib/trade-redirects";
 import { getCanonicalCitySlug } from "@/lib/suburb-cities";
 import { buildOgImageUrl } from "@/lib/og-image";
 import { directoryRobots } from "@/lib/seo/index-policy";
+import { getJobMaterials } from "@/lib/materials";
+import { JobMaterialsCard } from "@/components/JobMaterialsCard";
 
 export const dynamic = "force-dynamic";
 
@@ -157,9 +159,10 @@ export default async function JobTypePage({ params }: PageProps) {
     const jobName = formatSlug(job);
     const stateName = state.toUpperCase();
 
-    const [businesses, nearbySuburbs] = await Promise.all([
+    const [businesses, nearbySuburbs, jobMaterials] = await Promise.all([
         getBusinesses(state, city, trade, canonicalSuburb),
         getNearbySuburbs(state, city, canonicalSuburb, trade),
+        getJobMaterials(job),
     ]);
 
     const avgRating = businesses.length > 0
@@ -394,6 +397,15 @@ export default async function JobTypePage({ params }: PageProps) {
                             </div>
                             <p className="text-xs text-zinc-400">Price estimates only. Confirm scope, timing, and final cost with your chosen tradie before work begins.</p>
                         </section>
+                    )}
+
+                    {/* Materials */}
+                    {jobMaterials.length > 0 && (
+                        <JobMaterialsCard
+                            jobName={jobName}
+                            tradeNoun={TRADE_NOUNS[normalizeTradeName(tradeName)] || TRADE_NOUNS[tradeName] || `${tradeName}s`}
+                            materials={jobMaterials}
+                        />
                     )}
 
                     {/* Licensing */}

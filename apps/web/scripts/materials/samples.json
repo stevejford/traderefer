@@ -1,0 +1,132 @@
+[
+ {
+  "slug": "led-downlight",
+  "retailer": "bunnings",
+  "low": 6.5,
+  "typical": 10.25,
+  "high": 13.45,
+  "sample_size": 8,
+  "examples": [
+   "Arlec 9W Tri-Colour Dimmable LED Downlight",
+   "Click 8W 90mm CCT LED Downlight",
+   "Arlec 6W Tri-Colour Dimmable LED Downlight"
+  ]
+ },
+ {
+  "slug": "interior-low-sheen-paint-10l",
+  "retailer": "bunnings",
+  "low": 75.5,
+  "typical": 158.4,
+  "high": 196.5,
+  "sample_size": 8,
+  "examples": [
+   "Dulux 10L Deep Low Sheen Wash&Wear Interior Paint",
+   "Spring 10L Low Sheen White Interior Paint",
+   "Dulux 10L Natural White Low Sheen Wash&Wear Interior Paint"
+  ]
+ },
+ {
+  "slug": "plasterboard-sheet-10mm",
+  "retailer": "bunnings",
+  "low": 10.76,
+  "typical": 27.83,
+  "high": 41.1,
+  "sample_size": 8,
+  "examples": [
+   "Gyprock CSR 2700 x 1200 x 10mm 3.24sqm Plasterboard RE",
+   "Gyprock CSR 3600 x 1200mm 10mm 4.32sqm Plasterboard RE",
+   "Gyprock CSR 3000 x 1200 x 10mm 3.60sqm Plasterboard RE"
+  ]
+ },
+ {
+  "slug": "tile-adhesive-20kg",
+  "retailer": "bunnings",
+  "low": 22.9,
+  "typical": 31.09,
+  "high": 42.75,
+  "sample_size": 8,
+  "examples": [
+   "Bastion 20kg Mastic Powder Adhesive Tile",
+   "Dunlop 20kg Universal Tile Adhesive",
+   "Dunlop 20kg Mastic Tile Adhesive"
+  ]
+ },
+ {
+  "slug": "waterproofing-membrane-15l",
+  "retailer": "bunnings",
+  "low": 29.28,
+  "typical": 93.43,
+  "high": 251.16,
+  "sample_size": 8,
+  "examples": [
+   "Crommelin 15L Shower Waterproofing Membrane",
+   "Bastion 15kg Under Tile Waterproofing Membrane",
+   "Crommelin 4L Shower Waterproofing Membrane"
+  ]
+ },
+ {
+  "slug": "quad-gutter",
+  "retailer": "bunnings",
+  "low": 3.86,
+  "typical": 17.83,
+  "high": 26.8,
+  "sample_size": 8,
+  "examples": [
+   "COLORBOND\u00ae Steel 0.42 x 115mm Quad Gutter - Basalt",
+   "COLORBOND 115mm RH Quad Gutter Stop End - Woodland Grey",
+   "COLORBOND Steel 0.42 x 115mm x 3.0m Quad Gutter - Woodland Grey"
+  ]
+ },
+ {
+  "slug": "treated-pine-sleeper-200x75",
+  "retailer": "bunnings",
+  "low": 24.4,
+  "typical": 30.73,
+  "high": 55.76,
+  "sample_size": 6,
+  "examples": [
+   "200 x 75mm 2.4m Treated Pine Sleeper",
+   "200 x 75mm 1.8m Sleeper H4 Treated Pine Sienna MicroPro",
+   "200 x 50mm 3.0m Treated Pine Sleeper"
+  ]
+ },
+ {
+  "slug": "merbau-decking-90x19",
+  "retailer": "bunnings",
+  "low": 5.72,
+  "typical": 47.21,
+  "high": 85.0,
+  "sample_size": 4,
+  "examples": [
+   "90 x 19mm Merbau SpecRite Pre-Oiled Decking - Random Lengths",
+   "90 x 19mm 5.7m Merbau Joined Set Length Pre-Oiled Decking",
+   "90 x 19mm 2.25m Merbau Finger Joined Pre-Oiled Decking - 5 Pack"
+  ]
+ },
+ {
+  "slug": "concrete-mix-20kg",
+  "retailer": "bunnings",
+  "low": 8.69,
+  "typical": 10.44,
+  "high": 14.44,
+  "sample_size": 8,
+  "examples": [
+   "Australian Builders 20kg High Strength Concrete Mix",
+   "Australian Builders 20kg Sand And Cement Mix Bag",
+   "Bastion 20kg Concrete Mix"
+  ]
+ },
+ {
+  "slug": "ceiling-batts-r4-pack",
+  "retailer": "bunnings",
+  "low": 52.0,
+  "typical": 66.5,
+  "high": 97.48,
+  "sample_size": 8,
+  "examples": [
+   "Pink Batts 1160 x 580 x 250mm R6.0 Ceiling Batts - 6 Pack",
+   "Bradford R4.1 1160 x 430 x 215mm 5.6m2 Gold Ceiling Batts - 10 Pack",
+   "Bradford R4.1 1160 x 580 x 215mm 6.7m2 Gold Ceiling Batts - 10 Pack"
+  ]
+ }
+]
