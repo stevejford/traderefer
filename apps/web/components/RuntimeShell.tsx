@@ -26,7 +26,7 @@ function PublicSeoHeader() {
     <header className="fixed top-0 z-50 h-[72px] w-full border-b border-gray-100 bg-white/90 backdrop-blur-md md:h-[100px]">
       <div className="container mx-auto flex h-full items-center justify-between gap-4 px-4">
         <Link href="/" prefetch={false} className="flex shrink-0 items-center gap-2">
-          <Logo size="sm" />
+          <Logo size="lg" />
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
@@ -35,7 +35,7 @@ function PublicSeoHeader() {
               key={href}
               href={href}
               prefetch={false}
-              className="px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:text-orange-600"
+              className="px-3 py-2 text-base font-bold text-zinc-700 transition-colors hover:text-orange-600"
             >
               {label}
             </Link>
@@ -43,14 +43,14 @@ function PublicSeoHeader() {
           <Link
             href="/login"
             prefetch={false}
-            className="ml-2 px-3 py-2 text-sm font-bold text-zinc-600 transition-colors hover:text-zinc-900"
+            className="ml-2 px-3 py-2 text-base font-bold text-zinc-700 transition-colors hover:text-zinc-900"
           >
             Sign In
           </Link>
           <Link
             href="/register"
             prefetch={false}
-            className="rounded-full bg-orange-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-orange-500/20 transition-colors hover:bg-orange-700"
+            className="rounded-full bg-orange-600 px-6 py-2.5 text-base font-bold text-white shadow-lg shadow-orange-500/20 transition-colors hover:bg-orange-700"
           >
             Sign Up
           </Link>
