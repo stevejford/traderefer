@@ -40,3 +40,22 @@ CREATE TABLE IF NOT EXISTS job_materials (
 );
 
 CREATE INDEX IF NOT EXISTS idx_job_materials_job ON job_materials (job_slug);
+
+-- Full scraped retail catalog (facts only: name/brand/price/category). Rows
+-- link to a canonical material via material_id once matched, and material
+-- price ranges are then computed from ALL linked products (percentiles),
+-- giving far more robust ranges than search sampling.
+CREATE TABLE IF NOT EXISTS retail_products (
+    id SERIAL PRIMARY KEY,
+    retailer TEXT NOT NULL,
+    sku TEXT NOT NULL,
+    name TEXT NOT NULL,
+    brand TEXT,
+    price NUMERIC(10,2) NOT NULL,
+    category_path TEXT,
+    material_id INT REFERENCES materials(id) ON DELETE SET NULL,
+    scraped_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (retailer, sku)
+);
+
+CREATE INDEX IF NOT EXISTS idx_retail_products_material ON retail_products (material_id);
