@@ -23,8 +23,32 @@ MATERIALS = json.loads((HERE / "materials.json").read_text(encoding="utf-8"))
 STOPWORDS = {"per", "each", "with", "and", "kit", "pack", "the", "mm", "kg", "l", "m", "lm"}
 
 
+def stem(word: str) -> str:
+    # Trailing-s stemming so "paver" matches "Pavers" — keep in sync with
+    # the JS matchers in ingest-products.mjs / refine-ranges.mjs.
+    return word[:-1] if len(word) > 3 and word.endswith("s") else word
+
+
 def tokens(text: str) -> set[str]:
-    return {t for t in re.findall(r"[a-z0-9]+", text.lower()) if len(t) > 2 and t not in STOPWORDS}
+    return {stem(t) for t in re.findall(r"[a-z0-9]+", text.lower()) if len(t) > 2 and t not in STOPWORDS}
+
+
+AREA_RE = re.compile(r"(\d+(?:\.\d+)?)\s*(?:m²|m2|sqm|square met)", re.I)
+
+
+def unit_price(material, title: str, price: float) -> float | None:
+    """Per-m² materials are only comparable after pack normalisation: parse
+    the pack area from the product title and divide. Products that state no
+    area can't be compared, so they're dropped rather than guessed."""
+    if material.get("unit") != "per m²":
+        return price
+    m = AREA_RE.search(title)
+    if not m:
+        return None
+    area = float(m.group(1))
+    if not (0.2 <= area <= 100):
+        return None
+    return price / area
 
 
 def extract_products(html: str):
@@ -63,7 +87,13 @@ def sample(material) -> dict | None:
         return None
     products = extract_products(page.html_content)
     want = tokens(material["name"] + " " + " ".join(material.get("aliases", [])))
-    matched = [(t, p) for t, p in products if len(want & tokens(t)) >= min(2, len(want))]
+    matched = []
+    for t, p in products:
+        if len(want & tokens(t)) < min(2, len(want)):
+            continue
+        up = unit_price(material, t, p)
+        if up is not None:
+            matched.append((t, up))
     if len(matched) < 2:
         print(f"  ! only {len(matched)} relevant of {len(products)} products — skipped")
         return None

@@ -3,7 +3,7 @@
 // turf laying is far cheaper per m² than general landscaping). Keyed by
 // job slug (see jobToSlug in lib/constants.ts).
 export const JOB_COST_OVERRIDES: Record<string, { unit: string; low: number; high: number; note?: string }> = {
-    "turf-laying": { unit: "/m²", low: 25, high: 50, note: "supplied and laid; turf alone $10-$15/m²" },
+    "turf-laying": { unit: "/m²", low: 25, high: 50, note: "supplied and laid; turf alone $10-$19/m²" },
 };
 
 /**

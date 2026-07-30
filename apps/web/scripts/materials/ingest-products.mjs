@@ -46,8 +46,11 @@ console.log("Upserted into retail_products.");
 
 // --- token-match unlinked products to materials ---
 const STOP = new Set(["per", "each", "with", "and", "kit", "pack", "the", "mm", "kg", "l", "m", "lm"]);
+// Trailing-s stemming so "paver" matches "Pavers" — without it whole material
+// families never link. Keep in sync with refine-ranges.mjs.
+const stem = (w) => (w.length > 3 ? w.replace(/s$/, "") : w);
 const tokens = (t) => new Set(
-    (t.toLowerCase().match(/[a-z0-9]+/g) || []).filter((w) => w.length > 2 && !STOP.has(w))
+    (t.toLowerCase().match(/[a-z0-9]+/g) || []).filter((w) => w.length > 2 && !STOP.has(w)).map(stem)
 );
 const mats = await sql`SELECT id, name, aliases FROM materials`;
 const matWant = mats.map((m) => ({ id: m.id, want: tokens(m.name + " " + (m.aliases || []).join(" ")) }));

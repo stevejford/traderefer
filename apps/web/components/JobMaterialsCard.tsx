@@ -5,6 +5,12 @@ function money(n: number) {
     return n >= 100 ? `$${Math.round(n)}` : `$${n.toFixed(2).replace(/\.00$/, "")}`;
 }
 
+// Single-product samples have low === high; "around $499" reads honestly
+// where "$499–$499" reads like a bug.
+function moneyRange(low: number, high: number) {
+    return money(low) === money(high) ? `about ${money(low)}` : `${money(low)}–${money(high)}`;
+}
+
 /**
  * "Materials you'll need" card for job pages — renders the job's mapped
  * materials with live-sampled retail price ranges and a quote CTA. Server
@@ -56,7 +62,7 @@ export function JobMaterialsCard({
                         </div>
                         <span className="shrink-0 font-bold text-zinc-800 text-base tabular-nums">
                             {m.price_low != null && m.price_high != null
-                                ? `${money(m.price_low)}–${money(m.price_high)}`
+                                ? moneyRange(m.price_low, m.price_high)
                                 : "varies"}
                         </span>
                     </li>
