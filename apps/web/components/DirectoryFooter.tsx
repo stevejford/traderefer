@@ -165,10 +165,10 @@ export async function DirectoryFooter() {
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-6 border-t border-white/5">
                     <div className="text-left">
                         <p className="text-zinc-600" style={{ fontSize: '18px' }}>
-                            &copy; {new Date().getFullYear()} TradeRefer Pty Ltd. All rights reserved.
+                            &copy; {new Date().getFullYear()} TradeRefer. All rights reserved.
                         </p>
                         <p className="text-zinc-700 mt-1" style={{ fontSize: '18px' }}>
-                            ABN: 88 764 351 213 &nbsp;|&nbsp; Level 1, 123 Collins Street, Melbourne VIC 3000 Australia &nbsp;|&nbsp; Made in Australia 🇦🇺
+                            ABN: 88 764 351 213 &nbsp;|&nbsp; Geelong, Victoria &nbsp;|&nbsp; Made in Australia 🇦🇺
                         </p>
                     </div>
                     <div className="flex flex-wrap gap-6 text-zinc-600 font-bold uppercase tracking-widest" style={{ fontSize: '14px' }}>
