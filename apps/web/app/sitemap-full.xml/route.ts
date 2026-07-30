@@ -22,6 +22,7 @@ export async function GET() {
 ${profileSitemaps}
   <sitemap><loc>${BASE_URL}/sitemaps/suburbs</loc></sitemap>
   <sitemap><loc>${BASE_URL}/sitemaps/trades</loc></sitemap>
+  <sitemap><loc>${BASE_URL}/sitemaps/jobs</loc></sitemap>
   <sitemap><loc>${BASE_URL}/sitemaps/top</loc></sitemap>
 </sitemapindex>`;
 

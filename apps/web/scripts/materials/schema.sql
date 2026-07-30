@@ -59,3 +59,14 @@ CREATE TABLE IF NOT EXISTS retail_products (
 );
 
 CREATE INDEX IF NOT EXISTS idx_retail_products_material ON retail_products (material_id);
+
+-- Support + contact form submissions (support page + contact page share this
+-- table via /api/support). department is optional (contact page only).
+CREATE TABLE IF NOT EXISTS support_requests (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    department TEXT,
+    message TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now()
+);

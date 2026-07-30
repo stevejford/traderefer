@@ -40,9 +40,23 @@ export async function getJobQuestions(jobSlug: string): Promise<JobQuestion[]> {
  * price). Data layer: scripts/materials/. Returns [] on any failure so pages
  * never break on this module.
  */
+// A catalog token-match occasionally lands products of wildly different pack
+// sizes on one material (per-roll vs per-pallet), producing self-discrediting
+// ranges like $7.64-$761. A real per-unit retail spread stays well inside this
+// ratio, so wider ranges are treated as bad samples and hidden.
+const MAX_RANGE_RATIO = 8;
+
+function sanitizePrices(row: JobMaterial): JobMaterial {
+    const { price_low, price_high } = row;
+    if (price_low != null && price_high != null && price_low > 0 && price_high / price_low > MAX_RANGE_RATIO) {
+        return { ...row, price_low: null, price_typical: null, price_high: null, sampled_at: null };
+    }
+    return row;
+}
+
 export async function getJobMaterials(jobSlug: string): Promise<JobMaterial[]> {
     try {
-        return await sql<JobMaterial[]>`
+        const rows = await sql<JobMaterial[]>`
             SELECT m.name,
                    m.unit,
                    jm.qty_note,
@@ -63,6 +77,7 @@ export async function getJobMaterials(jobSlug: string): Promise<JobMaterial[]> {
             WHERE jm.job_slug = ${jobSlug}
             ORDER BY jm.optional ASC, jm.sort ASC
         `;
+        return rows.map(sanitizePrices);
     } catch {
         return [];
     }

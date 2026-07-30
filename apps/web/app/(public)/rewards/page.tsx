@@ -13,7 +13,7 @@ const rewardsOgImage = buildOgImageUrl({
     badge: "Powered by Prezzee",
     stat1: "Invite rewards",
     stat2: "Referral rewards",
-    stat3: "400+ brands",
+    stat3: "335+ brands",
 });
 
 export const metadata: Metadata = {
@@ -397,7 +397,7 @@ const TRUST = [
     { icon: Clock3, label: "Valid 3 years", sub: "No rush to spend" },
     { icon: Mail, label: "Instant delivery", sub: "Email or SMS" },
     { icon: Smartphone, label: "Prezzee Wallet app", sub: "Apple Wallet compatible" },
-    { icon: Star, label: "400+ brands", sub: "One card, your choice" },
+    { icon: Star, label: "335+ brands", sub: "One card, your choice" },
 ];
 
 export default function RewardsPage() {
@@ -423,7 +423,7 @@ export default function RewardsPage() {
 
                         <h1 className="text-5xl md:text-7xl font-black text-zinc-900 mb-6 leading-[1.05] tracking-tight font-display">
                             One Card.<br />
-                            <span className="text-[#FF6600]">400+ Places</span> to Spend It.
+                            <span className="text-[#FF6600]">335+ Places</span> to Spend It.
                         </h1>
                         <p className="text-xl md:text-2xl text-zinc-600 mb-8 leading-relaxed max-w-2xl mx-auto">
                             Eligible referrers can receive a <strong className="text-zinc-900">$25 Prezzee Smart Card</strong> when 5 invitees join and become active. Spend it with Woolworths, Bunnings, Uber, Netflix and hundreds more.
@@ -565,7 +565,7 @@ export default function RewardsPage() {
                             </div>
                             <h2 className="text-4xl md:text-5xl font-black text-zinc-900 mb-4 font-display">Where you can spend</h2>
                             <p className="text-xl text-zinc-500 font-medium max-w-2xl mx-auto">
-                                Your Prezzee Smart Card unlocks 400+ brands. Here&apos;s just a taste of where you can spend it.
+                                Your Prezzee Smart Card unlocks 335+ brands. Here&apos;s just a taste of where you can spend it.
                             </p>
                         </div>
 

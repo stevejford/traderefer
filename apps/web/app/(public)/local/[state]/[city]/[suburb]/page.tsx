@@ -3,7 +3,7 @@ import { PublicMultiQuoteForm } from "@/components/PublicMultiQuoteForm";
 import { ChevronRight, Hammer, Lightbulb, Pipette as Pipe, Paintbrush, Wrench, Home, Truck, Trash2, Shovel, Scissors, Lock, Wind, Bug, PenTool, HardHat, Construction, LayoutGrid, Fence, MapPin, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { Metadata } from "next";
-import { permanentRedirect, redirect } from "next/navigation";
+import { notFound, permanentRedirect, redirect } from "next/navigation";
 import { SUBURB_CONTEXT } from "@/lib/constants";
 import { parseSuburbSlug, getPostcode, getCanonicalSuburbSlug, getDisplayPostcode } from "@/lib/postcodes";
 import { getCanonicalCitySlug } from "@/lib/suburb-cities";
@@ -65,6 +65,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const pc = getDisplayPostcode(canonicalSuburb, state);
     const pcLabel = pc ? ` ${stateUpper} ${pc}` : ` ${stateUpper}`;
     const stats = await getSuburbStats(state, city, canonicalSuburb);
+    // Unknown suburb slug + no real listings = crawl trap, not a page.
+    if (getPostcode(parseSuburbSlug(suburb).suburb, state) === null && stats.total === 0) notFound();
     const canonicalUrl = `https://traderefer.au/local/${state}/${getCanonicalCitySlug(state, suburb) ?? city}/${canonicalSuburb}`;
     const ogImageUrl = buildOgImageUrl({
         template: "suburb",
@@ -188,6 +190,10 @@ export default async function SuburbDirectoryPage({ params, searchParams }: Page
         getNearbySuburbs(state, city, canonicalSuburb),
     ]);
 
+    // A suburb the postcode dataset has never heard of, with zero active
+    // businesses, is junk-slug territory: 404 instead of fabricating a hub.
+    if (getPostcode(bareSuburb, state) === null && suburbStats.total === 0) notFound();
+
     const displayTrades = tradesWithCounts;
 
     const suburbCtxKey = suburbName.toLowerCase().replace(/\s+/g, "-");
@@ -297,8 +303,8 @@ export default async function SuburbDirectoryPage({ params, searchParams }: Page
                                         return (
                                             <Link key={trade} href={tradeUrl} className="group">
                                                 <div className="bg-white rounded-2xl border border-zinc-200 hover:border-orange-500 hover:shadow-xl transition-all duration-300 p-5 flex flex-col items-center text-center gap-4">
-                                                    <div className="w-[120px] h-[120px] bg-zinc-50 rounded-2xl flex items-center justify-center text-zinc-400 group-hover:bg-orange-50 group-hover:text-orange-600 transition-colors">
-                                                        <Icon className="w-12 h-12" />
+                                                    <div className="w-full max-w-[120px] aspect-square bg-zinc-50 rounded-2xl flex items-center justify-center text-zinc-400 group-hover:bg-orange-50 group-hover:text-orange-600 transition-colors">
+                                                        <Icon className="w-10 h-10 sm:w-12 sm:h-12" />
                                                     </div>
                                                     <div>
                                                         <p className="font-black text-[#1A1A1A] group-hover:text-[#FF6600] transition-colors leading-tight mb-1" style={{ fontSize: '22px' }}>

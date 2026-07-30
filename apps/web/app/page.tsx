@@ -443,14 +443,14 @@ export default async function HomePage() {
                 />
               </div>
               <h2 className="text-3xl md:text-4xl font-extrabold text-[#1A1A1A] mb-2 font-display">Cash in Your Goodwill</h2>
-              <p className="text-gray-600 text-lg">Invite 5 people → earn a $25 Prezzee Smart Card. Spend it at 400+ brands.</p>
+              <p className="text-gray-600 text-lg">Invite 5 people → earn a $25 Prezzee Smart Card. Spend it at 335+ brands.</p>
             </div>
             <Link
               href="/rewards"
               prefetch={false}
               className="shrink-0 inline-flex items-center gap-2 bg-[#FF6600] hover:bg-[#E65C00] text-white font-black px-7 py-3 rounded-full transition-colors shadow-lg"
             >
-              See all 335 brands <ArrowRight className="w-4 h-4" />
+              See all 335+ brands <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 

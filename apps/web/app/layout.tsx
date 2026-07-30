@@ -45,6 +45,16 @@ const defaultOgImage = buildOgImageUrl({
 export const metadata: Metadata = {
   title: "TradeRefer | Trade Referrals Australia",
   description: "Find ABN-checked trade profiles near you, compare reviews, request free quotes, and receive rewards for eligible referrals.",
+  // Explicit icon links: app/icon.png never resolves in production because the
+  // (public)/[slug] catch-all route intercepts /icon.png, so point at public/
+  // assets which are served ahead of dynamic routes.
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.png", type: "image/png", sizes: "640x640" },
+    ],
+    apple: [{ url: "/favicon.png", type: "image/png", sizes: "640x640" }],
+  },
   openGraph: {
     title: "TradeRefer | Australia's Trade Referral Marketplace",
     description: "Find ABN-checked trade profiles near you, compare reviews, request free quotes, and receive rewards for eligible referrals.",

@@ -48,7 +48,9 @@ const BASE_URL = "https://traderefer.au";
 
 type UrlEntry = {
     loc: string;
-    lastmod: string;
+    // Omitted (null) when we have no real modification date — a fabricated
+    // "today" on every crawl teaches engines to distrust the whole field.
+    lastmod: string | null;
     changefreq: string;
     priority: string;
 };
@@ -80,7 +82,7 @@ function dateString(value: unknown, fallback = todayIso()) {
     return String(value).slice(0, 10);
 }
 
-function entry(loc: string, lastmod = todayIso(), changefreq = "weekly", priority = "0.7"): UrlEntry {
+function entry(loc: string, lastmod: string | null = null, changefreq = "weekly", priority = "0.7"): UrlEntry {
     return { loc, lastmod, changefreq, priority };
 }
 
@@ -100,20 +102,19 @@ function suburbSegment(suburbSlug: string, state: string, address: string | null
 }
 
 async function googleCoreEntries(): Promise<UrlEntry[]> {
-    const today = todayIso();
     const entries: UrlEntry[] = [
-        entry(BASE_URL, today, "daily", "1.0"),
-        entry(`${BASE_URL}/businesses`, today, "daily", "0.9"),
-        entry(`${BASE_URL}/categories`, today, "weekly", "0.95"),
-        entry(`${BASE_URL}/locations`, today, "weekly", "0.95"),
-        entry(`${BASE_URL}/local`, today, "weekly", "0.9"),
-        entry(`${BASE_URL}/find-a-plumber-near-me`, today, "weekly", "0.95"),
-        entry(`${BASE_URL}/find-an-electrician-near-me`, today, "weekly", "0.95"),
-        entry(`${BASE_URL}/about`, today, "monthly", "0.5"),
-        entry(`${BASE_URL}/contact`, today, "monthly", "0.5"),
-        entry(`${BASE_URL}/terms`, today, "monthly", "0.3"),
-        entry(`${BASE_URL}/privacy`, today, "monthly", "0.3"),
-        entry(`${BASE_URL}/cookies`, today, "monthly", "0.2"),
+        entry(BASE_URL, null, "daily", "1.0"),
+        entry(`${BASE_URL}/businesses`, null, "daily", "0.9"),
+        entry(`${BASE_URL}/categories`, null, "weekly", "0.95"),
+        entry(`${BASE_URL}/locations`, null, "weekly", "0.95"),
+        entry(`${BASE_URL}/local`, null, "weekly", "0.9"),
+        entry(`${BASE_URL}/find-a-plumber-near-me`, null, "weekly", "0.95"),
+        entry(`${BASE_URL}/find-an-electrician-near-me`, null, "weekly", "0.95"),
+        entry(`${BASE_URL}/about`, null, "monthly", "0.5"),
+        entry(`${BASE_URL}/contact`, null, "monthly", "0.5"),
+        entry(`${BASE_URL}/terms`, null, "monthly", "0.3"),
+        entry(`${BASE_URL}/privacy`, null, "monthly", "0.3"),
+        entry(`${BASE_URL}/cookies`, null, "monthly", "0.2"),
     ];
 
     const states = await sql<{ s: string }[]>`
@@ -125,7 +126,7 @@ async function googleCoreEntries(): Promise<UrlEntry[]> {
           AND state != ''
     `;
     for (const row of states) {
-        entries.push(entry(`${BASE_URL}/local/${row.s}`, today, "weekly", "0.9"));
+        entries.push(entry(`${BASE_URL}/local/${row.s}`, null, "weekly", "0.9"));
     }
 
     const cities = await sql<{ s: string; c: string }[]>`
@@ -139,7 +140,7 @@ async function googleCoreEntries(): Promise<UrlEntry[]> {
         HAVING COUNT(*) >= ${GOOGLE_GATES.cityMinBusinesses}
     `;
     for (const row of cities) {
-        entries.push(entry(`${BASE_URL}/local/${row.s}/${row.c}`, today, "weekly", "0.85"));
+        entries.push(entry(`${BASE_URL}/local/${row.s}/${row.c}`, null, "weekly", "0.85"));
     }
 
     return entries;
@@ -179,9 +180,9 @@ async function googleTradeEntries(): Promise<UrlEntry[]> {
 }
 
 async function googleTopEntries(): Promise<UrlEntry[]> {
-    const today = todayIso();
-    const rows = await sql<{ trade_category: string; s: string; c: string }[]>`
-        SELECT trade_category, LOWER(state) AS s, LOWER(REPLACE(city, ' ', '-')) AS c
+    const rows = await sql<{ trade_category: string; s: string; c: string; lastmod: Date | string | null }[]>`
+        SELECT trade_category, LOWER(state) AS s, LOWER(REPLACE(city, ' ', '-')) AS c,
+               MAX(COALESCE(updated_at, created_at))::date AS lastmod
         FROM businesses
         WHERE status = 'active'
           AND (listing_visibility = 'public' OR listing_visibility IS NULL)
@@ -195,7 +196,7 @@ async function googleTopEntries(): Promise<UrlEntry[]> {
            AND SUM(total_reviews) >= ${GOOGLE_SITEMAP_TIER.topMinReviews}
         ORDER BY trade_category, s, c
     `;
-    return rows.map((row) => entry(`${BASE_URL}/top/${slugifyValue(row.trade_category)}/${row.s}/${row.c}`, today, "weekly", "0.8"));
+    return rows.map((row) => entry(`${BASE_URL}/top/${slugifyValue(row.trade_category)}/${row.s}/${row.c}`, dateString(row.lastmod), "weekly", "0.8"));
 }
 
 async function googleProfileEntries(): Promise<UrlEntry[]> {
@@ -221,7 +222,7 @@ export async function googleSitemapXml() {
         googleProfileEntries(),
     ]);
     const body = groups.flat().map((e) =>
-        `  <url><loc>${xmlEscape(e.loc)}</loc><lastmod>${xmlEscape(e.lastmod)}</lastmod><changefreq>${xmlEscape(e.changefreq)}</changefreq><priority>${xmlEscape(e.priority)}</priority></url>`
+        `  <url><loc>${xmlEscape(e.loc)}</loc>${e.lastmod ? `<lastmod>${xmlEscape(e.lastmod)}</lastmod>` : ""}<changefreq>${xmlEscape(e.changefreq)}</changefreq><priority>${xmlEscape(e.priority)}</priority></url>`
     ).join("\n");
     return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>`;
 }

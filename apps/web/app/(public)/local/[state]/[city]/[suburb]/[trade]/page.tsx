@@ -4,9 +4,9 @@ import { MapPin, Star, ShieldCheck, ChevronRight, CheckCircle2, Award, Users, Ar
 import Link from "next/link";
 import { BusinessLogo } from "@/components/BusinessLogo";
 import { Metadata } from "next";
-import { permanentRedirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { TRADE_COST_GUIDE, TRADE_FAQ_BANK, STATE_LICENSING, STATE_AUTHORITY_LINKS, SUBURB_CONTEXT, JOB_TYPES, TRADE_NOUNS, jobToSlug, generateLocalizedIntro, normalizeTradeName } from "@/lib/constants";
-import { parseSuburbSlug, getCanonicalSuburbSlug, getDisplayPostcode, isPostcodeValidForState } from "@/lib/postcodes";
+import { parseSuburbSlug, getCanonicalSuburbSlug, getDisplayPostcode, getPostcode, isPostcodeValidForState } from "@/lib/postcodes";
 import { retiredTradeSlugTarget } from "@/lib/trade-redirects";
 import { getCanonicalCitySlug } from "@/lib/suburb-cities";
 import { generateFallbackDescription } from "@/lib/business-utils";
@@ -241,6 +241,28 @@ export default async function TradeLocationPage({ params }: PageProps) {
         getCityReferralCount(city),
     ]);
 
+    // Junk-slug guard: an unrecognised trade or suburb with zero active
+    // businesses is crawl-trap territory (any garbage slug used to 200 with
+    // fabricated hero content) — 404 instead. Real-but-quiet combinations
+    // keep their zero-state page via the fallbacks below.
+    if (businesses.length === 0) {
+        const isKnownTrade = Object.keys(TRADE_NOUNS).some((n) => slugify(n) === trade)
+            || Object.keys(JOB_TYPES).some((n) => slugify(n) === trade);
+        if (!isKnownTrade) notFound();
+        if (getPostcode(bareSuburb, state) === null) {
+            // Suburb missing from the postcode dataset: real if ANY active
+            // business (any trade) lives there, junk otherwise.
+            const rows = await sql<{ x: number }[]>`
+                SELECT 1 AS x FROM businesses
+                WHERE status = 'active'
+                  AND UPPER(state) = ${state.toUpperCase()}
+                  AND LOWER(suburb) = LOWER(${suburbName})
+                LIMIT 1
+            `;
+            if (rows.length === 0) notFound();
+        }
+    }
+
     if (businesses.length === 0) {
         logEmptyPage(state, city, suburb, trade); // fire-and-forget, never awaited
     }
@@ -259,7 +281,9 @@ export default async function TradeLocationPage({ params }: PageProps) {
     const cost = TRADE_COST_GUIDE[tradeKey] || TRADE_COST_GUIDE[tradeName];
     const faqs = TRADE_FAQ_BANK[tradeKey] || TRADE_FAQ_BANK[tradeName] || [];
     const licenceText = STATE_LICENSING[tradeKey]?.[stateName] || STATE_LICENSING[tradeName]?.[stateName] || null;
-    const relatedJobs = (JOB_TYPES[tradeKey] || JOB_TYPES[tradeName])?.slice(0, 6) || [];
+    const allJobs = JOB_TYPES[tradeKey] || JOB_TYPES[tradeName] || [];
+    const relatedJobs = allJobs.slice(0, 6);
+    const moreJobs = allJobs.slice(6);
     const localizedIntro = generateLocalizedIntro(tradeName, suburbName, cityName, stateName, businesses.length, avgRating || "0", totalReviews);
 
     const availabilityLabel = businesses.length >= 5 ? "High" : businesses.length >= 2 ? "Moderate" : "Limited";
@@ -948,6 +972,22 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                                 </Link>
                                             ))}
                                         </div>
+                                        {moreJobs.length > 0 && (
+                                            <div className="mt-6 pt-6 border-t border-zinc-100">
+                                                <p className="text-sm font-bold text-zinc-500 mb-3">More {tradeName} jobs in {suburbName}</p>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {moreJobs.map((job) => (
+                                                        <Link prefetch={false}
+                                                            key={job}
+                                                            href={`/local/${state}/${city}/${canonicalSuburb}/${trade}/${jobToSlug(job)}`}
+                                                            className="inline-flex items-center px-3 py-1.5 bg-zinc-50 border border-zinc-200 rounded-full text-xs font-bold text-zinc-600 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-700 transition-colors capitalize"
+                                                        >
+                                                            {job}
+                                                        </Link>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
                                     </section>
                                 )}
 
@@ -1107,11 +1147,15 @@ export default async function TradeLocationPage({ params }: PageProps) {
                                     <div className="grid grid-cols-1 gap-2">
                                         {nearbySuburbs.map((s: any) => {
                                             const nSlug = getCanonicalSuburbSlug(slugify(s.suburb), state);
+                                            // getCanonicalSuburbSlug already appends the postcode (e.g. "albert-park-3206")
+                                            // when one is known — only append nPc if nSlug isn't already suffixed.
+                                            const nSlugHasPostcode = /-(\d{4})$/.test(nSlug);
                                             const nPc = getDisplayPostcode(nSlug, state);
+                                            const nHref = nSlugHasPostcode ? nSlug : (nPc ? `${nSlug}-${nPc}` : nSlug);
                                             return (
                                             <Link prefetch={false}
                                                 key={s.suburb}
-                                                href={`/local/${state}/${city}/${nSlug}${nPc ? `-${nPc}` : ''}/${trade}`}
+                                                href={`/local/${state}/${city}/${nHref}/${trade}`}
                                                 className="flex items-center justify-between px-4 py-3 bg-zinc-50 border border-zinc-100 rounded-xl text-xs font-bold text-zinc-600 hover:bg-zinc-100 transition-colors"
                                             >
                                                 <span>{formatSlug(s.suburb)}{nPc ? ` ${nPc}` : ''}</span>
@@ -1141,7 +1185,7 @@ export default async function TradeLocationPage({ params }: PageProps) {
 
         {/* ── STICKY GET QUOTES CTA BAR ── */}
         {businesses.length > 0 && (
-            <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-zinc-200 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] py-3 px-4 md:px-6">
+            <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-zinc-200 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] px-4 md:px-6">
                 <div className="container mx-auto flex items-center justify-between gap-4">
                     <div className="hidden sm:block">
                         <p className="font-black text-zinc-900" style={{ fontSize: '16px' }}>{businesses.length} {tradeNamePlural.toLowerCase()} in {suburbName}</p>

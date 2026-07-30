@@ -13,7 +13,7 @@ const FIND_TRADE_PAGES = ["find-a-plumber-near-me", "find-an-electrician-near-me
 // directory (audit 2026-06-12 PM) and must not be sitemapped.
 const LOCAL_TRADE_PAGES: string[] = [];
 
-type SitemapName = "general" | "suburbs" | "trades" | "top";
+type SitemapName = "general" | "suburbs" | "trades" | "top" | "jobs";
 
 type SitemapParams = {
     params: Promise<{ sitemap: string }>;
@@ -261,6 +261,55 @@ async function topSitemap() {
     return rows.map((row) => url(`${BASE_URL}/top/${slugify(row.trade_category)}/${row.s}/${row.c}`, today, "weekly", "0.8"));
 }
 
+async function jobsSitemap() {
+    // Job pages carrying editorial content (DB-answered FAQs; materials render
+    // for any job). Emitted for every trade combo the trades sitemap carries,
+    // so Bing gets a crawl path to the pages the content pipeline enriches —
+    // job URLs previously appeared in no sitemap at all.
+    const answeredRows = await sql<{ job_slug: string }[]>`
+        SELECT DISTINCT job_slug FROM job_questions WHERE answer IS NOT NULL
+    `;
+    const answered = new Set(answeredRows.map((r) => r.job_slug));
+    if (answered.size === 0) return [];
+
+    // trade_category (as slugified) -> answered job slugs under that trade
+    const tradeAnsweredJobs = new Map<string, string[]>();
+    for (const [trade, jobs] of Object.entries(JOB_TYPES)) {
+        const slugs = jobs.map((j) => slugify(j)).filter((j) => answered.has(j));
+        if (slugs.length > 0) tradeAnsweredJobs.set(slugify(trade), slugs);
+    }
+
+    const rows = await sql<{ s: string; c: string; sub: string; trade_category: string; lastmod: Date | string | null; addr: string | null }[]>`
+        SELECT LOWER(state) AS s,
+               LOWER(REPLACE(city, ' ', '-')) AS c,
+               LOWER(REPLACE(suburb, ' ', '-')) AS sub,
+               trade_category,
+               MAX(COALESCE(updated_at, created_at))::date AS lastmod,
+               MAX(address) AS addr
+        FROM businesses
+        WHERE status = 'active'
+          AND (listing_visibility = 'public' OR listing_visibility IS NULL)
+          AND state IS NOT NULL AND state != ''
+          AND city IS NOT NULL AND city != ''
+          AND suburb IS NOT NULL AND suburb != ''
+          AND trade_category IS NOT NULL AND trade_category != ''
+        GROUP BY LOWER(state), LOWER(REPLACE(city, ' ', '-')), LOWER(REPLACE(suburb, ' ', '-')), trade_category
+        HAVING COUNT(*) >= 2
+    `;
+    const entries: UrlEntry[] = [];
+    for (const row of rows) {
+        const jobSlugs = tradeAnsweredJobs.get(slugify(row.trade_category));
+        if (!jobSlugs) continue;
+        const suburb = sitemapSuburbSegment(row.sub, row.s, row.addr);
+        if (!suburb) continue;
+        const base = `${BASE_URL}/local/${row.s}/${row.c}/${suburb}/${slugify(row.trade_category)}`;
+        for (const jobSlug of jobSlugs) {
+            entries.push(url(`${base}/${jobSlug}`, dateString(row.lastmod), "weekly", "0.65"));
+        }
+    }
+    return entries;
+}
+
 export async function GET(_request: NextRequest, { params }: SitemapParams) {
     const { sitemap } = await params;
 
@@ -272,7 +321,7 @@ export async function GET(_request: NextRequest, { params }: SitemapParams) {
         return entries.length > 0 ? sitemapResponse(entries) : sitemapResponse([], 404);
     }
 
-    if (!["general", "suburbs", "trades", "top"].includes(sitemap)) {
+    if (!["general", "suburbs", "trades", "top", "jobs"].includes(sitemap)) {
         return sitemapResponse([], 404);
     }
 
@@ -282,6 +331,7 @@ export async function GET(_request: NextRequest, { params }: SitemapParams) {
         suburbs: suburbsSitemap,
         trades: tradesSitemap,
         top: topSitemap,
+        jobs: jobsSitemap,
     }[sitemapName];
 
     return sitemapResponse(await entries());

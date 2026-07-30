@@ -210,6 +210,29 @@ export default async function Top10SuburbPage({ params }: PageProps) {
             "position": i + 1,
             "url": `https://traderefer.au/b/${biz.slug}`,
             "name": biz.business_name,
+            "item": {
+                "@type": "LocalBusiness",
+                "name": biz.business_name,
+                "url": `https://traderefer.au/b/${biz.slug}`,
+                ...(biz.business_phone ? { "telephone": biz.business_phone } : {}),
+                "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": biz.suburb || suburbName,
+                    "addressRegion": stateName,
+                    ...(urlPostcode ? { "postalCode": urlPostcode } : {}),
+                    "addressCountry": "AU"
+                },
+                ...(parseFloat(biz.avg_rating) > 0 && parseInt(biz.total_reviews) > 0 ? {
+                    "aggregateRating": {
+                        "@type": "AggregateRating",
+                        "ratingValue": parseFloat(biz.avg_rating).toFixed(1),
+                        "reviewCount": parseInt(biz.total_reviews),
+                        "bestRating": "5",
+                        "worstRating": "1"
+                    }
+                } : {}),
+                ...(biz.logo_url ? { "image": biz.logo_url } : {}),
+            }
         }))
     };
 

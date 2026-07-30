@@ -5,14 +5,15 @@ import Link from "next/link";
 import { BusinessLogo } from "@/components/BusinessLogo";
 import { Metadata } from "next";
 import { TRADE_COST_GUIDE, TRADE_FAQ_BANK, STATE_LICENSING, JOB_TYPES, TRADE_NOUNS, jobToSlug, normalizeTradeName } from "@/lib/constants";
-import { permanentRedirect } from "next/navigation";
-import { parseSuburbSlug, getCanonicalSuburbSlug, getDisplayPostcode } from "@/lib/postcodes";
+import { notFound, permanentRedirect } from "next/navigation";
+import { parseSuburbSlug, getCanonicalSuburbSlug, getDisplayPostcode, getPostcode } from "@/lib/postcodes";
 import { retiredTradeSlugTarget } from "@/lib/trade-redirects";
 import { getCanonicalCitySlug } from "@/lib/suburb-cities";
 import { buildOgImageUrl } from "@/lib/og-image";
 import { directoryRobots } from "@/lib/seo/index-policy";
 import { getJobMaterials, getJobQuestions } from "@/lib/materials";
 import { JobMaterialsCard } from "@/components/JobMaterialsCard";
+import { jobCostGuide } from "@/lib/job-costs";
 
 export const dynamic = "force-dynamic";
 
@@ -49,7 +50,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const stateUpper = state.toUpperCase();
     const jobName = formatSlug(job);
     const tradeKey = normalizeTradeName(tradeName);
-    const cost = TRADE_COST_GUIDE[tradeKey] || TRADE_COST_GUIDE[tradeName];
+    const tradeCost = TRADE_COST_GUIDE[tradeKey] || TRADE_COST_GUIDE[tradeName];
+    const cost = jobCostGuide(job, tradeCost);
     const businesses = await getBusinesses(state, city, trade, canonicalSuburb);
     const count = businesses.length;
     const postcode = getDisplayPostcode(canonicalSuburb, state);
@@ -172,12 +174,31 @@ export default async function JobTypePage({ params }: PageProps) {
         : "4.8";
 
     const tradeKey = normalizeTradeName(tradeName);
-    const cost = TRADE_COST_GUIDE[tradeKey] || TRADE_COST_GUIDE[tradeName];
+
+    // Junk-slug guard: the job catalogue is fully programmatic, so any job
+    // slug outside JOB_TYPES for this trade (or any unknown trade) would
+    // render fabricated content under an infinite URL space — 404 instead.
+    const catalogueJobs = JOB_TYPES[tradeKey] || JOB_TYPES[tradeName] || [];
+    if (!catalogueJobs.some((j) => jobToSlug(j) === job)) notFound();
+    if (businesses.length === 0 && getPostcode(bareSuburb, state) === null) {
+        // Suburb missing from the postcode dataset: real if ANY active
+        // business (any trade) lives there, junk otherwise.
+        const suburbRows = await sql<{ x: number }[]>`
+            SELECT 1 AS x FROM businesses
+            WHERE status = 'active'
+              AND UPPER(state) = ${state.toUpperCase()}
+              AND LOWER(suburb) = LOWER(${suburbName})
+            LIMIT 1
+        `;
+        if (suburbRows.length === 0) notFound();
+    }
+
+    const tradeCost = TRADE_COST_GUIDE[tradeKey] || TRADE_COST_GUIDE[tradeName];
+    const cost = jobCostGuide(job, tradeCost);
     const faqs = TRADE_FAQ_BANK[tradeKey] || TRADE_FAQ_BANK[tradeName] || [];
     const licenceText = STATE_LICENSING[tradeKey]?.[stateName] || STATE_LICENSING[tradeName]?.[stateName] || null;
     const relatedJobs = (JOB_TYPES[tradeKey] || JOB_TYPES[tradeName] || [])
-        .filter(j => jobToSlug(j) !== job)
-        .slice(0, 6);
+        .filter(j => jobToSlug(j) !== job);
     const broaderTradeHref = `/local/${state}/${city}/${canonicalSuburb}/${trade}`;
 
     const breadcrumbJsonLd = {
@@ -217,10 +238,16 @@ export default async function JobTypePage({ params }: PageProps) {
 
     // Job-specific Q&As (real Google PAA questions, in-house answers) lead;
     // generic trade FAQs fill the remainder.
-    const normQ = (t: string) => t.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+    // Stopwords are stripped before comparing so paraphrases collapse:
+    // "What time of year should I lay turf?" and "What's the best time of
+    // year to lay turf in Australia?" normalise to the same content tokens.
+    const FAQ_STOPWORDS = new Set(["what", "whats", "is", "are", "the", "a", "an", "of", "in", "on", "for", "to", "i", "my", "you", "your", "it", "do", "does", "should", "can", "how", "much", "best", "australia"]);
+    const normQ = (t: string) => t.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim()
+        .split(/\s+/).filter((w) => w && !FAQ_STOPWORDS.has(w)).join(" ");
     const authoredFaqs = jobQuestions.map((q) => ({ q: q.question, a: q.answer }));
     const authoredNorms = authoredFaqs.map((f) => normQ(f.q));
     const overlaps = (a: string, b: string) => {
+        if (!a || !b) return false; // empty normalisation must never match-all
         if (a.includes(b) || b.includes(a)) return true;
         const wa = new Set(a.split(" ")), wb = new Set(b.split(" "));
         const shared = [...wa].filter((w) => wb.has(w)).length;
@@ -285,7 +312,7 @@ export default async function JobTypePage({ params }: PageProps) {
                                 {cost && ` Typical ${tradeName.toLowerCase()} rates in ${stateName} range from $${cost.low}–$${cost.high}${cost.unit}.`}
                             </p>
                             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
-                                <Button asChild size="lg" className="bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold h-14 px-8 text-lg border-none w-full sm:w-auto">
+                                <Button asChild size="lg" className="bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold h-auto min-h-14 px-8 text-lg border-none w-full sm:w-auto whitespace-normal">
                                     <Link href={`/register?type=homeowner&job=${job}&suburb=${canonicalSuburb}`}>Request a Free {jobName} Quote</Link>
                                 </Button>
                                 <Button asChild variant="outline" size="lg" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl font-bold h-14 px-8 text-lg w-full sm:w-auto">
@@ -318,7 +345,7 @@ export default async function JobTypePage({ params }: PageProps) {
             </div>
 
             {/* Main Content */}
-            <div className="container mx-auto px-4 py-16">
+            <div className="container mx-auto px-4 pt-16 pb-32 lg:pb-16">
                 <div className="max-w-7xl mx-auto space-y-16">
 
                     {/* Business Listings */}
@@ -336,9 +363,9 @@ export default async function JobTypePage({ params }: PageProps) {
                                     return (
                                         <Link key={biz.id} href={`/b/${biz.slug}`} className="group block">
                                             <div className="bg-white rounded-2xl border border-zinc-200 hover:border-orange-500 hover:shadow-lg transition-all duration-300 p-6">
-                                                <div className="flex items-start gap-4">
+                                                <div className="flex flex-col sm:flex-row items-start gap-4">
                                                     <BusinessLogo logoUrl={biz.logo_url || null} name={biz.business_name || "?"} size="md" photoUrls={biz.photo_urls} bgColor={biz.logo_bg_color} />
-                                                    <div className="flex-1 min-w-0">
+                                                    <div className="flex-1 min-w-0 w-full">
                                                         <div className="flex items-start justify-between gap-2">
                                                             <div>
                                                                 <h3 className="font-black text-zinc-900 group-hover:text-orange-600 transition-colors text-xl leading-tight">
@@ -374,7 +401,7 @@ export default async function JobTypePage({ params }: PageProps) {
                                                             </span>
                                                         </div>
                                                     </div>
-                                                    <span className="shrink-0 mt-1 inline-flex items-center gap-1 text-base font-bold text-orange-600">View profile<ArrowRight className="w-4 h-4" /></span>
+                                                    <span className="shrink-0 mt-3 sm:mt-1 inline-flex items-center gap-1 text-base font-bold text-orange-600">View profile<ArrowRight className="w-4 h-4" /></span>
                                                 </div>
                                             </div>
                                         </Link>
@@ -388,10 +415,10 @@ export default async function JobTypePage({ params }: PageProps) {
                                 <p className="text-zinc-600 text-base mb-6 max-w-xl mx-auto">No specialists listed in {suburbName} yet. Get quotes from {tradeName.toLowerCase()} businesses across {cityName} instead.</p>
                                 <div className="flex flex-col sm:flex-row justify-center gap-3">
                                     <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold border-none">
-                                        <Link href={broaderTradeHref}>See {tradeName} Across {cityName}</Link>
+                                        <Link href={`/register?type=homeowner&job=${job}&suburb=${canonicalSuburb}`}>Request a Free Quote</Link>
                                     </Button>
                                     <Button asChild variant="outline" className="rounded-xl font-bold">
-                                        <Link href={`/register?type=homeowner&job=${job}&suburb=${canonicalSuburb}`}>Request a Free Quote</Link>
+                                        <Link href={`/local/${state}/${city}`}>Browse trades across {cityName}</Link>
                                     </Button>
                                 </div>
                             </div>
@@ -462,15 +489,14 @@ export default async function JobTypePage({ params }: PageProps) {
                         <section className="bg-white rounded-3xl border border-zinc-200 p-8">
                             <h2 className="text-xl font-black text-zinc-900 mb-2">Other {tradeName} Services in {suburbName}</h2>
                             <p className="text-base text-zinc-600 mb-6">Also looking for related {tradeName.toLowerCase()} work in {suburbName}?</p>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div className="flex flex-wrap gap-2">
                                 {relatedJobs.map((j) => (
                                     <Link
                                         key={j}
                                         href={`/local/${state}/${city}/${canonicalSuburb}/${trade}/${jobToSlug(j)}`}
-                                        className="flex items-center justify-between px-4 py-3 bg-zinc-50 border border-zinc-100 rounded-xl text-sm font-bold text-zinc-600 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-700 transition-colors"
+                                        className="capitalize inline-flex items-center px-3 py-1.5 bg-zinc-50 border border-zinc-100 rounded-full text-base font-bold text-zinc-600 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-700 transition-colors"
                                     >
-                                        <span className="capitalize">{j}</span>
-                                        <ArrowRight className="w-4 h-4 text-zinc-300" />
+                                        {j}
                                     </Link>
                                 ))}
                             </div>
@@ -536,8 +562,8 @@ export default async function JobTypePage({ params }: PageProps) {
                 </div>
             </div>
 
-        <div className="fixed bottom-0 inset-x-0 z-40 p-3 bg-white/95 backdrop-blur border-t border-zinc-200 lg:hidden">
-            <Button asChild size="lg" className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold h-13 text-base border-none">
+        <div className="fixed bottom-0 inset-x-0 z-40 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] bg-white/95 backdrop-blur border-t border-zinc-200 lg:hidden">
+            <Button asChild size="lg" className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold h-auto min-h-13 text-base border-none whitespace-normal">
                 <Link href={`/register?type=homeowner&job=${job}&suburb=${canonicalSuburb}`}>Get Free {jobName} Quotes</Link>
             </Button>
         </div>
