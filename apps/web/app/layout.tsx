@@ -3,6 +3,7 @@ import { Inter, Outfit, Montserrat, Oswald } from "next/font/google";
 import "./globals.css";
 import { DirectoryFooter } from "@/components/DirectoryFooter";
 import { RuntimeShell } from "@/components/RuntimeShell";
+import { SeoBeacon } from "@/components/SeoBeacon";
 import { buildOgImageUrl } from "@/lib/og-image";
 
 const inter = Inter({
@@ -113,6 +114,7 @@ export default function RootLayout({
         </a>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
+        <SeoBeacon />
         <RuntimeShell footer={<DirectoryFooter />}>
           {children}
         </RuntimeShell>
