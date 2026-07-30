@@ -148,5 +148,173 @@
    "q": "What is the best time of year to paint a house exterior?",
    "a": "Autumn and spring: mild temperatures, lower humidity and no overnight dew sitting on fresh film. Avoid painting in direct summer sun (paint skins too fast and shows lap marks) and winter mornings where surfaces stay damp past 10am."
   }
+ ],
+ "carpet-laying": [
+  {
+   "q": "How much should a carpet cost?",
+   "a": "Carpet supplied and laid with underlay costs $40–$90 per square metre in Australia, so a 12m² bedroom runs $500–$1,100 and a full three-bedroom home lands around $5,000–$10,000. Budget carpet alone retails from about $7 per square metre before underlay and fitting labour are added."
+  },
+  {
+   "q": "Is it cheaper to lay flooring or carpet?",
+   "a": "Carpet is usually cheaper upfront: budget carpet supplied and laid starts around $40 per square metre versus $60–$100 for laminate or hybrid flooring. Hard flooring costs more initially but lasts longer and skips the replacement carpet needs every 8–10 years in high traffic areas, so it depends on your time frame."
+  },
+  {
+   "q": "What is the cheapest carpet you can buy?",
+   "a": "Budget polypropylene loop-pile carpet is the cheapest option, retailing from about $7–$13 per square metre before underlay and installation. It holds up fine in bedrooms and low traffic areas but wears faster than nylon or wool blends. Underlay and fitting typically double the total cost per square metre."
+  }
+ ],
+ "cornice-installation": [
+  {
+   "q": "What is the purpose of a cornice?",
+   "a": "Cornice covers and seals the join between wall and ceiling, hiding gaps and shrinkage cracks for a finished look. Cove cornice (90mm) costs about $14–$24 per 4.8m length in Australia, plus adhesive. Installed cost including labour runs $8–$15 per linear metre for a standard cove profile."
+  },
+  {
+   "q": "What is the difference between a cornice and a coving?",
+   "a": "In Australia the terms are used interchangeably for the moulded strip covering the wall-ceiling join. Coving usually means that curved shape specifically, while cornice can also cover square-set, bullnose or decorative profiles. Decorative styles cost more than the standard $14–$24 per 4.8m cove length."
+  },
+  {
+   "q": "What is the difference between a cornice and an architrave?",
+   "a": "Cornice sits at the wall-ceiling join, while architrave frames doors and windows where the wall meets the timber. Both are finishing trims but cover different junctions. Cove cornice costs roughly $14–$24 per 4.8m length, with architrave priced separately by the metre depending on profile and timber species."
+  }
+ ],
+ "merbau-decking-installation": [
+  {
+   "q": "Is Merbau a good wood?",
+   "a": "Yes, merbau is a popular hardwood decking choice in Australia: naturally durable, termite resistant and needs no chemical treatment. Boards retail from about $8–$15 per linear metre. It does leach red tannins in the first few rains, which wash onto surrounding paving, so hose the deck down after installation."
+  },
+  {
+   "q": "Is Merbau native to Australia?",
+   "a": "No, merbau is imported from Southeast Asia and the Pacific, mainly Indonesia, Papua New Guinea and Malaysia. It's sold widely through Australian timber yards and hardware stores from about $8–$15 per linear metre. Local alternatives with similar durability include spotted gum and ironbark, both grown and milled in Australia."
+  },
+  {
+   "q": "Why is Merbau so expensive?",
+   "a": "Merbau costs more than treated pine because it's a slow-growing imported hardwood with natural termite and rot resistance, needing no chemical treatment. Expect $8–$15 per linear metre for boards versus $4–$7 for treated pine decking. Supply has also tightened as sustainably certified merbau gets harder to source."
+  }
+ ],
+ "villaboard-installation": [
+  {
+   "q": "Is Villaboard the same as cement sheeting?",
+   "a": "Yes. Villaboard is James Hardie's branded fibre cement sheet, the same product category as generic cement sheeting or compressed sheet. A 6mm sheet retails for roughly $45–$70 in Australia. It's rated for wet areas like bathrooms and laundries, unlike standard plasterboard, which breaks down when it gets wet."
+  },
+  {
+   "q": "Do you screw or nail Villaboard?",
+   "a": "Screw it. Villaboard is fixed with corrosion resistant screws at 200mm centres on sheet edges and 300mm through the field, never nails, since nails back out over time and fibre cement is too dense for a clean nail fix. A 6mm sheet costs roughly $45–$70 before fixings and jointing compound."
+  },
+  {
+   "q": "Do I need to waterproof a Villaboard?",
+   "a": "Yes, in shower and bath areas. Villaboard is water resistant, not waterproof. AS 3740 requires a membrane over the sheet joints and penetrations in wet areas before tiling. Skipping the membrane on Villaboard alone is one of the most common causes of bathroom leaks in Australian renovations."
+  }
+ ],
+ "caesarstone-benchtop-installation": [
+  {
+   "q": "Is Caesarstone still legal in Australia?",
+   "a": "Engineered stone was banned from 1 July 2024 due to the silicosis risk from cutting it, but Caesarstone benchtops already installed remain completely legal and safe once in place. New engineered stone benchtops can no longer be manufactured, supplied or installed here, so kitchens now use porcelain, laminate or natural stone instead."
+  },
+  {
+   "q": "What is Caesarstone material?",
+   "a": "Caesarstone is an engineered quartz product, roughly 90 percent crushed quartz bound with polymer resin and pigment. It was popular for benchtops at $400–$900 per linear metre installed before Australia's 2024 ban on engineered stone. Porcelain benchtops are now the closest legal replacement at a similar price point."
+  },
+  {
+   "q": "Is Caesarstone better than marble?",
+   "a": "Caesarstone (engineered stone) was more stain and scratch resistant than natural marble and needed no sealing, but it's no longer available new in Australia after the 2024 engineered stone ban. Marble remains legal, costs $500–$1,500+ per linear metre installed, and needs periodic sealing to resist etching from acidic foods."
+  }
+ ],
+ "rangehood-installation": [
+  {
+   "q": "Which type of rangehood is best?",
+   "a": "Ducted rangehoods are best because they actually remove cooking odours and moisture, venting outside rather than recirculating air through a filter. A 600mm rangehood retails for $65–$135 in Australia. Recirculating models are cheaper to install but only filter grease, not steam or smell, from the kitchen air."
+  },
+  {
+   "q": "Does a rangehood need to be vented outside?",
+   "a": "Not legally, but it performs far better if it is. Ducted rangehoods vent steam, heat and cooking smells outside; recirculating models just filter grease through charcoal and return the air to the kitchen. Ducting adds installation cost but is worth it, especially in enclosed kitchens with poor cross ventilation."
+  },
+  {
+   "q": "Do you legally need a rangehood in Australia?",
+   "a": "There's no single blanket law, but Australian plumbing and building codes generally require mechanical ventilation above a cooktop, and a rangehood is the standard way to meet that. Councils and certifiers check for it at renovation approval. A 600mm rangehood costs $65–$135 supplied, before installation and ducting."
+  }
+ ],
+ "whirlybird-installation": [
+  {
+   "q": "Are whirlybirds really effective?",
+   "a": "Yes, in the right roof. A wind driven whirlybird extracts hot air from the roof cavity, noticeably dropping summer roof space temperatures and easing pressure on air conditioning. They cost $80–$220 supplied in Australia. They work best on larger roofs and do little without matching intake vents at the eaves."
+  },
+  {
+   "q": "How much does it cost to install a whirlybird?",
+   "a": "A whirlybird costs $80–$220 for the unit, plus $150–$350 in labour for a licensed roofer to cut in and flash it properly. Total installed cost typically lands at $250–$500 per unit in Australia, more on steep or multi-storey roofs needing extra access equipment."
+  },
+  {
+   "q": "What does the whirlybird do?",
+   "a": "A whirlybird is a wind driven turbine vent that spins with any breeze to pull hot, moist air out of the roof cavity. This lowers roof space temperature in summer and cuts condensation risk in winter. Units cost $80–$220 supplied, with most homes fitted with one per 50–90m² of roof."
+  }
+ ],
+ "colorbond-fencing-installation": [
+  {
+   "q": "How much does COLORBOND cost per metre?",
+   "a": "Colorbond fencing costs $70–$150 per linear metre supplied and installed in Australia, depending on fence height, ground conditions and how many gates or corners are needed. A standard 1.8m back yard fence sits toward the lower end, while colour matched capping and taller pool-compliant panels push the price up."
+  },
+  {
+   "q": "Is COLORBOND actually made in Australia?",
+   "a": "Yes. Colorbond steel is manufactured by BlueScope at Port Kembla, NSW, and has been used across Australian roofing and fencing for over 50 years. That local production is why it carries corrosion and colour warranties matched to Australian climate zones, from tropical Queensland to salty coastal exposure."
+  },
+  {
+   "q": "Is COLORBOND or aluminium better?",
+   "a": "Colorbond steel is stronger, cheaper and better for full privacy fencing at $70–$150 per linear metre installed. Aluminium slat fencing costs more, often $300–$700 per panel, but resists denting and never rusts, making it the better pick for coastal properties or a more open, architectural look."
+  }
+ ],
+ "concrete-slab-for-shed": [
+  {
+   "q": "How much will 20kg of concrete cover?",
+   "a": "A 20kg bag of premixed concrete ($9–$14 at retail) covers about 0.1 square metre at 100mm thickness, or roughly 10 litres of wet mix. For a shed slab you need batched truck concrete instead: a typical 3x3m base at 100mm thick needs about 0.9 cubic metres, equal to roughly 90 bags."
+  },
+  {
+   "q": "What is the 4 2 1 rule for concrete?",
+   "a": "It's the classic hand-mix ratio: four parts gravel, two parts sand, one part cement. That's fine for small footings but not a shed slab, since backyard mixing can't guarantee consistent strength across the pour. Shed slabs should use batched N20–N25 concrete ordered from a plant and reinforced with mesh."
+  },
+  {
+   "q": "Is concrete the same as cement?",
+   "a": "No. Cement is the powder binder, about $9–$15 per 20kg bag, that mixed with sand, gravel and water becomes concrete. A shed slab is concrete, not cement: for a typical 3x3m base you'd order around 0.9 cubic metres of batched concrete rather than hand-mixing individual bags."
+  }
+ ],
+ "travertine-paving": [
+  {
+   "q": "Is travertine very expensive?",
+   "a": "Travertine sits in the mid-to-premium bracket: pavers retail for about $50–$100 per square metre, with supply and lay installed cost around $100–$180 per square metre in Australia. It costs more than concrete or clay pavers but less than premium granite or marble paving."
+  },
+  {
+   "q": "What are the disadvantages of travertine?",
+   "a": "Travertine is porous and needs sealing every 1–2 years to resist staining, especially around pools with chlorine and sunscreen. It can also get slippery when honed smooth, so a tumbled or brushed finish is safer outdoors. Budget $100–$180 per square metre installed, plus ongoing sealing costs."
+  },
+  {
+   "q": "Is travertine out of style in 2026?",
+   "a": "No, travertine remains a popular natural stone choice for Australian pool surrounds and courtyards, prized for staying cooler underfoot than porcelain or concrete in direct sun. At $100–$180 per square metre installed it costs more than concrete pavers, but the natural variation and heat performance keep demand steady."
+  }
+ ],
+ "insulation-batts-installation": [
+  {
+   "q": "What is the best type of insulation?",
+   "a": "For most Australian homes, glasswool or polyester ceiling batts rated R4.0–R6.0 give the best value, costing $50–$100 per pack covering about 10–14 square metres, with no specialist tools needed. Reflective foil suits humid climates and underfloor spaces, while rigid foam boards cost more but rate higher per millimetre."
+  },
+  {
+   "q": "What is the best insulation for Australian walls?",
+   "a": "R2.5 polyester or glasswool batts are standard for external walls across most of Australia, balancing thermal performance with cost. Acoustic batts are worth the upgrade between bedrooms and living areas. Wall batts typically run $40–$80 per pack, and only work well if fitted without gaps or compression around wiring."
+  },
+  {
+   "q": "What are the rules for insulation in Australia?",
+   "a": "The National Construction Code sets minimum ceiling and wall R-values by climate zone, generally R3.5–R6.0 for ceilings and R1.4–R2.8 for walls. Ceiling batts cost $50–$100 per pack. Installers must also keep insulation clear of downlights and exhaust fans unless it's IC-rated, to avoid a fire risk."
+  }
+ ],
+ "turf-laying": [
+  {
+   "q": "Can I just lay turf over dirt?",
+   "a": "No, not directly. Turf needs 50–100mm of quality garden soil or turf underlay spread and levelled first, or the grass won't root properly and low spots will pond water. Sir Walter buffalo turf costs about $10–$15 per square metre supplied, so skipping soil prep to save money usually costs more in dead patches."
+  },
+  {
+   "q": "What time of year should I lay turf?",
+   "a": "Spring and autumn are best across most of Australia, when soil is warm and rainfall is more reliable for establishing new roots. Turf laid in the middle of summer needs daily watering to survive the heat, and winter growth is too slow to root before frost. Sir Walter runs $10–$15 per square metre."
+  },
+  {
+   "q": "How much does turf cost to lay in Australia?",
+   "a": "Turf costs $10–$25 per square metre supplied and laid in Australia, depending on grass variety and soil prep needed. Sir Walter buffalo sits around $10–$15 per square metre for turf alone, while synthetic turf runs higher upfront at $12–$23 per square metre but needs no water or mowing."
+  }
  ]
 }
