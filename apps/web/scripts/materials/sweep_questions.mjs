@@ -16,9 +16,15 @@ const sql = neon(envFile.match(/^DATABASE_URL="?([^"\n]+)"?/m)[1]);
 const limitArg = process.argv.indexOf("--limit");
 const limit = limitArg > -1 ? Number(process.argv[limitArg + 1]) : null;
 
+// Sweep every job that has no ANSWERED questions yet — including jobs whose
+// earlier sweep banked only junk (the answered set is the quality bar, and
+// ON CONFLICT dedupes re-swept questions).
 const jobs = await sql`
     SELECT DISTINCT jm.job_slug FROM job_materials jm
-    WHERE NOT EXISTS (SELECT 1 FROM job_questions q WHERE q.job_slug = jm.job_slug)
+    WHERE NOT EXISTS (
+        SELECT 1 FROM job_questions q
+        WHERE q.job_slug = jm.job_slug AND q.answer IS NOT NULL
+    )
     ORDER BY jm.job_slug
 `;
 const todo = limit ? jobs.slice(0, limit) : jobs;
@@ -28,7 +34,7 @@ const slugToWords = (s) => s.replace(/-/g, " ");
 
 let saved = 0;
 for (const [i, { job_slug }] of todo.entries()) {
-    const keyword = `${slugToWords(job_slug)} cost`;
+    const keyword = `${slugToWords(job_slug)} cost australia`;
     let items;
     try {
         const raw = execFileSync("dfs", ["serp", keyword, "--location-code", "2036", "--language-code", "en", "--json"],
@@ -41,8 +47,12 @@ for (const [i, { job_slug }] of todo.entries()) {
     // PAA sometimes answers the words, not the job ("what does artificial
     // mean?") — drop dictionary-style questions and ones with no job token.
     const GENERIC = /\b(meaning|synonym|definition|abbreviation|acronym)\b|what does .* mean|why is .* called/i;
+    // Homonym junk seen in earlier sweeps: car parts (downpipe/exhaust), TV
+    // and film titles (House/Power/Smoke/Split/Glass), language trivia.
+    const OFFTOPIC = /\b(car|vehicle|exhaust|turbo|movie|film|netflix|season|episode|series|lyrics|song|album|actor|cast)\b|in french|in spanish|american english/i;
     const jobTokens = slugToWords(job_slug).split(" ").filter((w) => w.length > 3);
-    const relevant = (q) => !GENERIC.test(q) && (jobTokens.some((t) => q.toLowerCase().includes(t)) || /cost|price|how much/i.test(q));
+    const relevant = (q) => !GENERIC.test(q) && !OFFTOPIC.test(q)
+        && (jobTokens.some((t) => q.toLowerCase().includes(t)) || /cost|price|how much/i.test(q));
     const questions = [];
     for (const it of items) {
         if (it.type === "people_also_ask") {
