@@ -17,6 +17,9 @@ if (typeof window !== "undefined" && !isAnonymousSeoPath(window.location.pathnam
       debug: false,
       ...(beaconId ? { bootstrap: { distinctID: beaconId, isIdentifiedID: false } } : {}),
     });
+    // capture_pageview is off, so without this the app paths log no views at
+    // all and the SEO -> register funnel has no middle step.
+    posthog.capture("$pageview");
   });
 }
 
