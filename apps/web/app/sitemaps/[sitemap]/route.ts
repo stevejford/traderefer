@@ -97,6 +97,7 @@ async function generalSitemap() {
         url(`${BASE_URL}/categories`, today, "weekly", "0.95"),
         url(`${BASE_URL}/locations`, today, "weekly", "0.95"),
         url(`${BASE_URL}/local`, today, "weekly", "0.9"),
+        url(`${BASE_URL}/costs`, today, "weekly", "0.9"),
         url(`${BASE_URL}/about`, today, "monthly", "0.5"),
         url(`${BASE_URL}/contact`, today, "monthly", "0.5"),
         url(`${BASE_URL}/terms`, today, "monthly", "0.3"),

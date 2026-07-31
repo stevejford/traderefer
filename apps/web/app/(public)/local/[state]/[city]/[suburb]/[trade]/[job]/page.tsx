@@ -500,6 +500,11 @@ export default async function JobTypePage({ params }: PageProps) {
                                     </Link>
                                 ))}
                             </div>
+                            <p className="mt-5 text-base">
+                                <Link href="/costs" className="font-bold text-orange-600 hover:text-orange-700 transition-colors">
+                                    See what every trade job costs in Australia →
+                                </Link>
+                            </p>
                         </section>
                     )}
 

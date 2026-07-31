@@ -126,6 +126,11 @@ export async function DirectoryFooter() {
                                     View All Categories →
                                 </Link>
                             </li>
+                            <li>
+                                <Link href="/costs" prefetch={false} className="text-orange-500 hover:text-orange-400 font-bold uppercase tracking-widest transition-colors" style={{ fontSize: '18px' }}>
+                                    Job Cost Guide →
+                                </Link>
+                            </li>
                         </ul>
                     </div>
 

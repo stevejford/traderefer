@@ -108,6 +108,7 @@ async function googleCoreEntries(): Promise<UrlEntry[]> {
         entry(`${BASE_URL}/categories`, null, "weekly", "0.95"),
         entry(`${BASE_URL}/locations`, null, "weekly", "0.95"),
         entry(`${BASE_URL}/local`, null, "weekly", "0.9"),
+        entry(`${BASE_URL}/costs`, null, "weekly", "0.9"),
         entry(`${BASE_URL}/find-a-plumber-near-me`, null, "weekly", "0.95"),
         entry(`${BASE_URL}/find-an-electrician-near-me`, null, "weekly", "0.95"),
         entry(`${BASE_URL}/about`, null, "monthly", "0.5"),
