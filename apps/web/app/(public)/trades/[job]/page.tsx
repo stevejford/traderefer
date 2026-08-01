@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { JOB_TYPES, TRADE_COST_GUIDE, TRADE_FAQ_BANK, STATE_LICENSING, jobToSlug } from "@/lib/constants";
+import { jobCostGuide } from "@/lib/job-costs";
 import { sql } from "@/lib/db";
 import { buildOgImageUrl } from "@/lib/og-image";
 
@@ -42,9 +43,12 @@ function findJobNameForSlug(jobSlug: string): string | null {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { job } = await params;
     const hubTrade = findJobNameForSlug(job) ? null : findTradeBySlug(job);
-    const jobName = findJobNameForSlug(job) || (hubTrade ? `${hubTrade} work` : formatSlug(job));
+    // JOB_TYPES stores lowercase job names; these read as sentence subjects
+    // and titles here, so title-case them.
+    const rawJobName = findJobNameForSlug(job);
+    const jobName = rawJobName ? formatSlug(jobToSlug(rawJobName)) : (hubTrade ? `${hubTrade} Work` : formatSlug(job));
     const tradeName = findTradeForJob(job) ?? hubTrade;
-    const cost = tradeName ? TRADE_COST_GUIDE[tradeName] : undefined;
+    const cost = jobCostGuide(job, tradeName ? TRADE_COST_GUIDE[tradeName] : undefined);
     const ogImageUrl = buildOgImageUrl({
         template: "trade-guide",
         title: `${jobName} cost guide`,
@@ -132,7 +136,8 @@ export default async function TradeHubPage({ params }: PageProps) {
     // that trade's jobs; they used to 500 on the trade lookups below.
     const hubTrade = findJobNameForSlug(job) ? null : findTradeBySlug(job);
     const isTradeHub = hubTrade !== null;
-    const jobName = findJobNameForSlug(job) || (hubTrade ? `${hubTrade} work` : formatSlug(job));
+    const rawJobName = findJobNameForSlug(job);
+    const jobName = rawJobName ? formatSlug(jobToSlug(rawJobName)) : (hubTrade ? `${hubTrade} Work` : formatSlug(job));
     const tradeName = findTradeForJob(job) ?? hubTrade;
     // Safe stand-in for the copy below when a slug resolves to no trade at all.
     const tradeLabel = tradeName ?? jobName;
@@ -141,7 +146,9 @@ export default async function TradeHubPage({ params }: PageProps) {
 
     const year = new Date().getFullYear();
     const tradeKey = tradeName ?? jobName;
-    const cost = TRADE_COST_GUIDE[tradeKey] ?? null;
+    // Job-level override first: the trade guides are too coarse for many jobs
+    // and would contradict the page's own cost answer.
+    const cost = jobCostGuide(job, TRADE_COST_GUIDE[tradeKey]) ?? null;
     const faqs = TRADE_FAQ_BANK[tradeKey] || [];
     // Trade hubs list the whole trade (that is the point of the hub); job
     // pages keep the tighter related-jobs strip.
