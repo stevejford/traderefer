@@ -161,6 +161,11 @@ export default async function CostsHubPage() {
                         <h2 className="font-black text-[#1A1A1A] font-display mb-1" style={{ fontSize: "28px" }}>
                             {s.trade} costs
                         </h2>
+                        <p className="mb-2">
+                            <Link href={`/trades/${s.tradeSlug}`} className="font-bold text-orange-600 hover:text-orange-700 transition-colors text-base">
+                                All {s.trade.toLowerCase()} guides and local specialists →
+                            </Link>
+                        </p>
                         {s.guide && (
                             <p className="text-zinc-500 mb-5 text-base">
                                 Typical {s.trade.toLowerCase()} rates: ${s.guide.low.toLocaleString()}–${s.guide.high.toLocaleString()}{s.guide.unit}

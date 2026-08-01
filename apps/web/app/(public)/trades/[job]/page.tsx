@@ -24,6 +24,13 @@ function findTradeForJob(jobSlug: string): string | null {
     return null;
 }
 
+// /trades/{trade} (e.g. /trades/security-systems) is a trade-level hub, not a
+// job. Resolving it here keeps those URLs alive: they used to 500 because the
+// job lookup returned null and the render then dereferenced it.
+function findTradeBySlug(slug: string): string | null {
+    return Object.keys(JOB_TYPES).find(t => jobToSlug(t) === slug) ?? null;
+}
+
 function findJobNameForSlug(jobSlug: string): string | null {
     for (const jobs of Object.values(JOB_TYPES)) {
         const match = jobs.find(j => jobToSlug(j) === jobSlug);
@@ -34,8 +41,9 @@ function findJobNameForSlug(jobSlug: string): string | null {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { job } = await params;
-    const jobName = findJobNameForSlug(job) || formatSlug(job);
-    const tradeName = findTradeForJob(job);
+    const hubTrade = findJobNameForSlug(job) ? null : findTradeBySlug(job);
+    const jobName = findJobNameForSlug(job) || (hubTrade ? `${hubTrade} work` : formatSlug(job));
+    const tradeName = findTradeForJob(job) ?? hubTrade;
     const cost = tradeName ? TRADE_COST_GUIDE[tradeName] : undefined;
     const ogImageUrl = buildOgImageUrl({
         template: "trade-guide",
@@ -119,8 +127,15 @@ const STATE_SLUGS: Record<string, string> = {
 
 export default async function TradeHubPage({ params }: PageProps) {
     const { job } = await params;
-    const jobName = findJobNameForSlug(job) || formatSlug(job);
-    const tradeName = findTradeForJob(job);
+    // A slug can be a job ("cctv-installation") or a whole trade
+    // ("security-systems"). Trade slugs render the same guide as a hub over
+    // that trade's jobs; they used to 500 on the trade lookups below.
+    const hubTrade = findJobNameForSlug(job) ? null : findTradeBySlug(job);
+    const isTradeHub = hubTrade !== null;
+    const jobName = findJobNameForSlug(job) || (hubTrade ? `${hubTrade} work` : formatSlug(job));
+    const tradeName = findTradeForJob(job) ?? hubTrade;
+    // Safe stand-in for the copy below when a slug resolves to no trade at all.
+    const tradeLabel = tradeName ?? jobName;
 
     // Unknown job types: show generic page rather than 404
 
@@ -128,7 +143,11 @@ export default async function TradeHubPage({ params }: PageProps) {
     const tradeKey = tradeName ?? jobName;
     const cost = TRADE_COST_GUIDE[tradeKey] ?? null;
     const faqs = TRADE_FAQ_BANK[tradeKey] || [];
-    const relatedJobs = tradeName ? (JOB_TYPES[tradeName] || []).filter(j => jobToSlug(j) !== job).slice(0, 8) : [];
+    // Trade hubs list the whole trade (that is the point of the hub); job
+    // pages keep the tighter related-jobs strip.
+    const relatedJobs = tradeName
+        ? (JOB_TYPES[tradeName] || []).filter(j => jobToSlug(j) !== job).slice(0, isTradeHub ? 100 : 8)
+        : [];
 
     const [countsByState, topCities] = await Promise.all([
         getBusinessCountByState(tradeName ?? jobName),
@@ -210,14 +229,14 @@ export default async function TradeHubPage({ params }: PageProps) {
                         </h1>
                         <p className="text-zinc-300 mb-6" style={{ fontSize: '20px', lineHeight: 1.7 }}>
                             {jobName} costs vary significantly across Australia depending on your state, the complexity of the work, and local market conditions.
-                            {cost && ` Typical ${tradeName!.toLowerCase()} rates range from $${cost.low}–$${cost.high}${cost.unit} nationally.`}
+                            {cost && ` Typical ${tradeLabel.toLowerCase()} rates range from $${cost.low}–$${cost.high}${cost.unit} nationally.`}
                             {" "}Use this guide to understand what to expect, how to compare quotes, and find local specialists near you.
                         </p>
                         {totalBusinesses > 0 && (
                             <div className="flex flex-wrap gap-6 text-white font-bold" style={{ fontSize: '16px' }}>
                                 <span className="flex items-center gap-1.5">
                                     <Users className="w-4 h-4 text-[#FF6600]" />
-                                    {totalBusinesses.toLocaleString()} {tradeName!.toLowerCase()} across Australia
+                                    {totalBusinesses.toLocaleString()} {tradeLabel.toLowerCase()} across Australia
                                 </span>
                                 <span className="flex items-center gap-1.5">
                                     <MapPin className="w-4 h-4 text-[#FF6600]" />
@@ -240,7 +259,7 @@ export default async function TradeHubPage({ params }: PageProps) {
                                 {jobName} Cost Guide Australia {year}
                             </h2>
                             <p className="text-zinc-600 mb-8" style={{ fontSize: '16px', lineHeight: 1.6 }}>
-                                The following pricing is based on national industry averages. Costs may be 10–20% higher in capital cities (Sydney, Melbourne) and lower in regional areas. Always get 2–3 written quotes before committing to any {tradeName!.toLowerCase()} work.
+                                The following pricing is based on national industry averages. Costs may be 10–20% higher in capital cities (Sydney, Melbourne) and lower in regional areas. Always get 2–3 written quotes before committing to any {tradeLabel.toLowerCase()} work.
                             </p>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                                 <div className="bg-zinc-50 rounded-2xl p-5 border border-zinc-100">
@@ -286,7 +305,7 @@ export default async function TradeHubPage({ params }: PageProps) {
                                 <MapPin className="w-6 h-6 text-[#FF6600]" />
                                 Find {jobName} Specialists Near You
                             </h2>
-                            <p className="text-zinc-600 mb-6" style={{ fontSize: '16px' }}>Browse {tradeName!.toLowerCase()} profiles by city across Australia:</p>
+                            <p className="text-zinc-600 mb-6" style={{ fontSize: '16px' }}>Browse {tradeLabel.toLowerCase()} profiles by city across Australia:</p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 {topCities.map(({ city, state, count }) => {
                                     const stateSlug = STATE_SLUGS[state?.toUpperCase()] || state?.toLowerCase();
@@ -310,7 +329,7 @@ export default async function TradeHubPage({ params }: PageProps) {
                     )}
 
                     {/* State Licensing */}
-                    {STATE_LICENSING[tradeName!] && (
+                    {STATE_LICENSING[tradeLabel] && (
                         <section className="bg-white rounded-3xl border border-zinc-200 p-8">
                             <h2 className="font-black text-[#1A1A1A] mb-2 flex items-center gap-2 font-display" style={{ fontSize: '32px' }}>
                                 <FileText className="w-6 h-6 text-blue-500" />
@@ -318,7 +337,7 @@ export default async function TradeHubPage({ params }: PageProps) {
                             </h2>
                             <p className="text-zinc-600 mb-6" style={{ fontSize: '16px' }}>Licensing requirements vary by state. Always verify your contractor holds the correct licence for your location.</p>
                             <div className="space-y-3">
-                                {Object.entries(STATE_LICENSING[tradeName!]).map(([stateCode, text]) => (
+                                {Object.entries(STATE_LICENSING[tradeLabel]).map(([stateCode, text]) => (
                                     <div key={stateCode} className="bg-blue-50 border border-blue-100 rounded-2xl p-5">
                                         <p className="font-black text-blue-600 uppercase tracking-wider mb-2" style={{ fontSize: '16px' }}>
                                             {STATE_NAMES[stateCode] || stateCode}
@@ -337,7 +356,7 @@ export default async function TradeHubPage({ params }: PageProps) {
                                 <Wrench className="w-5 h-5 text-[#FF6600]" />
                                 Related {tradeName} Services
                             </h2>
-                            <p className="text-zinc-600 mb-6" style={{ fontSize: '16px' }}>Also looking for other {tradeName!.toLowerCase()} services in Australia?</p>
+                            <p className="text-zinc-600 mb-6" style={{ fontSize: '16px' }}>Also looking for other {tradeLabel.toLowerCase()} services in Australia?</p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 {relatedJobs.map((j) => (
                                     <Link
@@ -374,7 +393,7 @@ export default async function TradeHubPage({ params }: PageProps) {
                     <section className="bg-[#1A1A1A] rounded-3xl p-8 md:p-12 text-center text-white">
                         <h2 className="font-black mb-4 text-white" style={{ fontSize: '40px' }}>Find a {tradeName} Near You</h2>
                         <p className="text-zinc-400 mb-8 max-w-xl mx-auto" style={{ fontSize: '20px', lineHeight: 1.7 }}>
-                            TradeRefer lists {tradeName!.toLowerCase()} across Australia with ABN, profile, public review, and referral signals where available.
+                            TradeRefer lists {tradeLabel.toLowerCase()} across Australia with ABN, profile, public review, and referral signals where available.
                         </p>
                         <Link
                             href="/local"
