@@ -13,9 +13,14 @@ interface PageProps {
     params: Promise<{ job: string }>;
 }
 
+// Acronyms that appear in job names and must not title-case to "Cctv".
+const ACRONYMS = new Set(["cctv", "nbn", "tv", "ev", "led"]);
+
 function formatSlug(slug: string) {
     if (!slug) return "";
-    return slug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    return slug.split("-")
+        .map(w => (ACRONYMS.has(w.toLowerCase()) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1)))
+        .join(" ");
 }
 
 function findTradeForJob(jobSlug: string): string | null {
